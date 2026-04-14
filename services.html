@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Þjónusta og verðskrá — Hrein Gæði. Fyrirtækjaþrif, heimilisþrif, AirBnB þrif og húsfélög.">
+<title>Þjónusta – Hrein Gæði</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--off-white:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--accent-hover:#1e429f;--green:#057a55;--green-light:#ecfdf5;--radius:12px;--radius-lg:20px;--shadow:0 4px 32px rgba(17,24,39,0.08);--shadow-lg:0 16px 64px rgba(17,24,39,0.14);--transition:0.35s cubic-bezier(0.4,0,0.2,1);--header-h:72px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body.lang-is .en{display:none;}
+body.lang-en .is{display:none;}
+
+/* HEADER */
+header{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--header-h);display:flex;align-items:center;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(17,24,39,0.08);}
+.header-inner{width:100%;max-width:1280px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+.logo-icon{width:40px;height:40px;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--navy);letter-spacing:0.01em;}
+nav{display:flex;align-items:center;gap:2.5rem;}
+nav a{font-size:14px;font-weight:400;color:var(--slate);text-decoration:none;letter-spacing:0.03em;transition:color var(--transition);}
+nav a:hover{color:var(--navy);}
+nav a.active{color:var(--navy);font-weight:500;}
+.header-right{display:flex;align-items:center;gap:1rem;}
+.lang-toggle{display:flex;align-items:center;background:var(--light);border-radius:50px;padding:3px;gap:2px;}
+.lang-btn{background:none;border:none;padding:4px 11px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;color:var(--steel);cursor:pointer;transition:var(--transition);}
+.lang-btn.active{background:var(--white);color:var(--navy);font-weight:500;}
+.btn-book-nav{background:var(--accent);color:#fff;border:none;padding:10px 22px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.03em;transition:var(--transition);text-decoration:none;display:inline-flex;align-items:center;}
+.btn-book-nav:hover{background:var(--accent-hover);transform:translateY(-1px);}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-direction:column;gap:5px;}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--navy);border-radius:2px;transition:var(--transition);}
+.mobile-menu{display:none;position:fixed;top:var(--header-h);left:0;right:0;background:var(--white);border-bottom:1px solid var(--mist);padding:1.5rem 2rem;flex-direction:column;gap:1.25rem;z-index:199;box-shadow:var(--shadow);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:15px;color:var(--slate);text-decoration:none;padding:0.25rem 0;}
+
+/* PAGE HERO */
+.page-hero{padding:calc(var(--header-h) + 4rem) 2rem 4rem;background:var(--off-white);text-align:center;}
+.page-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:300;color:var(--navy);line-height:1.15;margin-bottom:1rem;}
+.page-hero-title em{font-style:italic;}
+.page-hero-sub{font-size:16px;color:var(--slate);line-height:1.8;max-width:560px;margin:0 auto;font-weight:300;}
+
+/* SECTIONS */
+section{padding:5rem 2rem;}
+.section-inner{max-width:1280px;margin:0 auto;}
+.section-header{text-align:center;margin-bottom:4rem;}
+.section-eyebrow{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;font-weight:500;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,52px);font-weight:300;color:var(--navy);line-height:1.2;}
+.section-title em{font-style:italic;}
+
+/* SERVICE DETAIL CARDS */
+.svc-detail{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;padding:4rem 0;border-bottom:1px solid var(--mist);}
+.svc-detail:last-of-type{border-bottom:none;}
+.svc-detail.reverse{direction:rtl;}
+.svc-detail.reverse>*{direction:ltr;}
+.svc-detail-img{border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/3;}
+.svc-detail-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;}
+.svc-detail-img:hover img{transform:scale(1.04);}
+.svc-detail-body{}
+.svc-detail-icon{font-size:32px;margin-bottom:0.75rem;}
+.svc-detail-name{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3vw,38px);font-weight:300;color:var(--navy);margin-bottom:0.75rem;}
+.svc-detail-desc{font-size:15px;color:var(--slate);line-height:1.8;font-weight:300;margin-bottom:1.5rem;}
+.svc-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:2rem;}
+.svc-features li{font-size:14px;color:var(--slate);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.feat-chk{width:16px;height:16px;background:var(--green-light);border-radius:4px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
+.feat-chk svg{width:10px;height:10px;fill:none;stroke:var(--green);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.svc-price-tag{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--navy);margin-bottom:1rem;}
+.svc-price-tag small{font-family:'Outfit',sans-serif;font-size:13px;color:var(--steel);font-weight:300;}
+.btn-svc{display:inline-block;background:var(--navy);color:#fff;border:none;padding:12px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition);text-decoration:none;}
+.btn-svc:hover{background:var(--accent);}
+.btn-svc-outline{display:inline-block;background:none;color:var(--navy);border:1.5px solid var(--mist);padding:12px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:400;cursor:pointer;transition:var(--transition);text-decoration:none;margin-left:0.5rem;}
+.btn-svc-outline:hover{border-color:var(--navy);}
+
+/* PRICING */
+#pricing{background:var(--off-white);}
+.pricing-note{text-align:center;font-size:14px;color:var(--steel);margin-bottom:2.5rem;font-style:italic;}
+.pricing-table-wrap{overflow-x:auto;}
+.pricing-table{width:100%;border-collapse:collapse;font-size:14px;}
+.pricing-table th{background:var(--navy);color:#fff;padding:14px 20px;text-align:left;font-weight:500;font-size:13px;letter-spacing:0.03em;}
+.pricing-table th:first-child{border-radius:12px 0 0 0;}
+.pricing-table th:last-child{border-radius:0 12px 0 0;}
+.pricing-table td{padding:13px 20px;border-bottom:1px solid var(--light);color:var(--slate);}
+.pricing-table tr:last-child td{border-bottom:none;}
+.pricing-table tr:hover td{background:var(--white);}
+.pricing-table td:first-child{font-weight:500;color:var(--navy);}
+.pricing-table td.price{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--navy);}
+.extras-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--navy);margin:3rem 0 1.5rem;text-align:center;}
+.extras-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.extra-item{background:var(--white);border:1px solid var(--mist);border-radius:var(--radius);padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:center;}
+.extra-name{font-size:13px;color:var(--navy);}
+.extra-price{font-size:14px;font-weight:500;color:var(--accent);background:var(--accent-light);padding:3px 10px;border-radius:50px;}
+.surcharge-note{background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius);padding:1rem 1.25rem;margin-top:1.5rem;font-size:13px;color:var(--accent-hover);display:flex;align-items:flex-start;gap:10px;}
+.surcharge-note svg{width:16px;height:16px;stroke:var(--accent);flex-shrink:0;margin-top:1px;}
+
+/* COMPANY QUOTE */
+#company-quote{background:var(--navy);}
+.company-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.company-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3.5vw,42px);font-weight:300;color:#fff;line-height:1.2;margin-bottom:1.25rem;}
+.company-title em{font-style:italic;color:rgba(255,255,255,0.65);}
+.company-body{font-size:15px;color:rgba(255,255,255,0.6);line-height:1.8;font-weight:300;margin-bottom:2rem;}
+.company-features{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.company-features li{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,0.7);}
+.company-features li::before{content:'';width:6px;height:6px;background:#34d399;border-radius:50%;flex-shrink:0;}
+.company-form{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-lg);padding:2.5rem;backdrop-filter:blur(10px);}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:#fff;margin-bottom:1.5rem;}
+.form-group{margin-bottom:1.1rem;}
+.form-label{font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:5px;display:block;letter-spacing:0.03em;}
+.form-input{width:100%;padding:11px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#fff;transition:var(--transition);}
+.form-input::placeholder{color:rgba(255,255,255,0.3);}
+.form-input:focus{outline:none;border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);}
+.form-input option{background:var(--navy);color:#fff;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#fff;resize:none;height:80px;transition:var(--transition);}
+.form-textarea::placeholder{color:rgba(255,255,255,0.3);}
+.form-textarea:focus{outline:none;border-color:rgba(255,255,255,0.3);}
+.btn-submit{width:100%;background:var(--accent);color:#fff;border:none;padding:13px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition);margin-top:0.5rem;}
+.btn-submit:hover{background:var(--accent-hover);}
+.form-success{display:none;text-align:center;padding:2rem 0;}
+.form-success svg{width:48px;height:48px;fill:none;stroke:#34d399;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 1rem;display:block;}
+.form-success h4{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:#fff;margin-bottom:0.5rem;}
+.form-success p{font-size:14px;color:rgba(255,255,255,0.6);}
+
+/* FOOTER */
+footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
+.footer-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+.footer-brand .logo-text{color:#fff;}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-top:1rem;max-width:280px;}
+.footer-col-title{font-size:13px;font-weight:500;color:#fff;margin-bottom:1.25rem;letter-spacing:0.03em;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:0.75rem;}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.45);text-decoration:none;transition:color var(--transition);}
+.footer-links a:hover{color:#fff;}
+.footer-bottom{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:1.75rem;font-size:12px;flex-wrap:wrap;gap:1rem;}
+.footer-social{display:flex;gap:1rem;}
+.social-link{width:34px;height:34px;background:rgba(255,255,255,0.07);border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:var(--transition);}
+.social-link:hover{background:rgba(255,255,255,0.15);}
+.social-link svg{width:15px;height:15px;fill:none;stroke:rgba(255,255,255,0.6);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ANIMATIONS */
+.fade-in{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+.fade-in-delay-1{transition-delay:0.1s;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .svc-detail,.svc-detail.reverse{grid-template-columns:1fr;direction:ltr;}
+  .svc-detail.reverse>*{direction:ltr;}
+  .company-inner{grid-template-columns:1fr;}
+  .footer-inner{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  nav{display:none;}.hamburger{display:flex;}
+  .btn-book-nav{display:none;}
+  section{padding:4rem 1.25rem;}
+  .form-row{grid-template-columns:1fr;}
+  .extras-grid{grid-template-columns:1fr 1fr;}
+  .footer-inner{grid-template-columns:1fr;}
+}
+@media(max-width:480px){.extras-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body class="lang-is">
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <span class="logo-text">Hrein Gæði</span>
+    </a>
+    <nav>
+      <a href="services.html" class="active"><span class="is">Þjónusta</span><span class="en">Services</span></a>
+      <a href="services.html#pricing"><span class="is">Verðskrá</span><span class="en">Pricing</span></a>
+      <a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a>
+      <a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('is')">IS</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="booking.html" class="btn-book-nav"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Valmynd"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="services.html"><span class="is">Þjónusta</span><span class="en">Services</span></a>
+  <a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a>
+  <a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a>
+  <a href="booking.html" style="background:var(--accent);color:#fff;padding:12px 20px;border-radius:50px;text-align:center;font-weight:500;"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
+</div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <h1 class="page-hero-title"><span class="is">Okkar <em>þjónusta</em></span><span class="en">Our <em>services</em></span></h1>
+  <p class="page-hero-sub is">Við bjóðum upp á faglega hreingerningarþjónustu fyrir fyrirtæki, heimili, AirBnB gestgjafa og húsfélög.</p>
+  <p class="page-hero-sub en">We offer professional cleaning services for businesses, homes, AirBnB hosts and housing associations.</p>
+</div>
+
+<!-- SERVICES -->
+<section>
+  <div class="section-inner">
+
+    <!-- Fyrirtækjaþrif -->
+    <div class="svc-detail fade-in" id="fyrirtaeki">
+      <div class="svc-detail-img"><img src="img-fyrirtaeki.jpg" alt="Fyrirtækjaþrif" loading="lazy"/></div>
+      <div class="svc-detail-body">
+        <div class="svc-detail-icon">🏢</div>
+        <h2 class="svc-detail-name is">Fyrirtækjaþrif</h2>
+        <h2 class="svc-detail-name en">Commercial cleaning</h2>
+        <p class="svc-detail-desc is">Hreinlæti á vinnustað skiptir máli. Það hefur áhrif á ásýnd fyrirtækisins, líðan starfsfólks og fyrstu upplifun gesta. Hjá Hrein Gæði bjóðum við upp á faglega hreingerningarþjónustu fyrir skrifstofur, verslanir og annað atvinnuhúsnæði.</p>
+        <p class="svc-detail-desc en">Workplace cleanliness matters. It affects your company's image, staff wellbeing and the first impression of visitors. At Hrein Gæði we offer professional cleaning for offices, shops and other commercial properties.</p>
+        <ul class="svc-features">
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Reglulegar ræstingar eftir þínum þörfum</span><span class="en">Regular cleaning on your schedule</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Sérsniðið tilboð eftir stærð og tíðni</span><span class="en">Custom quote based on size and frequency</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Faglegt starfsfólk með þagnarskyldu</span><span class="en">Professional staff with confidentiality</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Umhverfisvænar þrifavörur</span><span class="en">Eco-friendly cleaning products</span></li>
+        </ul>
+        <div class="svc-price-tag is">Sérsniðið <small>tilboð</small></div>
+        <div class="svc-price-tag en">Custom <small>quote</small></div>
+        <a href="#company-quote" class="btn-svc is">Sækja um tilboð</a>
+        <a href="#company-quote" class="btn-svc en">Get a quote</a>
+      </div>
+    </div>
+
+    <!-- Heimilisþrif -->
+    <div class="svc-detail reverse fade-in" id="heimili">
+      <div class="svc-detail-img"><img src="img-heimili.jpg" alt="Heimilisþrif" loading="lazy"/></div>
+      <div class="svc-detail-body">
+        <div class="svc-detail-icon">🏠</div>
+        <h2 class="svc-detail-name is">Heimilisþrif</h2>
+        <h2 class="svc-detail-name en">Home cleaning</h2>
+        <p class="svc-detail-desc is">Almenn viðhaldsþrif á 240 kr per fermetri. Bókaðu beint á netinu og veldu dag og tíma sem hentar þér. Við komum og skilum þér hreinu og þægilegu rými.</p>
+        <p class="svc-detail-desc en">Standard maintenance cleaning at 240 kr per square metre. Book directly online and choose a day and time that suits you. We'll arrive and hand you back a clean, comfortable space.</p>
+        <ul class="svc-features">
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Ryksugað og skúrað gólf og teppi</span><span class="en">Vacuum and mop all floors and carpets</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Klósett, vaskar og speglar þrifin</span><span class="en">Toilet, sinks and mirrors cleaned</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Þurrkað af öllum yfirborðsflötum</span><span class="en">All surfaces wiped down</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Rusl tekið út</span><span class="en">Rubbish removed</span></li>
+        </ul>
+        <div class="svc-price-tag">240 kr<small>/m²</small></div>
+        <a href="booking.html" class="btn-svc is">Bóka núna</a>
+        <a href="booking.html" class="btn-svc en">Book now</a>
+      </div>
+    </div>
+
+    <!-- AirBnB -->
+    <div class="svc-detail fade-in" id="airbnb">
+      <div class="svc-detail-img"><img src="img-airbnb.jpg" alt="AirBnB þrif" loading="lazy"/></div>
+      <div class="svc-detail-body">
+        <div class="svc-detail-icon">🛎️</div>
+        <h2 class="svc-detail-name">AirBnB þrif</h2>
+        <p class="svc-detail-desc is">Snögg og áreiðanleg þjónusta milli gesta. Við þrífum, búum um rúm, skipum handklæðum og tryggjum að rýmið sé fullbúið fyrir næsta gest.</p>
+        <p class="svc-detail-desc en">Fast and reliable turnover between guests. We clean, make beds, arrange towels and make sure the space is ready for the next guest.</p>
+        <ul class="svc-features">
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Hraðvirk þjónusta milli gesta</span><span class="en">Quick turnaround between guests</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Rúm búið um og handklæði skipað</span><span class="en">Beds made and towels arranged</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Fullkláruð þrif á skömmum tíma</span><span class="en">Complete clean in minimal time</span></li>
+        </ul>
+        <div class="svc-price-tag is">Sérsniðið <small>tilboð</small></div>
+        <div class="svc-price-tag en">Custom <small>quote</small></div>
+        <a href="booking.html?type=airbnb" class="btn-svc is">Bóka núna</a>
+        <a href="booking.html?type=airbnb" class="btn-svc en">Book now</a>
+        <a href="contact.html" class="btn-svc-outline is">Hafa samband</a>
+        <a href="contact.html" class="btn-svc-outline en">Contact us</a>
+      </div>
+    </div>
+
+    <!-- Húsfélög -->
+    <div class="svc-detail reverse fade-in" id="husfelag">
+      <div class="svc-detail-img"><img src="img-husfelag.jpg" alt="Húsfélög" loading="lazy"/></div>
+      <div class="svc-detail-body">
+        <div class="svc-detail-icon">🏗️</div>
+        <h2 class="svc-detail-name is">Húsfélög</h2>
+        <h2 class="svc-detail-name en">Housing associations</h2>
+        <p class="svc-detail-desc is">Stigagangar og sameignir í góðu ástandi. Reglulegar ræstingar eftir samningi á sanngjörnu verði. Hafðu samband og við setjum saman tilboð.</p>
+        <p class="svc-detail-desc en">Stairwells and common areas well maintained. Regular cleaning by contract at fair prices. Get in touch and we'll put together a quote.</p>
+        <ul class="svc-features">
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Stigagangar og sameiginleg svæði</span><span class="en">Stairwells and common areas</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Reglulegar ræstingar eftir samningi</span><span class="en">Regular cleaning by contract</span></li>
+          <li><div class="feat-chk"><svg viewBox="0 0 9 9"><polyline points="1.5 4.5 3.5 6.5 7.5 2.5"/></svg></div><span class="is">Sanngjarnt verð fyrir húsfélög</span><span class="en">Fair pricing for housing associations</span></li>
+        </ul>
+        <div class="svc-price-tag is">Sérsniðið <small>tilboð</small></div>
+        <div class="svc-price-tag en">Custom <small>quote</small></div>
+        <a href="contact.html" class="btn-svc is">Hafa samband</a>
+        <a href="contact.html" class="btn-svc en">Contact us</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <p class="section-eyebrow"><span class="is">Verðskrá</span><span class="en">Pricing</span></p>
+      <h2 class="section-title"><span class="is">Gagnsætt <em>verð</em></span><span class="en">Transparent <em>pricing</em></span></h2>
+    </div>
+    <p class="pricing-note is fade-in">Almenn heimilisþrif — 240 kr per fermetri. Engar leyndar gjaldtökur.</p>
+    <p class="pricing-note en fade-in">Standard home cleaning — 240 kr per square metre. No hidden fees.</p>
+    <div class="pricing-table-wrap fade-in">
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th><span class="is">Stærð húsnæðis</span><span class="en">Property size</span></th>
+            <th><span class="is">Verð per þrif</span><span class="en">Price per clean</span></th>
+            <th><span class="is">Vikulegt (10% afsl.)</span><span class="en">Weekly (10% off)</span></th>
+            <th><span class="is">Hálfmánuðarlegt (5% afsl.)</span><span class="en">Fortnightly (5% off)</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0 – 50 m²</td><td class="price">12.000 kr</td><td class="price">10.800 kr</td><td class="price">11.400 kr</td></tr>
+          <tr><td>51 – 75 m²</td><td class="price">15.600 kr</td><td class="price">14.040 kr</td><td class="price">14.820 kr</td></tr>
+          <tr><td>76 – 100 m²</td><td class="price">21.600 kr</td><td class="price">19.440 kr</td><td class="price">20.520 kr</td></tr>
+          <tr><td>101 – 150 m²</td><td class="price">30.000 kr</td><td class="price">27.000 kr</td><td class="price">28.500 kr</td></tr>
+          <tr><td>151 – 200 m²</td><td class="price">40.800 kr</td><td class="price">36.720 kr</td><td class="price">38.760 kr</td></tr>
+          <tr><td>200+ m²</td><td colspan="3" style="text-align:center;font-style:italic;color:var(--steel);"><span class="is">Sérsniðið tilboð — hafðu samband</span><span class="en">Custom quote — contact us</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 class="extras-title fade-in"><span class="is">Aukaþjónusta</span><span class="en">Add-on services</span></h3>
+    <div class="extras-grid fade-in">
+      <div class="extra-item"><span class="extra-name is">Bakaraofn þrifinn</span><span class="extra-name en">Oven cleaned</span><span class="extra-price">4.500 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Ísskápur þrifinn</span><span class="extra-name en">Fridge cleaned</span><span class="extra-price">3.500 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Gluggar (per glugga)</span><span class="extra-name en">Windows (per window)</span><span class="extra-price">600 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Þvottavél keyrð</span><span class="extra-name en">Laundry washed</span><span class="extra-price">2.000 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Rúm búið um (per rúm)</span><span class="extra-name en">Bed made (per bed)</span><span class="extra-price">1.500 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Örbylgjuofn þrifinn</span><span class="extra-name en">Microwave cleaned</span><span class="extra-price">1.500 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Djúphreinsun baðherbergis</span><span class="extra-name en">Deep clean bathroom</span><span class="extra-price">5.000 kr</span></div>
+      <div class="extra-item"><span class="extra-name is">Eldhúsinnréttingar</span><span class="extra-name en">Kitchen cabinets</span><span class="extra-price">3.000 kr</span></div>
+    </div>
+    <div class="surcharge-note fade-in">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="is">Fyrsta þrif: 25% álag á staðlaðar verðskrár þar sem húsnæðið þarf ítarlegri þrif í upphafi.</span>
+      <span class="en">First clean: 25% surcharge on standard rates as the property requires more thorough initial cleaning.</span>
+    </div>
+  </div>
+</section>
+
+<!-- COMPANY QUOTE -->
+<section id="company-quote">
+  <div class="section-inner">
+    <div class="company-inner">
+      <div class="fade-in">
+        <p class="section-eyebrow" style="color:rgba(255,255,255,0.5);"><span class="is">Fyrirtækjaþrif</span><span class="en">Commercial cleaning</span></p>
+        <h2 class="company-title"><span class="is">Fagleg þjónusta fyrir <em>fyrirtæki þitt</em></span><span class="en">Professional service for <em>your business</em></span></h2>
+        <p class="company-body is">Þrifin eru skipulögð í samráði við hvern viðskiptavin þannig að þau falli sem best að daglegum rekstri og trufli sem minnst.</p>
+        <p class="company-body en">Cleaning is organised in consultation with each client so it fits your daily operations with minimal disruption.</p>
+        <ul class="company-features">
+          <li><span class="is">Sérsniðið tilboð eftir stærð og tíðni</span><span class="en">Custom quote based on size and frequency</span></li>
+          <li><span class="is">Reglulegar ræstingar — daglegar, vikulegar eða mánaðarlegar</span><span class="en">Regular cleaning — daily, weekly or monthly</span></li>
+          <li><span class="is">Faglegt og traust starfsfólk með þagnarskyldu</span><span class="en">Professional and trusted staff with confidentiality</span></li>
+          <li><span class="is">Umhverfisvænar þrifavörur</span><span class="en">Eco-friendly cleaning products</span></li>
+          <li><span class="is">Sveigjanleg þjónusta — við komum þegar það hentar þér</span><span class="en">Flexible service — we come when it suits you</span></li>
+        </ul>
+      </div>
+      <div class="company-form fade-in fade-in-delay-1" id="company-form-wrap">
+        <h3 class="form-title is">Sækja um tilboð</h3>
+        <h3 class="form-title en">Request a quote</h3>
+        <div id="company-form">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label is">Nafn fyrirtækis</label><label class="form-label en">Company name</label><input class="form-input" id="cf-company" placeholder="Kaupfélag ehf."/></div>
+            <div class="form-group"><label class="form-label is">Kennitala</label><label class="form-label en">Company ID</label><input class="form-input" id="cf-kt" placeholder="000000-0000"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label is">Nafn tengiliðs</label><label class="form-label en">Contact name</label><input class="form-input" id="cf-name" placeholder="Jón Jónsson"/></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cf-email" type="email" placeholder="jon@fyrirtaeki.is"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label is">Sími</label><label class="form-label en">Phone</label><input class="form-input" id="cf-phone" type="tel" placeholder="+354 xxx xxxx"/></div>
+            <div class="form-group"><label class="form-label is">Stærð (m²)</label><label class="form-label en">Size (m²)</label><input class="form-input" id="cf-size" type="number" placeholder="250"/></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label is">Hversu oft á þjónustan að vera?</label>
+            <label class="form-label en">How often do you need cleaning?</label>
+            <select class="form-input" id="cf-freq">
+              <option value="" disabled selected class="is">Veldu tíðni</option>
+              <option value="daily" class="is">Daglega</option>
+              <option value="weekly" class="is">Vikulega</option>
+              <option value="biweekly" class="is">Tvisvar í viku</option>
+              <option value="monthly" class="is">Mánaðarlega</option>
+              <option value="custom" class="is">Annað</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label is">Aðrar upplýsingar</label><label class="form-label en">Additional information</label><textarea class="form-textarea" id="cf-notes" placeholder="..."></textarea></div>
+          <button class="btn-submit" onclick="submitCompanyForm()"><span class="is">Senda tilboðsbeiðni</span><span class="en">Send quote request</span></button>
+        </div>
+        <div class="form-success" id="company-success">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <h4 class="is">Beiðni móttekin!</h4><h4 class="en">Request received!</h4>
+          <p class="is">Við höfum samband við þig innan 24 klst með sérsniðið tilboð.</p>
+          <p class="en">We will contact you within 24 hours with a tailored quote.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="logo" style="text-decoration:none;"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="logo-text">Hrein Gæði</span></a>
+      <p class="is">Fagleg hreingerningarþjónusta fyrir fyrirtæki og heimili á höfuðborgarsvæðinu.</p>
+      <p class="en">Professional cleaning for businesses and homes in the capital region.</p>
+    </div>
+    <div>
+      <div class="footer-col-title is">Þjónusta</div><div class="footer-col-title en">Services</div>
+      <ul class="footer-links">
+        <li><a href="services.html#fyrirtaeki"><span class="is">Fyrirtækjaþrif</span><span class="en">Commercial</span></a></li>
+        <li><a href="services.html#heimili"><span class="is">Heimilisþrif</span><span class="en">Home</span></a></li>
+        <li><a href="services.html#airbnb">AirBnB</a></li>
+        <li><a href="services.html#husfelag"><span class="is">Húsfélög</span><span class="en">Housing</span></a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title is">Fyrirtækið</div><div class="footer-col-title en">Company</div>
+      <ul class="footer-links">
+        <li><a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a></li>
+        <li><a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a></li>
+        <li><a href="booking.html"><span class="is">Bóka þrif</span><span class="en">Book</span></a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title is">Samband</div><div class="footer-col-title en">Contact</div>
+      <ul class="footer-links">
+        <li><span style="color:rgba(255,255,255,0.45);">+354 xxx xxxx</span></li>
+        <li><a href="mailto:info@hreingaedi.is">info@hreingaedi.is</a></li>
+        <li><span style="color:rgba(255,255,255,0.45);">Reykjavík, Ísland</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Hrein Gæði ehf. <span class="is">Öll réttindi áskilin.</span><span class="en">All rights reserved.</span></span>
+    <div class="footer-social">
+      <a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+      <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+let lang='is';
+function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
+const savedLang=localStorage.getItem('hg-lang');if(savedLang)setLang(savedLang);
+function toggleMenu(){document.getElementById('mobile-menu').classList.toggle('open');}
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+function submitCompanyForm(){
+  const company=document.getElementById('cf-company').value;
+  const name=document.getElementById('cf-name').value;
+  const email=document.getElementById('cf-email').value;
+  if(!company||!name||!email){alert(lang==='is'?'Vinsamlegast fylltu út nauðsynlegar upplýsingar.':'Please fill in the required fields.');return;}
+  document.getElementById('company-form').style.display='none';
+  document.getElementById('company-success').style.display='block';
+}
+</script>
+</body>
+</html>

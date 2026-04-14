@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hafðu samband við Hrein Gæði. Sími, netfang og samskiptaform.">
+<title>Hafa samband – Hrein Gæði</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--off-white:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--accent-hover:#1e429f;--green:#057a55;--green-light:#ecfdf5;--radius:12px;--radius-lg:20px;--shadow:0 4px 32px rgba(17,24,39,0.08);--transition:0.35s cubic-bezier(0.4,0,0.2,1);--header-h:72px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body.lang-is .en{display:none;}body.lang-en .is{display:none;}
+
+header{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--header-h);display:flex;align-items:center;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(17,24,39,0.08);}
+.header-inner{width:100%;max-width:1280px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+.logo-icon{width:40px;height:40px;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--navy);}
+nav{display:flex;align-items:center;gap:2.5rem;}
+nav a{font-size:14px;color:var(--slate);text-decoration:none;letter-spacing:0.03em;transition:color var(--transition);}
+nav a:hover{color:var(--navy);}nav a.active{color:var(--navy);font-weight:500;}
+.header-right{display:flex;align-items:center;gap:1rem;}
+.lang-toggle{display:flex;align-items:center;background:var(--light);border-radius:50px;padding:3px;gap:2px;}
+.lang-btn{background:none;border:none;padding:4px 11px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--steel);cursor:pointer;transition:var(--transition);}
+.lang-btn.active{background:var(--white);color:var(--navy);font-weight:500;}
+.btn-book-nav{background:var(--accent);color:#fff;border:none;padding:10px 22px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:var(--transition);text-decoration:none;display:inline-flex;align-items:center;}
+.btn-book-nav:hover{background:var(--accent-hover);}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-direction:column;gap:5px;}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--navy);border-radius:2px;}
+.mobile-menu{display:none;position:fixed;top:var(--header-h);left:0;right:0;background:var(--white);border-bottom:1px solid var(--mist);padding:1.5rem 2rem;flex-direction:column;gap:1.25rem;z-index:199;box-shadow:var(--shadow);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:15px;color:var(--slate);text-decoration:none;}
+
+.page-hero{padding:calc(var(--header-h) + 4rem) 2rem 4rem;background:var(--off-white);text-align:center;}
+.page-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:300;color:var(--navy);line-height:1.15;margin-bottom:1rem;}
+.page-hero-title em{font-style:italic;}
+.page-hero-sub{font-size:16px;color:var(--slate);line-height:1.8;max-width:560px;margin:0 auto;font-weight:300;}
+
+section{padding:5rem 2rem;}
+.section-inner{max-width:1280px;margin:0 auto;}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;}
+.contact-info{display:flex;flex-direction:column;gap:2rem;}
+.contact-item{display:flex;gap:1rem;align-items:flex-start;}
+.contact-icon{width:48px;height:48px;background:var(--off-white);border-radius:var(--radius);border:1px solid var(--mist);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.contact-icon svg{width:20px;height:20px;fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.contact-item-title{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:3px;}
+.contact-item-val{font-size:14px;color:var(--slate);font-weight:300;}
+.contact-item-val a{color:var(--accent);text-decoration:none;transition:color var(--transition);}
+.contact-item-val a:hover{color:var(--accent-hover);}
+.contact-hours{margin-top:1rem;background:var(--off-white);border-radius:var(--radius-lg);padding:1.5rem;border:1px solid var(--mist);}
+.hours-title{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:12px;}
+.hours-row{display:flex;justify-content:space-between;font-size:13px;color:var(--slate);padding:6px 0;border-bottom:1px solid var(--light);}
+.hours-row:last-child{border-bottom:none;}
+
+.contact-form-wrap{background:var(--off-white);border-radius:var(--radius-lg);padding:2.5rem;border:1px solid var(--mist);}
+.contact-form-title{font-size:18px;font-weight:500;color:var(--navy);margin-bottom:0.5rem;}
+.contact-form-sub{font-size:13px;color:var(--steel);margin-bottom:1.5rem;}
+.form-group{margin-bottom:1.1rem;}
+.form-label{font-size:12px;color:var(--slate);margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:12px 14px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);transition:var(--transition);}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.form-textarea{width:100%;padding:12px 14px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);resize:none;height:120px;transition:var(--transition);}
+.form-textarea:focus{outline:none;border-color:var(--accent);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.btn-send{width:100%;background:var(--navy);color:#fff;border:none;padding:14px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition);margin-top:0.5rem;}
+.btn-send:hover{background:var(--accent);}
+.form-success{display:none;text-align:center;padding:2rem 0;}
+.form-success svg{width:48px;height:48px;fill:none;stroke:var(--green);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 1rem;display:block;}
+.form-success h4{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--navy);margin-bottom:0.5rem;}
+.form-success p{font-size:14px;color:var(--steel);}
+
+footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
+.footer-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+.footer-brand .logo-text{color:#fff;}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-top:1rem;max-width:280px;}
+.footer-col-title{font-size:13px;font-weight:500;color:#fff;margin-bottom:1.25rem;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:0.75rem;}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.45);text-decoration:none;transition:color var(--transition);}
+.footer-links a:hover{color:#fff;}
+.footer-bottom{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:1.75rem;font-size:12px;flex-wrap:wrap;gap:1rem;}
+.footer-social{display:flex;gap:1rem;}
+.social-link{width:34px;height:34px;background:rgba(255,255,255,0.07);border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:var(--transition);}
+.social-link:hover{background:rgba(255,255,255,0.15);}
+.social-link svg{width:15px;height:15px;fill:none;stroke:rgba(255,255,255,0.6);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+.fade-in{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+.fade-in-delay-1{transition-delay:0.15s;}
+
+@media(max-width:1024px){.contact-grid{grid-template-columns:1fr;}.footer-inner{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){nav{display:none;}.hamburger{display:flex;}.btn-book-nav{display:none;}section{padding:4rem 1.25rem;}.form-row{grid-template-columns:1fr;}.footer-inner{grid-template-columns:1fr;}}
+</style>
+</head>
+<body class="lang-is">
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="logo-text">Hrein Gæði</span></a>
+    <nav>
+      <a href="services.html"><span class="is">Þjónusta</span><span class="en">Services</span></a>
+      <a href="services.html#pricing"><span class="is">Verðskrá</span><span class="en">Pricing</span></a>
+      <a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a>
+      <a href="contact.html" class="active"><span class="is">Samband</span><span class="en">Contact</span></a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('is')">IS</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+      <a href="booking.html" class="btn-book-nav"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="services.html"><span class="is">Þjónusta</span><span class="en">Services</span></a>
+  <a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a>
+  <a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a>
+  <a href="booking.html" style="background:var(--accent);color:#fff;padding:12px 20px;border-radius:50px;text-align:center;font-weight:500;"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
+</div>
+
+<div class="page-hero">
+  <h1 class="page-hero-title"><span class="is">Hafa <em>samband</em></span><span class="en">Get in <em>touch</em></span></h1>
+  <p class="page-hero-sub is">Við erum hér til að svara spurningum og hjálpa þér að finna réttu þjónustuna.</p>
+  <p class="page-hero-sub en">We're here to answer questions and help you find the right service.</p>
+</div>
+
+<section>
+  <div class="section-inner">
+    <div class="contact-grid">
+      <div class="contact-info fade-in">
+        <div class="contact-item">
+          <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.25 10a19.79 19.79 0 01-3.07-8.67A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.72-.72a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div><div class="contact-item-title is">Sími</div><div class="contact-item-title en">Phone</div><div class="contact-item-val">+354 xxx xxxx</div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div><div class="contact-item-title">Email</div><div class="contact-item-val"><a href="mailto:info@hreingaedi.is">info@hreingaedi.is</a></div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><div class="contact-item-title is">Staðsetning</div><div class="contact-item-title en">Location</div><div class="contact-item-val">Reykjavík, Ísland</div></div>
+        </div>
+        <div class="contact-hours">
+          <div class="hours-title is">Þjónustutímar</div><div class="hours-title en">Opening hours</div>
+          <div class="hours-row"><span class="is">Mánudagur – Föstudagur</span><span class="en">Monday – Friday</span><span>8:00 – 18:00</span></div>
+          <div class="hours-row"><span class="is">Laugardagur</span><span class="en">Saturday</span><span>9:00 – 15:00</span></div>
+          <div class="hours-row"><span class="is">Sunnudagur</span><span class="en">Sunday</span><span class="is">Lokað</span><span class="en">Closed</span></div>
+        </div>
+      </div>
+      <div class="contact-form-wrap fade-in fade-in-delay-1">
+        <div class="contact-form-title is">Sendu okkur skilaboð</div>
+        <div class="contact-form-title en">Send us a message</div>
+        <div class="contact-form-sub is">Við svörum innan 24 klukkustunda.</div>
+        <div class="contact-form-sub en">We reply within 24 hours.</div>
+        <div id="contact-form">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label is">Nafn</label><label class="form-label en">Name</label><input class="form-input" id="c-name" placeholder="Jón Jónsson"/></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="c-email" type="email" placeholder="jon@email.is"/></div>
+          </div>
+          <div class="form-group"><label class="form-label is">Sími (valkvætt)</label><label class="form-label en">Phone (optional)</label><input class="form-input" id="c-phone" type="tel" placeholder="+354 xxx xxxx"/></div>
+          <div class="form-group"><label class="form-label is">Efni</label><label class="form-label en">Subject</label>
+            <select class="form-input" id="c-subject">
+              <option value="" disabled selected><span class="is">Veldu efni</span></option>
+              <option value="quote" class="is">Fá tilboð fyrir fyrirtæki</option>
+              <option value="booking" class="is">Spurning um bókun</option>
+              <option value="husfelag" class="is">Húsfélög / Stigagangar</option>
+              <option value="other" class="is">Annað</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label is">Skilaboð</label><label class="form-label en">Message</label><textarea class="form-textarea" id="c-message" placeholder="..."></textarea></div>
+          <button class="btn-send" onclick="submitContact()"><span class="is">Senda skilaboð</span><span class="en">Send message</span></button>
+        </div>
+        <div class="form-success" id="contact-success">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <h4 class="is">Skilaboð send!</h4><h4 class="en">Message sent!</h4>
+          <p class="is">Við höfum samband við þig innan 24 klukkustunda.</p>
+          <p class="en">We'll get back to you within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><a href="index.html" class="logo" style="text-decoration:none;"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="logo-text">Hrein Gæði</span></a><p class="is">Fagleg hreingerningarþjónusta fyrir fyrirtæki og heimili.</p><p class="en">Professional cleaning for businesses and homes.</p></div>
+    <div><div class="footer-col-title is">Þjónusta</div><div class="footer-col-title en">Services</div><ul class="footer-links"><li><a href="services.html#fyrirtaeki"><span class="is">Fyrirtækjaþrif</span><span class="en">Commercial</span></a></li><li><a href="services.html#heimili"><span class="is">Heimilisþrif</span><span class="en">Home</span></a></li><li><a href="services.html#airbnb">AirBnB</a></li><li><a href="services.html#pricing"><span class="is">Verðskrá</span><span class="en">Pricing</span></a></li></ul></div>
+    <div><div class="footer-col-title is">Fyrirtækið</div><div class="footer-col-title en">Company</div><ul class="footer-links"><li><a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a></li><li><a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a></li><li><a href="booking.html"><span class="is">Bóka þrif</span><span class="en">Book</span></a></li></ul></div>
+    <div><div class="footer-col-title is">Samband</div><div class="footer-col-title en">Contact</div><ul class="footer-links"><li><span style="color:rgba(255,255,255,0.45);">+354 xxx xxxx</span></li><li><a href="mailto:info@hreingaedi.is">info@hreingaedi.is</a></li><li><span style="color:rgba(255,255,255,0.45);">Reykjavík, Ísland</span></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Hrein Gæði ehf. <span class="is">Öll réttindi áskilin.</span><span class="en">All rights reserved.</span></span><div class="footer-social"><a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a><a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a></div></div>
+</footer>
+
+<script>
+let lang='is';
+function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
+const savedLang=localStorage.getItem('hg-lang');if(savedLang)setLang(savedLang);
+function toggleMenu(){document.getElementById('mobile-menu').classList.toggle('open');}
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+function submitContact(){
+  const name=document.getElementById('c-name').value;
+  const email=document.getElementById('c-email').value;
+  const msg=document.getElementById('c-message').value;
+  if(!name||!email||!msg){alert(lang==='is'?'Vinsamlegast fylltu út nafn, email og skilaboð.':'Please fill in name, email and message.');return;}
+  // SUPABASE PLACEHOLDER
+  document.getElementById('contact-form').style.display='none';
+  document.getElementById('contact-success').style.display='block';
+}
+</script>
+</body>
+</html>

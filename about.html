@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Um Hrein Gæði – Íslenskt fyrirtæki sem sérhæfir sig í hreingerningarþjónustu.">
+<title>Um okkur – Hrein Gæði</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--off-white:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--accent-hover:#1e429f;--green:#057a55;--green-light:#ecfdf5;--radius:12px;--radius-lg:20px;--shadow:0 4px 32px rgba(17,24,39,0.08);--transition:0.35s cubic-bezier(0.4,0,0.2,1);--header-h:72px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body.lang-is .en{display:none;}body.lang-en .is{display:none;}
+
+header{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--header-h);display:flex;align-items:center;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(17,24,39,0.08);}
+.header-inner{width:100%;max-width:1280px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+.logo-icon{width:40px;height:40px;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--navy);}
+nav{display:flex;align-items:center;gap:2.5rem;}
+nav a{font-size:14px;color:var(--slate);text-decoration:none;letter-spacing:0.03em;transition:color var(--transition);}
+nav a:hover{color:var(--navy);}nav a.active{color:var(--navy);font-weight:500;}
+.header-right{display:flex;align-items:center;gap:1rem;}
+.lang-toggle{display:flex;align-items:center;background:var(--light);border-radius:50px;padding:3px;gap:2px;}
+.lang-btn{background:none;border:none;padding:4px 11px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--steel);cursor:pointer;transition:var(--transition);}
+.lang-btn.active{background:var(--white);color:var(--navy);font-weight:500;}
+.btn-book-nav{background:var(--accent);color:#fff;border:none;padding:10px 22px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:var(--transition);text-decoration:none;display:inline-flex;align-items:center;}
+.btn-book-nav:hover{background:var(--accent-hover);}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-direction:column;gap:5px;}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--navy);border-radius:2px;}
+.mobile-menu{display:none;position:fixed;top:var(--header-h);left:0;right:0;background:var(--white);border-bottom:1px solid var(--mist);padding:1.5rem 2rem;flex-direction:column;gap:1.25rem;z-index:199;box-shadow:var(--shadow);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:15px;color:var(--slate);text-decoration:none;}
+
+.page-hero{padding:calc(var(--header-h) + 4rem) 2rem 4rem;background:var(--off-white);text-align:center;}
+.page-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:300;color:var(--navy);line-height:1.15;margin-bottom:1rem;}
+.page-hero-title em{font-style:italic;}
+.page-hero-sub{font-size:16px;color:var(--slate);line-height:1.8;max-width:560px;margin:0 auto;font-weight:300;}
+
+section{padding:5rem 2rem;}
+.section-inner{max-width:1280px;margin:0 auto;}
+
+/* ABOUT GRID */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.about-img{border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/5;}
+.about-img img{width:100%;height:100%;object-fit:cover;}
+.section-eyebrow{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;font-weight:500;}
+.about-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3.5vw,42px);font-weight:300;color:var(--navy);line-height:1.25;margin-bottom:1.5rem;}
+.about-body{font-size:15px;color:var(--slate);line-height:1.9;font-weight:300;margin-bottom:1.25rem;}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem;}
+.stat{background:var(--off-white);border-radius:var(--radius);padding:1.25rem;border:1px solid var(--mist);}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--navy);line-height:1;}
+.stat-label{font-size:12px;color:var(--steel);margin-top:4px;letter-spacing:0.03em;}
+
+/* VALUES */
+.values-section{background:var(--off-white);padding:5rem 2rem;}
+.values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;max-width:1280px;margin:2.5rem auto 0;}
+.value-card{background:var(--white);border:1px solid var(--mist);border-radius:var(--radius-lg);padding:2rem;text-align:center;transition:var(--transition);}
+.value-card:hover{box-shadow:var(--shadow);border-color:transparent;transform:translateY(-4px);}
+.value-icon{font-size:32px;margin-bottom:1rem;}
+.value-name{font-size:15px;font-weight:500;color:var(--navy);margin-bottom:0.5rem;}
+.value-desc{font-size:13px;color:var(--steel);line-height:1.6;}
+
+/* CTA */
+.cta-banner{background:var(--navy);padding:4rem 2rem;text-align:center;}
+.cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,44px);font-weight:300;color:#fff;margin-bottom:1rem;line-height:1.2;}
+.cta-title em{font-style:italic;color:rgba(255,255,255,0.65);}
+.cta-body{font-size:15px;color:rgba(255,255,255,0.55);max-width:460px;margin:0 auto 2rem;line-height:1.7;}
+.btn-cta{background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:var(--transition);text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-cta:hover{background:var(--accent-hover);transform:translateY(-2px);}
+
+footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
+.footer-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+.footer-brand .logo-text{color:#fff;}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-top:1rem;max-width:280px;}
+.footer-col-title{font-size:13px;font-weight:500;color:#fff;margin-bottom:1.25rem;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:0.75rem;}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.45);text-decoration:none;transition:color var(--transition);}
+.footer-links a:hover{color:#fff;}
+.footer-bottom{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:1.75rem;font-size:12px;flex-wrap:wrap;gap:1rem;}
+.footer-social{display:flex;gap:1rem;}
+.social-link{width:34px;height:34px;background:rgba(255,255,255,0.07);border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:var(--transition);}
+.social-link:hover{background:rgba(255,255,255,0.15);}
+.social-link svg{width:15px;height:15px;fill:none;stroke:rgba(255,255,255,0.6);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+.fade-in{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+.fade-in-delay-1{transition-delay:0.1s;}
+
+@media(max-width:1024px){.about-grid{grid-template-columns:1fr;}.about-img{display:none;}.values-grid{grid-template-columns:1fr 1fr;}.footer-inner{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){nav{display:none;}.hamburger{display:flex;}.btn-book-nav{display:none;}section{padding:4rem 1.25rem;}.values-grid{grid-template-columns:1fr;}.footer-inner{grid-template-columns:1fr;}}
+</style>
+</head>
+<body class="lang-is">
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="logo-text">Hrein Gæði</span></a>
+    <nav>
+      <a href="services.html"><span class="is">Þjónusta</span><span class="en">Services</span></a>
+      <a href="services.html#pricing"><span class="is">Verðskrá</span><span class="en">Pricing</span></a>
+      <a href="about.html" class="active"><span class="is">Um okkur</span><span class="en">About</span></a>
+      <a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('is')">IS</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+      <a href="booking.html" class="btn-book-nav"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="services.html"><span class="is">Þjónusta</span><span class="en">Services</span></a>
+  <a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a>
+  <a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a>
+  <a href="booking.html" style="background:var(--accent);color:#fff;padding:12px 20px;border-radius:50px;text-align:center;font-weight:500;"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
+</div>
+
+<div class="page-hero">
+  <h1 class="page-hero-title"><span class="is">Um <em>Hrein Gæði</em></span><span class="en">About <em>Hrein Gæði</em></span></h1>
+  <p class="page-hero-sub is">Íslenskt fyrirtæki byggt á fagmennsku, vandvirkni og virðingu.</p>
+  <p class="page-hero-sub en">An Icelandic company built on professionalism, care and respect.</p>
+</div>
+
+<section>
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-img fade-in"><img src="hero.jpg" alt="Hrein Gæði" loading="lazy"/></div>
+      <div class="fade-in fade-in-delay-1">
+        <p class="section-eyebrow"><span class="is">Sagan okkar</span><span class="en">Our story</span></p>
+        <h2 class="about-title"><span class="is">Þrif sem þú getur <em>treyst</em></span><span class="en">Cleaning you can <em>trust</em></span></h2>
+        <p class="about-body is">Hrein Gæði er íslenskt fyrirtæki sem sérhæfir sig í hreingerningarþjónustu fyrir fyrirtæki og heimili. Við byggjum starf okkar á fagmennsku, vandvirkni og virðingu — þar sem hvert verkefni er unnið af alúð og ábyrgð.</p>
+        <p class="about-body is">Við trúum því að hreint umhverfi hafi bein áhrif á líðan fólks. Þess vegna leggjum við áherslu á að skapa aðstæður þar sem viðskiptavinum okkar líður vel — hvort sem það er á vinnustað eða heima hjá sér.</p>
+        <p class="about-body en">Hrein Gæði is an Icelandic company specialising in cleaning services for businesses and homes. Our work is built on professionalism, care and respect — every task is carried out with diligence and responsibility.</p>
+        <p class="about-body en">We believe a clean environment directly affects how people feel. That is why we focus on creating conditions where our clients feel at ease — whether at work or in their own home.</p>
+        <div class="about-stats">
+          <div class="stat"><div class="stat-num">100+</div><div class="stat-label is">Ánægðir viðskiptavinir</div><div class="stat-label en">Happy clients</div></div>
+          <div class="stat"><div class="stat-num">24h</div><div class="stat-label is">Svartími</div><div class="stat-label en">Response time</div></div>
+          <div class="stat"><div class="stat-num">5★</div><div class="stat-label is">Meðaleinkunn</div><div class="stat-label en">Average rating</div></div>
+          <div class="stat"><div class="stat-num">100%</div><div class="stat-label is">Ánægjutrygging</div><div class="stat-label en">Satisfaction guarantee</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<div class="values-section">
+  <div style="text-align:center;">
+    <p class="section-eyebrow"><span class="is">Gildin okkar</span><span class="en">Our values</span></p>
+    <h2 class="about-title" style="text-align:center;"><span class="is">Hvað gerir okkur <em>öðruvísi</em></span><span class="en">What makes us <em>different</em></span></h2>
+  </div>
+  <div class="values-grid">
+    <div class="value-card fade-in">
+      <div class="value-icon">🛡️</div>
+      <div class="value-name is">Traust</div><div class="value-name en">Trust</div>
+      <p class="value-desc is">Starfsfólk sem þú getur treyst inn í heimilið þitt og fyrirtækið.</p>
+      <p class="value-desc en">Staff you can trust in your home and business.</p>
+    </div>
+    <div class="value-card fade-in fade-in-delay-1">
+      <div class="value-icon">⏱️</div>
+      <div class="value-name is">Stundvísni</div><div class="value-name en">Punctuality</div>
+      <p class="value-desc is">Við komum á réttum tíma og klárum á tilsettum tíma.</p>
+      <p class="value-desc en">We arrive on time and finish on schedule.</p>
+    </div>
+    <div class="value-card fade-in fade-in-delay-1">
+      <div class="value-icon">✨</div>
+      <div class="value-name is">Vandvirkni</div><div class="value-name en">Quality</div>
+      <p class="value-desc is">Hvert einasta þrif er unnið af alúð og nákvæmni.</p>
+      <p class="value-desc en">Every clean is carried out with care and precision.</p>
+    </div>
+    <div class="value-card fade-in fade-in-delay-1">
+      <div class="value-icon">🌿</div>
+      <div class="value-name is">Umhverfið</div><div class="value-name en">Environment</div>
+      <p class="value-desc is">Umhverfisvænar þrifavörur sem eru hlutlausar og öruggar.</p>
+      <p class="value-desc en">Eco-friendly cleaning products that are safe and gentle.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-banner">
+  <h2 class="cta-title"><span class="is">Tilbúin/n að prófa <em>Hrein Gæði?</em></span><span class="en">Ready to try <em>Hrein Gæði?</em></span></h2>
+  <p class="cta-body is">Bókaðu þrif á netinu á aðeins nokkrum mínútum eða hafðu samband og fáðu tilboð.</p>
+  <p class="cta-body en">Book a clean online in just a few minutes or get in touch for a quote.</p>
+  <a href="booking.html" class="btn-cta"><span class="is">Bóka þrif núna</span><span class="en">Book now</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><a href="index.html" class="logo" style="text-decoration:none;"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="logo-text">Hrein Gæði</span></a><p class="is">Fagleg hreingerningarþjónusta fyrir fyrirtæki og heimili.</p><p class="en">Professional cleaning for businesses and homes.</p></div>
+    <div><div class="footer-col-title is">Þjónusta</div><div class="footer-col-title en">Services</div><ul class="footer-links"><li><a href="services.html#fyrirtaeki"><span class="is">Fyrirtækjaþrif</span><span class="en">Commercial</span></a></li><li><a href="services.html#heimili"><span class="is">Heimilisþrif</span><span class="en">Home</span></a></li><li><a href="services.html#airbnb">AirBnB</a></li><li><a href="services.html#pricing"><span class="is">Verðskrá</span><span class="en">Pricing</span></a></li></ul></div>
+    <div><div class="footer-col-title is">Fyrirtækið</div><div class="footer-col-title en">Company</div><ul class="footer-links"><li><a href="about.html"><span class="is">Um okkur</span><span class="en">About</span></a></li><li><a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a></li><li><a href="booking.html"><span class="is">Bóka þrif</span><span class="en">Book</span></a></li></ul></div>
+    <div><div class="footer-col-title is">Samband</div><div class="footer-col-title en">Contact</div><ul class="footer-links"><li><span style="color:rgba(255,255,255,0.45);">+354 xxx xxxx</span></li><li><a href="mailto:info@hreingaedi.is">info@hreingaedi.is</a></li><li><span style="color:rgba(255,255,255,0.45);">Reykjavík, Ísland</span></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Hrein Gæði ehf. <span class="is">Öll réttindi áskilin.</span><span class="en">All rights reserved.</span></span><div class="footer-social"><a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a><a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a></div></div>
+</footer>
+
+<script>
+let lang='is';
+function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
+const savedLang=localStorage.getItem('hg-lang');if(savedLang)setLang(savedLang);
+function toggleMenu(){document.getElementById('mobile-menu').classList.toggle('open');}
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>

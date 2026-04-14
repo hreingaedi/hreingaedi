@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard – Hrein Gæði</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--off:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--green:#057a55;--green-light:#ecfdf5;--amber:#d97706;--amber-light:#fffbeb;--red:#dc2626;--red-light:#fef2f2;--purple:#7c3aed;--purple-light:#f5f3ff;--radius:10px;--radius-lg:16px;--shadow:0 2px 16px rgba(17,24,39,0.07);--transition:0.25s ease;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:100;}
+.sidebar-brand{padding:1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+.brand-logo{display:flex;align-items:center;gap:10px;}
+.brand-icon{width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.brand-icon svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:#fff;}
+.brand-role{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;}
+.sidebar-nav{flex:1;padding:1rem 0.75rem;display:flex;flex-direction:column;gap:2px;}
+.nav-section-label{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.12em;text-transform:uppercase;padding:0.75rem 0.5rem 0.25rem;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;transition:var(--transition);text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);}
+.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;font-weight:500;}
+.nav-item svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 7px;border-radius:50px;font-weight:500;}
+.sidebar-footer{padding:1rem 0.75rem;border-top:1px solid rgba(255,255,255,0.08);}
+.user-row{display:flex;align-items:center;gap:10px;}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#fff;flex-shrink:0;}
+.user-name{font-size:13px;color:rgba(255,255,255,0.8);}
+.user-role-label{font-size:10px;color:rgba(255,255,255,0.4);}
+.logout-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);padding:4px;transition:var(--transition);}
+.logout-btn:hover{color:rgba(255,255,255,0.8);}
+.logout-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:var(--white);border-bottom:1px solid var(--mist);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:16px;font-weight:500;color:var(--navy);}
+.topbar-right{display:flex;align-items:center;gap:1rem;}
+.topbar-date{font-size:12px;color:var(--steel);}
+.btn-sm{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-sm:hover{background:#1e429f;}
+.btn-sm-outline{background:none;border:1px solid var(--mist);color:var(--slate);padding:8px 16px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:var(--transition);}
+.btn-sm-outline:hover{border-color:var(--navy);color:var(--navy);}
+.content{flex:1;padding:2rem;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);padding:1.25rem 1.5rem;transition:var(--transition);}
+.stat-card:hover{box-shadow:var(--shadow);}
+.stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;}
+.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.stat-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.stat-icon.blue{background:var(--accent-light);color:var(--accent);}
+.stat-icon.green{background:var(--green-light);color:var(--green);}
+.stat-icon.amber{background:var(--amber-light);color:var(--amber);}
+.stat-icon.purple{background:var(--purple-light);color:var(--purple);}
+.stat-trend{font-size:11px;font-weight:500;padding:2px 7px;border-radius:50px;}
+.stat-trend.up{background:var(--green-light);color:var(--green);}
+.stat-trend.pending{background:var(--amber-light);color:var(--amber);}
+.stat-label{font-size:12px;color:var(--steel);margin-bottom:4px;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--navy);line-height:1;}
+.stat-sub{font-size:11px;color:var(--steel);margin-top:4px;}
+
+/* LAYOUT GRIDS */
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.dashboard-grid.three{grid-template-columns:2fr 1fr;}
+.card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--mist);}
+.card-title{font-size:14px;font-weight:500;color:var(--navy);}
+.card-action{font-size:12px;color:var(--accent);cursor:pointer;text-decoration:none;background:none;border:none;font-family:'Outfit',sans-serif;}
+.card-body{padding:1.25rem 1.5rem;}
+
+/* BOOKINGS TABLE */
+.bookings-table{width:100%;border-collapse:collapse;}
+.bookings-table th{font-size:11px;color:var(--steel);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;padding:0 0 10px;text-align:left;border-bottom:1px solid var(--light);}
+.bookings-table td{padding:12px 0;font-size:13px;border-bottom:1px solid var(--light);vertical-align:middle;}
+.bookings-table tr:last-child td{border-bottom:none;}
+.bookings-table tr{cursor:pointer;transition:background var(--transition);}
+.bookings-table tr:hover td{background:var(--off);}
+.booking-name{font-weight:500;color:var(--navy);}
+.booking-ref{font-size:11px;color:var(--steel);margin-top:1px;}
+.booking-svc{font-size:12px;color:var(--slate);}
+.booking-date{font-size:12px;color:var(--slate);}
+.badge{display:inline-flex;align-items:center;font-size:11px;padding:3px 9px;border-radius:50px;font-weight:500;white-space:nowrap;}
+.badge-pending{background:var(--amber-light);color:var(--amber);}
+.badge-confirmed{background:var(--green-light);color:var(--green);}
+.badge-done{background:var(--accent-light);color:var(--accent);}
+.badge-cancelled{background:var(--red-light);color:var(--red);}
+.worker-assign{display:flex;align-items:center;gap:6px;}
+.worker-dot{width:20px;height:20px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500;color:var(--accent);}
+.assign-select{background:none;border:1px solid var(--mist);border-radius:6px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--slate);padding:3px 6px;cursor:pointer;}
+.assign-select:focus{outline:none;border-color:var(--accent);}
+
+/* REVENUE CHART */
+.revenue-chart{padding:0 0 0.5rem;}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:8px;border-bottom:1px solid var(--light);}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;background:var(--accent-light);transition:var(--transition);cursor:pointer;position:relative;}
+.chart-bar:hover{background:var(--accent);}
+.chart-bar.current{background:var(--accent);}
+.chart-bar-tooltip{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;opacity:0;transition:var(--transition);pointer-events:none;}
+.chart-bar:hover .chart-bar-tooltip{opacity:1;}
+.chart-month{font-size:10px;color:var(--steel);}
+.chart-labels{display:flex;justify-content:space-between;margin-top:0.75rem;font-size:11px;color:var(--steel);}
+
+/* WORKERS */
+.workers-list{display:flex;flex-direction:column;gap:10px;}
+.worker-card{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--light);}
+.worker-card:last-child{border-bottom:none;}
+.worker-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#fff;flex-shrink:0;}
+.worker-info{flex:1;}
+.worker-name{font-size:13px;font-weight:500;color:var(--navy);}
+.worker-shifts{font-size:11px;color:var(--steel);margin-top:1px;}
+.worker-earnings{text-align:right;}
+.worker-amount{font-size:13px;font-weight:500;color:var(--navy);}
+.worker-label{font-size:10px;color:var(--steel);}
+
+/* FINANCE */
+.finance-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--light);font-size:13px;}
+.finance-row:last-child{border-bottom:none;}
+.finance-label{color:var(--slate);}
+.finance-amount{font-weight:500;}
+.finance-amount.income{color:var(--green);}
+.finance-amount.expense{color:var(--red);}
+.finance-amount.profit{color:var(--navy);font-family:'Cormorant Garamond',serif;font-size:18px;}
+.finance-total{display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:4px;border-top:2px solid var(--navy);}
+.finance-total-label{font-size:13px;font-weight:500;color:var(--navy);}
+
+/* UPCOMING */
+.upcoming-list{display:flex;flex-direction:column;gap:8px;}
+.upcoming-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--light);}
+.upcoming-item:last-child{border-bottom:none;}
+.upcoming-time{width:52px;text-align:center;flex-shrink:0;}
+.upcoming-date{font-size:11px;font-weight:500;color:var(--navy);}
+.upcoming-hour{font-size:10px;color:var(--steel);}
+.upcoming-body{flex:1;}
+.upcoming-name{font-size:13px;font-weight:500;color:var(--navy);}
+.upcoming-detail{font-size:11px;color:var(--steel);margin-top:1px;}
+.upcoming-worker{font-size:11px;color:var(--accent);margin-top:2px;}
+
+/* MODAL OVERLAY */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(17,24,39,0.5);z-index:200;align-items:center;justify-content:center;padding:2rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.modal-title{font-size:16px;font-weight:500;color:var(--navy);}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--steel);padding:4px;transition:var(--transition);}
+.modal-close:hover{color:var(--navy);}
+.modal-close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--light);font-size:13px;}
+.detail-row:last-child{border-bottom:none;}
+.detail-label{color:var(--steel);}
+.detail-val{font-weight:500;color:var(--navy);text-align:right;max-width:60%;}
+.modal-actions{display:flex;gap:8px;margin-top:1.5rem;flex-wrap:wrap;}
+.btn-action{flex:1;padding:10px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--mist);background:var(--off);color:var(--navy);transition:var(--transition);}
+.btn-action:hover{border-color:var(--navy);}
+.btn-action.confirm{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-action.done{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-action.cancel{background:var(--red-light);color:var(--red);border-color:var(--red-light);}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--light);border-radius:var(--radius);padding:3px;margin-bottom:1.5rem;}
+.tab{flex:1;padding:7px;border-radius:7px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;color:var(--steel);cursor:pointer;text-align:center;transition:var(--transition);border:none;background:none;}
+.tab.active{background:var(--white);color:var(--navy);font-weight:500;box-shadow:0 1px 4px rgba(17,24,39,0.08);}
+
+/* SLING NOTICE */
+.sling-notice{background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius);padding:0.75rem 1rem;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:1rem;}
+.sling-notice svg{width:14px;height:14px;stroke:var(--accent);flex-shrink:0;}
+
+@media(max-width:1024px){.stats-grid{grid-template-columns:1fr 1fr;}.dashboard-grid,.dashboard-grid.three{grid-template-columns:1fr;}}
+@media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;}.stats-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <span class="brand-name">Hrein Gæði</span>
+    </div>
+    <div class="brand-role" id="sidebar-role">Admin</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Yfirlit</div>
+    <a class="nav-item active" onclick="showView('overview')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Yfirlit
+    </a>
+    <a class="nav-item" onclick="showView('bookings')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Bókanir
+      <span class="nav-badge" id="pending-badge">0</span>
+    </a>
+    <a class="nav-item" onclick="showView('finance')">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Fjármál
+    </a>
+
+    <div class="nav-section-label">Starfsfólk</div>
+    <a class="nav-item" onclick="showView('workers')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Starfsmenn
+    </a>
+    <a class="nav-item" onclick="showView('schedule')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Vaktaáætlun
+    </a>
+
+    <div class="nav-section-label">Kerfið</div>
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Vefsíðan
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar" id="user-avatar">A</div>
+      <div><div class="user-name" id="user-name">Admin</div><div class="user-role-label" id="user-role-label">Stjórnandi</div></div>
+      <button class="logout-btn" onclick="logout()" title="Útskrá">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Yfirlit</div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="today-date"></span>
+      <a href="booking.html" class="btn-sm" target="_blank">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ný bókun
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW VIEW -->
+    <div id="view-overview">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="stat-trend pending" id="st-pending-count">0 í bið</span></div>
+          <div class="stat-label">Bókanir í dag</div>
+          <div class="stat-value" id="st-today">0</div>
+          <div class="stat-sub" id="st-today-sub">Engar bókanir í dag</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon green"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><span class="stat-trend up">↑ mánuður</span></div>
+          <div class="stat-label">Tekjur mánaðarins</div>
+          <div class="stat-value" id="st-revenue">0 kr</div>
+          <div class="stat-sub" id="st-revenue-sub">Greiddar bókanir</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon amber"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><span class="stat-trend up">Virkir</span></div>
+          <div class="stat-label">Starfsmenn</div>
+          <div class="stat-value" id="st-workers">0</div>
+          <div class="stat-sub">Á vöktum þessa viku</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="stat-trend up">↑ 12%</span></div>
+          <div class="stat-label">Hagnaður mánaðarins</div>
+          <div class="stat-value" id="st-profit">0 kr</div>
+          <div class="stat-sub">Eftir laun</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid three">
+        <!-- UPCOMING BOOKINGS -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Komandi bókanir</span>
+            <button class="card-action" onclick="showView('bookings')">Sjá allar →</button>
+          </div>
+          <div class="card-body">
+            <div class="upcoming-list" id="upcoming-list"></div>
+          </div>
+        </div>
+
+        <!-- REVENUE CHART -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Tekjur — síðustu 6 mánuðir</span></div>
+          <div class="card-body">
+            <div class="revenue-chart">
+              <div class="chart-bars" id="chart-bars"></div>
+              <div class="chart-labels" id="chart-labels"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- PENDING BOOKINGS -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Bókanir í bið</span>
+            <span class="badge badge-pending" id="pending-count-label">0</span>
+          </div>
+          <div class="card-body" style="padding:0 1.5rem;">
+            <table class="bookings-table" id="pending-table">
+              <thead><tr><th>Viðskiptavinur</th><th>Þjónusta</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
+              <tbody id="pending-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- QUICK FINANCE -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Fjárhag þessa mánaðar</span>
+            <button class="card-action" onclick="showView('finance')">Nánar →</button>
+          </div>
+          <div class="card-body">
+            <div class="finance-row"><span class="finance-label">Tekjur (greiddar)</span><span class="finance-amount income" id="f-income-q">0 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Laun starfsmanna</span><span class="finance-amount expense" id="f-wages-q">0 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Þrifavörur</span><span class="finance-amount expense">-15.000 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Annar kostnaður</span><span class="finance-amount expense">-8.000 kr</span></div>
+            <div class="finance-total">
+              <span class="finance-total-label">Hagnaður</span>
+              <span class="finance-amount profit" id="f-profit-q">0 kr</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS VIEW -->
+    <div id="view-bookings" style="display:none;">
+      <div class="tabs">
+        <button class="tab active" onclick="filterBookings('all',this)">Allar</button>
+        <button class="tab" onclick="filterBookings('Pending',this)">Í bið</button>
+        <button class="tab" onclick="filterBookings('Confirmed',this)">Staðfestar</button>
+        <button class="tab" onclick="filterBookings('Done',this)">Loknar</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Bókanir</span>
+          <span class="card-action" id="bookings-count">0 bókanir</span>
+        </div>
+        <div class="card-body" style="padding:0 1.5rem;">
+          <table class="bookings-table">
+            <thead><tr><th>Viðskiptavinur</th><th>Þjónusta</th><th>Stærð</th><th>Verð</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
+            <tbody id="all-bookings-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCE VIEW -->
+    <div id="view-finance" style="display:none;">
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Tekjur og gjöld — þessi mánuður</span></div>
+          <div class="card-body">
+            <div class="finance-row"><span class="finance-label">Heimilisþrif</span><span class="finance-amount income" id="fi-home">0 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Fyrirtækjaþrif</span><span class="finance-amount income" id="fi-company">0 kr</span></div>
+            <div class="finance-row"><span class="finance-label">AirBnB þrif</span><span class="finance-amount income" id="fi-airbnb">0 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Laun starfsmanna</span><span class="finance-amount expense" id="fi-wages">0 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Þrifavörur</span><span class="finance-amount expense">-15.000 kr</span></div>
+            <div class="finance-row"><span class="finance-label">Annar kostnaður</span><span class="finance-amount expense">-8.000 kr</span></div>
+            <div class="finance-total">
+              <span class="finance-total-label">Hagnaður mánaðarins</span>
+              <span class="finance-amount profit" id="fi-profit">0 kr</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Tekjurit — síðustu 6 mánuðir</span></div>
+          <div class="card-body">
+            <div class="chart-bars" id="chart-bars-finance" style="height:160px;"></div>
+            <div class="chart-labels" id="chart-labels-finance"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKERS VIEW -->
+    <div id="view-workers" style="display:none;">
+      <div class="sling-notice">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Sling vaktaforritið er tengt — opna Sling til að úthluta vöktum. Bókanir sem eru úthlutaðar þar birtast hér sjálfkrafa þegar tengingin er virkjuð.
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Starfsmenn</span><button class="btn-sm" onclick="openAddWorker()">+ Bæta við starfsmanni</button></div>
+        <div class="card-body">
+          <div class="workers-list" id="workers-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE VIEW -->
+    <div id="view-schedule" style="display:none;">
+      <div class="sling-notice">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Vaktaáætlunin er stjórnuð í gegnum Sling. Þegar Sling tengingin er virkjuð birtast allar vaktir hér sjálfkrafa.
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Vaktaáætlun þessarar viku</span><a href="https://app.getsling.com" target="_blank" class="btn-sm">Opna Sling →</a></div>
+        <div class="card-body">
+          <div id="schedule-grid" style="display:grid;grid-template-columns:100px repeat(7,1fr);gap:1px;background:var(--light);border-radius:var(--radius);overflow:hidden;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Bókunarupplýsingar</span>
+      <button class="modal-close" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="modal-content"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+// AUTH CHECK
+const userStr = localStorage.getItem('hg-user');
+if (!userStr) { window.location.href = 'login.html'; }
+const currentUser = JSON.parse(userStr || '{}');
+document.getElementById('user-name').textContent = currentUser.name || 'Admin';
+document.getElementById('user-avatar').textContent = (currentUser.name || 'A')[0].toUpperCase();
+document.getElementById('user-role-label').textContent = currentUser.role === 'admin' ? 'Stjórnandi' : currentUser.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður';
+document.getElementById('sidebar-role').textContent = currentUser.role === 'admin' ? 'Admin' : currentUser.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður';
+
+function logout() { localStorage.removeItem('hg-user'); window.location.href = 'login.html'; }
+
+// DATE
+const now = new Date();
+const dateStr = now.toLocaleDateString('is-IS', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+document.getElementById('today-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+// DEMO DATA
+const workers = [
+  { id:'w1', name:'Anna Sigurðardóttir', shifts:12, hourlyRate:2800, color:'#1a56db' },
+  { id:'w2', name:'Siggi Björnsson',     shifts:8,  hourlyRate:2800, color:'#057a55' },
+  { id:'w3', name:'Katrín Magnúsdóttir', shifts:10, hourlyRate:2800, color:'#7c3aed' },
+];
+
+let bookings = [
+  { ref:'HG-4821', name:'Sigríður Björnsdóttir', type:'home',    service:'Heimilisþrif', sqm:'76–100 m²', total:21600, date:'2026-04-12', time:'8:00–10:00',   address:'Hverfisgata 42, Reykjavík',  worker:'w1', status:'Pending'  },
+  { ref:'HG-3107', name:'Kaupfélag Reykjavíkur', type:'company', service:'Fyrirtækjaþrif',sqm:'200+ m²',  total:48000, date:'2026-04-12', time:'Eftirmiðdagur', address:'Borgartún 21, Reykjavík',    worker:'w2', status:'Confirmed'},
+  { ref:'HG-2984', name:'Arna Helgadóttir',       type:'home',    service:'Heimilisþrif', sqm:'51–75 m²', total:15600, date:'2026-04-14', time:'10:00–12:00',  address:'Laugavegur 88, Reykjavík',   worker:'w1', status:'Confirmed'},
+  { ref:'HG-2210', name:'Guesthouse Vaka',        type:'airbnb',  service:'AirBnB þrif',  sqm:'51–75 m²', total:18000, date:'2026-04-15', time:'Morgunn',      address:'Skólavörðustígur 14',        worker:'w3', status:'Pending'  },
+  { ref:'HG-1893', name:'Þór Gunnarsson',         type:'home',    service:'Heimilisþrif', sqm:'0–50 m²',  total:12000, date:'2026-04-08', time:'8:00–10:00',   address:'Melgata 5, Kópavogur',       worker:'w2', status:'Done'    },
+  { ref:'HG-1650', name:'Ísafold ehf.',           type:'company', service:'Fyrirtækjaþrif',sqm:'101–150 m²',total:36000, date:'2026-04-07', time:'Kvöld',      address:'Armúli 8, Reykjavík',        worker:'w1', status:'Done'    },
+];
+
+let currentFilter = 'all';
+let selectedBookingRef = null;
+
+// REVENUE DATA
+const revenueData = [
+  { month:'Nóv', amount:280000 },
+  { month:'Des', amount:320000 },
+  { month:'Jan', amount:195000 },
+  { month:'Feb', amount:340000 },
+  { month:'Mar', amount:410000 },
+  { month:'Apr', amount:174000 },
+];
+
+function getWorkerName(id) { const w = workers.find(w => w.id === id); return w ? w.name.split(' ')[0] : '—'; }
+function getWorkerColor(id) { const w = workers.find(w => w.id === id); return w ? w.color : '#888'; }
+
+function fmt(n) { return n.toLocaleString('is-IS') + ' kr'; }
+
+function showView(view) {
+  ['overview','bookings','finance','workers','schedule'].forEach(v => {
+    document.getElementById('view-'+v).style.display = v === view ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const titles = { overview:'Yfirlit', bookings:'Bókanir', finance:'Fjármál', workers:'Starfsmenn', schedule:'Vaktaáætlun' };
+  document.getElementById('topbar-title').textContent = titles[view] || 'Yfirlit';
+  if (view === 'bookings') renderAllBookings();
+  if (view === 'finance') renderFinance();
+  if (view === 'workers') renderWorkers();
+  if (view === 'schedule') renderSchedule();
+}
+
+function renderStats() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayBk = bookings.filter(b => b.date === today);
+  const pending = bookings.filter(b => b.status === 'Pending');
+  const monthRevenue = bookings.filter(b => b.status === 'Done' || b.status === 'Confirmed').reduce((s,b) => s+b.total, 0);
+  const totalWages = workers.reduce((s,w) => s + w.shifts * 5 * w.hourlyRate, 0);
+  const profit = monthRevenue - totalWages - 23000;
+
+  document.getElementById('st-today').textContent = todayBk.length;
+  document.getElementById('st-today-sub').textContent = todayBk.length > 0 ? todayBk.length + ' bókanir í dag' : 'Engar bókanir í dag';
+  document.getElementById('st-pending-count').textContent = pending.length + ' í bið';
+  document.getElementById('st-revenue').textContent = fmt(monthRevenue);
+  document.getElementById('st-workers').textContent = workers.length;
+  document.getElementById('st-profit').textContent = fmt(profit);
+  document.getElementById('pending-badge').textContent = pending.length;
+  document.getElementById('pending-count-label').textContent = pending.length;
+
+  document.getElementById('f-income-q').textContent = fmt(monthRevenue);
+  document.getElementById('f-wages-q').textContent = '-' + fmt(totalWages);
+  document.getElementById('f-profit-q').textContent = fmt(profit);
+}
+
+function renderUpcoming() {
+  const list = document.getElementById('upcoming-list');
+  const upcoming = bookings.filter(b => b.status !== 'Done').sort((a,b) => a.date.localeCompare(b.date)).slice(0,5);
+  list.innerHTML = upcoming.map(b => `
+    <div class="upcoming-item" onclick="openModal('${b.ref}')" style="cursor:pointer;">
+      <div class="upcoming-time">
+        <div class="upcoming-date">${b.date.slice(5).replace('-','/')}</div>
+        <div class="upcoming-hour">${b.time.split('–')[0] || b.time}</div>
+      </div>
+      <div class="upcoming-body">
+        <div class="upcoming-name">${b.name}</div>
+        <div class="upcoming-detail">${b.service} · ${b.sqm}</div>
+        <div class="upcoming-worker">Starfsm: ${getWorkerName(b.worker)}</div>
+      </div>
+      <span class="badge badge-${b.status.toLowerCase()}">${b.status === 'Pending' ? 'Í bið' : b.status === 'Confirmed' ? 'Staðfest' : 'Lokið'}</span>
+    </div>
+  `).join('');
+}
+
+function renderPending() {
+  const tbody = document.getElementById('pending-tbody');
+  const pending = bookings.filter(b => b.status === 'Pending');
+  tbody.innerHTML = pending.map(b => `
+    <tr onclick="openModal('${b.ref}')">
+      <td><div class="booking-name">${b.name}</div><div class="booking-ref">${b.ref}</div></td>
+      <td class="booking-svc">${b.service}</td>
+      <td class="booking-date">${b.date}</td>
+      <td>
+        <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
+          <option value="">— Veldu —</option>
+          ${workers.map(w => `<option value="${w.id}" ${b.worker===w.id?'selected':''}>${w.name.split(' ')[0]}</option>`).join('')}
+        </select>
+      </td>
+      <td><span class="badge badge-pending">Í bið</span></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--steel);padding:1.5rem 0;font-size:13px;">Engar bókanir í bið</td></tr>';
+}
+
+function renderAllBookings() {
+  const filtered = currentFilter === 'all' ? bookings : bookings.filter(b => b.status === currentFilter);
+  document.getElementById('bookings-count').textContent = filtered.length + ' bókanir';
+  const tbody = document.getElementById('all-bookings-tbody');
+  tbody.innerHTML = filtered.map(b => `
+    <tr onclick="openModal('${b.ref}')">
+      <td><div class="booking-name">${b.name}</div><div class="booking-ref">${b.ref}</div></td>
+      <td class="booking-svc">${b.service}</td>
+      <td class="booking-svc">${b.sqm}</td>
+      <td class="booking-svc">${fmt(b.total)}</td>
+      <td class="booking-date">${b.date} · ${b.time}</td>
+      <td>
+        <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
+          <option value="">— Veldu —</option>
+          ${workers.map(w => `<option value="${w.id}" ${b.worker===w.id?'selected':''}>${w.name.split(' ')[0]}</option>`).join('')}
+        </select>
+      </td>
+      <td><span class="badge badge-${b.status.toLowerCase()}">${b.status === 'Pending' ? 'Í bið' : b.status === 'Confirmed' ? 'Staðfest' : b.status === 'Done' ? 'Lokið' : 'Afbókað'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function filterBookings(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderAllBookings();
+}
+
+function assignWorker(ref, workerId) {
+  const b = bookings.find(b => b.ref === ref);
+  if (b) { b.worker = workerId; }
+  // SLING PLACEHOLDER: await notifySling({ ref, worker_id: workerId, date: b.date, address: b.address })
+}
+
+function renderChart(barsId, labelsId) {
+  const barsEl = document.getElementById(barsId);
+  const labelsEl = document.getElementById(labelsId);
+  if (!barsEl) return;
+  const max = Math.max(...revenueData.map(d => d.amount));
+  barsEl.innerHTML = revenueData.map((d, i) => {
+    const pct = (d.amount / max) * 100;
+    const isCurrent = i === revenueData.length - 1;
+    return `<div class="chart-bar-wrap">
+      <div class="chart-bar ${isCurrent ? 'current' : ''}" style="height:${pct}%;">
+        <div class="chart-bar-tooltip">${fmt(d.amount)}</div>
+      </div>
+      <div class="chart-month">${d.month}</div>
+    </div>`;
+  }).join('');
+  if (labelsEl) labelsEl.innerHTML = `<span>${fmt(0)}</span><span>${fmt(Math.round(max/2))}</span><span>${fmt(max)}</span>`;
+}
+
+function renderFinance() {
+  const done = bookings.filter(b => b.status === 'Done' || b.status === 'Confirmed');
+  const homeRev = done.filter(b => b.type === 'home').reduce((s,b) => s+b.total, 0);
+  const compRev = done.filter(b => b.type === 'company').reduce((s,b) => s+b.total, 0);
+  const airRev  = done.filter(b => b.type === 'airbnb').reduce((s,b) => s+b.total, 0);
+  const totalRev = homeRev + compRev + airRev;
+  const wages = workers.reduce((s,w) => s + w.shifts * 5 * w.hourlyRate, 0);
+  const profit = totalRev - wages - 23000;
+  document.getElementById('fi-home').textContent = fmt(homeRev);
+  document.getElementById('fi-company').textContent = fmt(compRev);
+  document.getElementById('fi-airbnb').textContent = fmt(airRev);
+  document.getElementById('fi-wages').textContent = '-' + fmt(wages);
+  document.getElementById('fi-profit').textContent = fmt(profit);
+  renderChart('chart-bars-finance', 'chart-labels-finance');
+}
+
+function renderWorkers() {
+  const list = document.getElementById('workers-list');
+  list.innerHTML = workers.map(w => {
+    const earnings = w.shifts * 5 * w.hourlyRate;
+    return `<div class="worker-card">
+      <div class="worker-avatar" style="background:${w.color};">${w.name[0]}</div>
+      <div class="worker-info">
+        <div class="worker-name">${w.name}</div>
+        <div class="worker-shifts">${w.shifts} vaktir þessa mánuð · ${w.hourlyRate.toLocaleString('is-IS')} kr/klst</div>
+      </div>
+      <div class="worker-earnings">
+        <div class="worker-amount">${fmt(earnings)}</div>
+        <div class="worker-label">Laun mánaðarins</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSchedule() {
+  const grid = document.getElementById('schedule-grid');
+  const days = ['Mán','Þri','Mið','Fim','Fös','Lau','Sun'];
+  grid.innerHTML = `
+    <div style="background:var(--navy);color:#fff;padding:8px;font-size:11px;font-weight:500;">Starfsmaður</div>
+    ${days.map(d => `<div style="background:var(--navy);color:rgba(255,255,255,0.7);padding:8px;font-size:11px;text-align:center;">${d}</div>`).join('')}
+    ${workers.map(w => `
+      <div style="background:var(--white);padding:8px;font-size:12px;font-weight:500;color:var(--navy);border-right:1px solid var(--light);">${w.name.split(' ')[0]}</div>
+      ${days.map((d,i) => {
+        const hasBk = bookings.filter(b => b.worker === w.id && b.status !== 'Done').length > 0 && i < 5;
+        return `<div style="background:var(--white);padding:6px;text-align:center;">${hasBk && Math.random()>0.4 ? `<div style="background:${w.color}20;color:${w.color};border-radius:4px;padding:2px 4px;font-size:10px;">${Math.floor(Math.random()*2+1)} verk</div>` : ''}</div>`;
+      }).join('')}
+    `).join('')}
+  `;
+}
+
+function openModal(ref) {
+  selectedBookingRef = ref;
+  const b = bookings.find(b => b.ref === ref);
+  const statusLabel = b.status === 'Pending' ? 'Í bið' : b.status === 'Confirmed' ? 'Staðfest' : b.status === 'Done' ? 'Lokið' : 'Afbókað';
+  document.getElementById('modal-content').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Tilvísunarnúmer</span><span class="detail-val">${b.ref}</span></div>
+    <div class="detail-row"><span class="detail-label">Staða</span><span class="detail-val"><span class="badge badge-${b.status.toLowerCase()}">${statusLabel}</span></span></div>
+    <div class="detail-row"><span class="detail-label">Viðskiptavinur</span><span class="detail-val">${b.name}</span></div>
+    <div class="detail-row"><span class="detail-label">Þjónusta</span><span class="detail-val">${b.service}</span></div>
+    <div class="detail-row"><span class="detail-label">Stærð</span><span class="detail-val">${b.sqm}</span></div>
+    <div class="detail-row"><span class="detail-label">Heildarverð</span><span class="detail-val">${fmt(b.total)}</span></div>
+    <div class="detail-row"><span class="detail-label">Heimilisfang</span><span class="detail-val">${b.address}</span></div>
+    <div class="detail-row"><span class="detail-label">Dagsetning</span><span class="detail-val">${b.date}</span></div>
+    <div class="detail-row"><span class="detail-label">Tími</span><span class="detail-val">${b.time}</span></div>
+    <div class="detail-row"><span class="detail-label">Starfsmaður</span><span class="detail-val">
+      <select class="assign-select" onchange="assignWorker('${b.ref}',this.value)" style="font-size:13px;padding:5px 8px;">
+        <option value="">— Veldu starfsmann —</option>
+        ${workers.map(w => `<option value="${w.id}" ${b.worker===w.id?'selected':''}>${w.name}</option>`).join('')}
+      </select>
+    </span></div>
+  `;
+  const actions = document.getElementById('modal-actions');
+  actions.innerHTML = '';
+  if (b.status === 'Pending') {
+    const btn = document.createElement('button');
+    btn.className = 'btn-action confirm';
+    btn.textContent = 'Staðfesta bókun';
+    btn.onclick = () => updateStatus(ref, 'Confirmed');
+    actions.appendChild(btn);
+  }
+  if (b.status === 'Confirmed') {
+    const btn = document.createElement('button');
+    btn.className = 'btn-action done';
+    btn.textContent = 'Merkja sem lokið';
+    btn.onclick = () => updateStatus(ref, 'Done');
+    actions.appendChild(btn);
+  }
+  if (b.status !== 'Done') {
+    const btn = document.createElement('button');
+    btn.className = 'btn-action cancel';
+    btn.textContent = 'Afbóka';
+    btn.onclick = () => updateStatus(ref, 'Cancelled');
+    actions.appendChild(btn);
+  }
+  document.getElementById('booking-modal').classList.add('open');
+}
+
+function updateStatus(ref, status) {
+  const b = bookings.find(b => b.ref === ref);
+  if (b) { b.status = status; }
+  // SUPABASE PLACEHOLDER: await supabase.from('bookings').update({ status }).eq('ref', ref)
+  closeModal();
+  renderAll();
+}
+
+function closeModal() { document.getElementById('booking-modal').classList.remove('open'); }
+document.getElementById('booking-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+function renderAll() {
+  renderStats();
+  renderUpcoming();
+  renderPending();
+  renderChart('chart-bars', 'chart-labels');
+}
+
+function openAddWorker() { alert('Hér mun koma form til að bæta við nýjum starfsmanni þegar Supabase Auth er tengt.'); }
+
+renderAll();
+</script>
+</body>
+</html>

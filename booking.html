@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bóka þrif – Hrein Gæði</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--off:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--green:#057a55;--green-light:#ecfdf5;--radius:12px;--radius-lg:20px;--shadow:0 4px 32px rgba(17,24,39,0.08);--transition:0.3s cubic-bezier(0.4,0,0.2,1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min-height:100vh;-webkit-font-smoothing:antialiased;}
+body.lang-is .en{display:none;}
+body.lang-en .is{display:none;}
+
+.page-header{background:var(--white);border-bottom:1px solid var(--mist);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.back-link{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--slate);font-size:14px;transition:color var(--transition);}
+.back-link:hover{color:var(--navy);}
+.back-link svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.header-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--navy);}
+.lang-toggle{display:flex;align-items:center;background:var(--light);border-radius:50px;padding:3px;gap:2px;}
+.lang-btn{background:none;border:none;padding:4px 11px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--steel);cursor:pointer;transition:var(--transition);}
+.lang-btn.active{background:var(--white);color:var(--navy);font-weight:500;}
+
+.booking-layout{max-width:900px;margin:0 auto;padding:3rem 2rem;}
+.booking-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--navy);margin-bottom:0.5rem;}
+.booking-sub{font-size:14px;color:var(--steel);margin-bottom:2.5rem;}
+
+.progress-wrap{display:flex;gap:0;margin-bottom:2.5rem;background:var(--white);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;border:1px solid var(--mist);}
+.prog-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
+.prog-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:60%;width:80%;height:1px;background:var(--mist);}
+.prog-step.done::after,.prog-step.active::after{background:var(--accent);}
+.prog-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--mist);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--steel);transition:var(--transition);z-index:1;}
+.prog-step.done .prog-dot{background:var(--accent);border-color:var(--accent);color:#fff;}
+.prog-step.active .prog-dot{border-color:var(--accent);color:var(--accent);}
+.prog-label{font-size:10px;color:var(--steel);letter-spacing:0.03em;text-align:center;}
+.prog-step.active .prog-label{color:var(--accent);}
+.prog-step.done .prog-label{color:var(--navy);}
+
+.step{display:none;}
+.step.active{display:block;}
+.step-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);padding:2.5rem;}
+.step-heading{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--navy);margin-bottom:0.5rem;}
+.step-subhead{font-size:13px;color:var(--steel);margin-bottom:2rem;line-height:1.6;}
+
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.type-card{border:1.5px solid var(--mist);border-radius:var(--radius-lg);padding:1.5rem;cursor:pointer;text-align:center;transition:var(--transition);background:var(--white);}
+.type-card:hover,.type-card.sel{border-color:var(--accent);background:var(--accent-light);}
+.type-card .icon{font-size:32px;margin-bottom:8px;}
+.type-card .label{font-size:15px;font-weight:500;color:var(--navy);}
+.type-card .sub{font-size:12px;color:var(--steel);margin-top:3px;}
+
+.sqm-section{margin-bottom:1.5rem;}
+.sqm-label{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:0.75rem;}
+.sqm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.sqm-btn{border:1.5px solid var(--mist);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer;background:var(--white);transition:var(--transition);}
+.sqm-btn:hover,.sqm-btn.sel{border-color:var(--accent);background:var(--accent-light);}
+.sqm-btn .sqm-range{font-size:14px;font-weight:500;color:var(--navy);}
+.sqm-btn .sqm-price{font-size:11px;color:var(--steel);margin-top:2px;}
+.sqm-custom{margin-top:10px;}
+.sqm-custom-label{font-size:12px;color:var(--steel);margin-bottom:5px;}
+.sqm-input{width:100%;padding:10px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);}
+.sqm-input:focus{outline:none;border-color:var(--accent);}
+.price-preview{background:var(--green-light);border:1px solid #a7f3d0;border-radius:var(--radius);padding:1rem 1.25rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:center;}
+.price-preview-label{font-size:13px;color:var(--green);}
+.price-preview-amount{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--navy);}
+
+.extras-section{margin-bottom:1.5rem;}
+.extras-label{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:0.75rem;}
+.extras-grid{display:flex;flex-direction:column;gap:8px;}
+.extra-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--mist);border-radius:var(--radius);background:var(--white);cursor:pointer;transition:var(--transition);}
+.extra-row:hover{border-color:var(--accent);}
+.extra-row.sel{border-color:var(--accent);background:var(--accent-light);}
+.extra-row-left{display:flex;align-items:center;gap:10px;}
+.extra-check{width:18px;height:18px;border:1.5px solid var(--mist);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition);}
+.extra-row.sel .extra-check{background:var(--accent);border-color:var(--accent);}
+.extra-check svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
+.extra-row.sel .extra-check svg{opacity:1;}
+.extra-row-name{font-size:13px;color:var(--navy);}
+.extra-row-price{font-size:12px;font-weight:500;color:var(--accent);}
+
+.total-box{background:var(--navy);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
+.total-label{font-size:13px;color:rgba(255,255,255,0.6);}
+.total-amount{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:#fff;}
+.total-note{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
+
+.cal-wrap{margin-bottom:1.5rem;}
+.cal-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.cal-month-label{font-size:15px;font-weight:500;color:var(--navy);}
+.cal-nav-btn{background:none;border:1px solid var(--mist);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--slate);display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+.cal-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-lbl{font-size:11px;color:var(--steel);text-align:center;padding-bottom:6px;letter-spacing:0.03em;}
+.cal-day{height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;color:var(--navy);cursor:pointer;transition:var(--transition);}
+.cal-day.empty{cursor:default;}
+.cal-day.past{color:var(--mist);cursor:not-allowed;}
+.cal-day:not(.empty):not(.past):hover{background:var(--accent-light);color:var(--accent);}
+.cal-day.sel{background:var(--navy);color:#fff;font-weight:500;}
+.cal-day.today{color:var(--accent);font-weight:500;}
+
+.time-section{margin-bottom:1.5rem;}
+.time-group-label{font-size:11px;color:var(--steel);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;margin-top:1rem;}
+.time-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.time-slot{border:1.5px solid var(--mist);border-radius:var(--radius);padding:10px 6px;text-align:center;cursor:pointer;font-size:12px;color:var(--navy);transition:var(--transition);}
+.time-slot:hover{border-color:var(--accent);background:var(--accent-light);}
+.time-slot.sel{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+.form-group{margin-bottom:1rem;}
+.form-label{font-size:12px;color:var(--slate);margin-bottom:5px;display:block;letter-spacing:0.02em;}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);background:var(--white);transition:var(--transition);}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);resize:none;height:80px;transition:var(--transition);}
+.form-textarea:focus{outline:none;border-color:var(--accent);}
+
+.confirm-card{background:var(--off);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border:1px solid var(--mist);}
+.confirm-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--light);font-size:13px;}
+.confirm-row:last-child{border-bottom:none;}
+.confirm-label{color:var(--steel);}
+.confirm-value{font-weight:500;color:var(--navy);text-align:right;max-width:60%;}
+.confirm-note{font-size:12px;color:var(--steel);text-align:center;line-height:1.6;margin-bottom:1.25rem;font-style:italic;}
+
+.teya-box{border:1px solid var(--mist);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem;}
+.teya-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
+.teya-badge{font-size:10px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:50px;}
+.teya-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--off);border-radius:8px;border:1px solid var(--mist);}
+.teya-logo-box{width:52px;height:30px;background:var(--navy);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;letter-spacing:0.05em;flex-shrink:0;}
+.teya-info-name{font-size:13px;font-weight:500;color:var(--navy);}
+.teya-info-sub{font-size:11px;color:var(--steel);}
+.teya-connect-btn{margin-left:auto;background:none;border:1px solid var(--mist);border-radius:50px;padding:6px 14px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--slate);cursor:pointer;transition:var(--transition);}
+.teya-connect-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+.step-actions{display:flex;gap:10px;margin-top:1.5rem;}
+.btn-back{background:none;border:1.5px solid var(--mist);color:var(--slate);padding:12px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;transition:var(--transition);}
+.btn-back:hover{border-color:var(--navy);color:var(--navy);}
+.btn-next{flex:1;background:var(--accent);color:#fff;border:none;padding:13px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition);}
+.btn-next:hover{background:#1e429f;}
+
+.success-wrap{text-align:center;padding:3rem 2rem;}
+.success-icon{width:64px;height:64px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
+.success-icon svg{width:28px;height:28px;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:var(--navy);margin-bottom:0.75rem;}
+.success-sub{font-size:15px;color:var(--slate);line-height:1.7;max-width:480px;margin:0 auto 2rem;font-weight:300;}
+.ref-box{display:inline-block;background:var(--green-light);border-radius:var(--radius);padding:1.25rem 2rem;margin-bottom:2rem;}
+.ref-label{font-size:11px;color:var(--green);letter-spacing:0.1em;text-transform:uppercase;}
+.ref-num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--navy);margin-top:4px;}
+.btn-outline{background:none;border:1.5px solid var(--mist);color:var(--slate);padding:12px 28px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;transition:var(--transition);}
+.btn-outline:hover{border-color:var(--navy);color:var(--navy);}
+
+@media(max-width:600px){
+  .booking-layout{padding:2rem 1rem;}
+  .step-card{padding:1.5rem;}
+  .type-grid{grid-template-columns:1fr;}
+  .sqm-grid{grid-template-columns:1fr 1fr;}
+  .time-slots{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .progress-wrap{padding:1rem;}
+  .prog-label{display:none;}
+}
+</style>
+</head>
+<body class="lang-is">
+
+<header class="page-header">
+  <a href="index.html" class="back-link">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span class="is">Til baka</span><span class="en">Back</span>
+  </a>
+  <a href="index.html" class="header-logo" style="text-decoration:none;color:var(--navy);">Hrein Gæði</a>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('is')">IS</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+</header>
+
+<div class="booking-layout">
+  <h1 class="booking-title is">Bóka þrif</h1>
+  <h1 class="booking-title en">Book a clean</h1>
+  <p class="booking-sub is">Við höfum samband og staðfestum tímann á þínum óskuðum tíma innan 24 klst.</p>
+  <p class="booking-sub en">We will contact you and confirm within 24 hours at your preferred time.</p>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="prog-step active" id="prog1">
+      <div class="prog-dot">1</div>
+      <span class="prog-label is">Tegund</span><span class="prog-label en">Type</span>
+    </div>
+    <div class="prog-step" id="prog2">
+      <div class="prog-dot">2</div>
+      <span class="prog-label is">Stærð & Verð</span><span class="prog-label en">Size & Price</span>
+    </div>
+    <div class="prog-step" id="prog3">
+      <div class="prog-dot">3</div>
+      <span class="prog-label is">Tími</span><span class="prog-label en">Time</span>
+    </div>
+    <div class="prog-step" id="prog4">
+      <div class="prog-dot">4</div>
+      <span class="prog-label is">Upplýsingar</span><span class="prog-label en">Details</span>
+    </div>
+    <div class="prog-step" id="prog5">
+      <div class="prog-dot">5</div>
+      <span class="prog-label is">Staðfesting</span><span class="prog-label en">Confirm</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: TYPE -->
+  <div class="step active" id="step1">
+    <div class="step-card">
+      <h2 class="step-heading is">Hvers konar þrif?</h2>
+      <h2 class="step-heading en">What type of clean?</h2>
+      <p class="step-subhead is">Veldu tegund þrifanna sem þú ert að bóka.</p>
+      <p class="step-subhead en">Select the type of cleaning you are booking.</p>
+      <div class="type-grid">
+        <div class="type-card" onclick="selType('home',this)">
+          <div class="icon">🏠</div>
+          <div class="label is">Heimilisþrif</div><div class="label en">Home cleaning</div>
+          <div class="sub is">Almenn viðhaldsþrif</div><div class="sub en">Standard maintenance</div>
+        </div>
+        <div class="type-card" onclick="selType('airbnb',this)">
+          <div class="icon">🛎️</div>
+          <div class="label">AirBnB þrif</div>
+          <div class="sub is">Þrif milli gesta</div><div class="sub en">Between guests</div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-next" onclick="goStep(2)"><span class="is">Áfram</span><span class="en">Continue</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: SIZE & EXTRAS -->
+  <div class="step" id="step2">
+    <div class="step-card">
+      <h2 class="step-heading is">Stærð og verð</h2>
+      <h2 class="step-heading en">Size and price</h2>
+      <p class="step-subhead is">Veldu stærð húsnæðisins til að sjá verðið. Þú getur bætt við aukaþjónustu.</p>
+      <p class="step-subhead en">Select the property size to see the price. You can add optional extras.</p>
+
+      <div class="sqm-section">
+        <div class="sqm-label is">Stærð húsnæðis (fermetrar)</div>
+        <div class="sqm-label en">Property size (square metres)</div>
+        <div class="sqm-grid">
+          <div class="sqm-btn" onclick="selSqm(25,this,'0–50 m²')"><div class="sqm-range">0 – 50 m²</div><div class="sqm-price">12.000 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(63,this,'51–75 m²')"><div class="sqm-range">51 – 75 m²</div><div class="sqm-price">15.600 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(88,this,'76–100 m²')"><div class="sqm-range">76 – 100 m²</div><div class="sqm-price">21.600 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(125,this,'101–150 m²')"><div class="sqm-range">101 – 150 m²</div><div class="sqm-price">30.000 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(175,this,'151–200 m²')"><div class="sqm-range">151 – 200 m²</div><div class="sqm-price">40.800 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(0,this,'200+ m²')" id="sqm-custom-btn"><div class="sqm-range">200+ m²</div><div class="sqm-price is">Sérsniðið</div><div class="sqm-price en">Custom</div></div>
+        </div>
+        <div class="sqm-custom" id="sqm-custom-wrap" style="display:none;">
+          <div class="sqm-custom-label is">Sláðu inn fermetra:</div>
+          <div class="sqm-custom-label en">Enter square metres:</div>
+          <input class="sqm-input" type="number" id="sqm-custom-input" placeholder="220" oninput="calcCustomSqm(this.value)"/>
+        </div>
+        <div class="price-preview" id="price-preview" style="display:none;">
+          <div><div class="price-preview-label is">Grunnverð þrifa</div><div class="price-preview-label en">Base cleaning price</div></div>
+          <div class="price-preview-amount" id="base-price-display">0 kr</div>
+        </div>
+      </div>
+
+      <div class="extras-section">
+        <div class="extras-label is">Aukaþjónusta (valkvætt)</div>
+        <div class="extras-label en">Add-on services (optional)</div>
+        <div class="extras-grid">
+          <div class="extra-row" onclick="toggleExtra(this,4500,'is-oven')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Bakaraofn þrifinn</span><span class="extra-row-name en">Oven cleaned</span></div><span class="extra-row-price">4.500 kr</span></div>
+          <div class="extra-row" onclick="toggleExtra(this,3500,'is-fridge')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Ísskápur þrifinn</span><span class="extra-row-name en">Fridge cleaned</span></div><span class="extra-row-price">3.500 kr</span></div>
+          <div class="extra-row" onclick="toggleExtra(this,1800,'is-windows')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Gluggar (3 glugg.)</span><span class="extra-row-name en">Windows (3 windows)</span></div><span class="extra-row-price">1.800 kr</span></div>
+          <div class="extra-row" onclick="toggleExtra(this,2000,'is-laundry')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Þvottavél keyrð</span><span class="extra-row-name en">Laundry washed</span></div><span class="extra-row-price">2.000 kr</span></div>
+          <div class="extra-row" onclick="toggleExtra(this,1500,'is-bed')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Rúm búið um</span><span class="extra-row-name en">Bed made</span></div><span class="extra-row-price">1.500 kr</span></div>
+          <div class="extra-row" onclick="toggleExtra(this,5000,'is-bath')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Djúphreinsun baðherbergis</span><span class="extra-row-name en">Deep clean bathroom</span></div><span class="extra-row-price">5.000 kr</span></div>
+        </div>
+      </div>
+
+      <div class="total-box" id="total-box" style="display:none;">
+        <div><div class="total-label is">Heildarverð</div><div class="total-label en">Total price</div><div class="total-note is">*25% álag á fyrsta þrif</div><div class="total-note en">*25% surcharge on first clean</div></div>
+        <div class="total-amount" id="total-display">0 kr</div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(1)"><span class="is">Til baka</span><span class="en">Back</span></button>
+        <button class="btn-next" onclick="goStep(3)"><span class="is">Áfram</span><span class="en">Continue</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: TIME -->
+  <div class="step" id="step3">
+    <div class="step-card">
+      <h2 class="step-heading is">Hvenær hentar þér best?</h2>
+      <h2 class="step-heading en">What time works best for you?</h2>
+      <p class="step-subhead is">Veldu þinn æskilega dag og tíma. Við staðfestum hvort teymið sé laust á þínum óskuðum tíma.</p>
+      <p class="step-subhead en">Pick your preferred date and time. We will confirm whether the team is available at your preferred time.</p>
+
+      <div class="cal-wrap">
+        <div class="cal-nav-row">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <span class="cal-month-label" id="cal-label">Apríl 2026</span>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+
+      <div class="time-section">
+        <div class="time-group-label is">Morgunn</div><div class="time-group-label en">Morning</div>
+        <div class="time-slots">
+          <div class="time-slot" onclick="selTime(this,'8:00–10:00')">8:00–10:00</div>
+          <div class="time-slot" onclick="selTime(this,'10:00–12:00')">10:00–12:00</div>
+          <div class="time-slot" onclick="selTime(this,'Morgunn')"><span class="is">Hvenær sem er</span><span class="en">Any time</span></div>
+        </div>
+        <div class="time-group-label is">Eftirmiðdagur</div><div class="time-group-label en">Afternoon</div>
+        <div class="time-slots">
+          <div class="time-slot" onclick="selTime(this,'12:00–14:00')">12:00–14:00</div>
+          <div class="time-slot" onclick="selTime(this,'14:00–17:00')">14:00–17:00</div>
+          <div class="time-slot" onclick="selTime(this,'Eftirmiðdagur')"><span class="is">Hvenær sem er</span><span class="en">Any time</span></div>
+        </div>
+        <div class="time-group-label is">Kvöld</div><div class="time-group-label en">Evening</div>
+        <div class="time-slots">
+          <div class="time-slot" onclick="selTime(this,'17:00–19:00')">17:00–19:00</div>
+          <div class="time-slot" onclick="selTime(this,'19:00–21:00')">19:00–21:00</div>
+          <div class="time-slot" onclick="selTime(this,'Kvöld')"><span class="is">Hvenær sem er</span><span class="en">Any time</span></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label is">Athugasemdir um tíma (valkvætt)</label>
+        <label class="form-label en">Notes about timing (optional)</label>
+        <textarea class="form-textarea" id="time-notes" placeholder="..."></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(2)"><span class="is">Til baka</span><span class="en">Back</span></button>
+        <button class="btn-next" onclick="goStep(4)"><span class="is">Áfram</span><span class="en">Continue</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: DETAILS -->
+  <div class="step" id="step4">
+    <div class="step-card">
+      <h2 class="step-heading is">Þínar upplýsingar</h2>
+      <h2 class="step-heading en">Your details</h2>
+      <p class="step-subhead is">Við notum þessar upplýsingar til að hafa samband við þig og staðfesta tímann.</p>
+      <p class="step-subhead en">We will use these details to contact you and confirm the appointment.</p>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label is">Fullt nafn *</label><label class="form-label en">Full name *</label><input class="form-input" id="f-name" placeholder="Jón Jónsson"/></div>
+        <div class="form-group"><label class="form-label is">Sími *</label><label class="form-label en">Phone *</label><input class="form-input" id="f-phone" type="tel" placeholder="+354 xxx xxxx"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="f-email" type="email" placeholder="jon@email.is"/></div>
+      <div class="form-group"><label class="form-label is">Heimilisfang *</label><label class="form-label en">Address *</label><input class="form-input" id="f-address" placeholder="Laugavegur 1, Reykjavík"/></div>
+      <div class="form-group"><label class="form-label is">Póstnúmer</label><label class="form-label en">Postal code</label><input class="form-input" id="f-zip" placeholder="101"/></div>
+      <div class="form-group"><label class="form-label is">Hvernig finnum við lykilinn? (valkvæmt)</label><label class="form-label en">How do we access the property? (optional)</label><textarea class="form-textarea" id="f-access" placeholder="..."></textarea></div>
+      <div class="form-group"><label class="form-label is">Aðrar athugasemdir (valkvæmt)</label><label class="form-label en">Other notes (optional)</label><textarea class="form-textarea" id="f-notes" placeholder="..."></textarea></div>
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(3)"><span class="is">Til baka</span><span class="en">Back</span></button>
+        <button class="btn-next" onclick="goConfirm()"><span class="is">Yfirfara bókun</span><span class="en">Review booking</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: CONFIRM -->
+  <div class="step" id="step5">
+    <div class="step-card">
+      <h2 class="step-heading is">Staðfesta bókunarbeiðni</h2>
+      <h2 class="step-heading en">Confirm booking request</h2>
+      <p class="step-subhead is">Farðu yfir upplýsingarnar áður en þú sendir beiðnina.</p>
+      <p class="step-subhead en">Review your details before submitting the request.</p>
+
+      <div class="confirm-card">
+        <div class="confirm-row"><span class="confirm-label is">Tegund</span><span class="confirm-label en">Type</span><span class="confirm-value" id="c-type">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Stærð</span><span class="confirm-label en">Size</span><span class="confirm-value" id="c-sqm">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Aukaþjónusta</span><span class="confirm-label en">Extras</span><span class="confirm-value" id="c-extras">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Heildarverð</span><span class="confirm-label en">Total price</span><span class="confirm-value" id="c-total">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Dagsetning</span><span class="confirm-label en">Date</span><span class="confirm-value" id="c-date">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Tími</span><span class="confirm-label en">Time</span><span class="confirm-value" id="c-time">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Nafn</span><span class="confirm-label en">Name</span><span class="confirm-value" id="c-name">—</span></div>
+        <div class="confirm-row"><span class="confirm-label is">Heimilisfang</span><span class="confirm-label en">Address</span><span class="confirm-value" id="c-address">—</span></div>
+      </div>
+
+      <div class="teya-box">
+        <div class="teya-title is">Greiðslumáti <span class="teya-badge">Kemur fljótlega</span></div>
+        <div class="teya-title en">Payment <span class="teya-badge">Coming soon</span></div>
+        <div class="teya-row">
+          <div class="teya-logo-box">TEYA</div>
+          <div><div class="teya-info-name">Teya Payments</div><div class="teya-info-sub is">Íslenskur greiðsluveitandi</div><div class="teya-info-sub en">Icelandic payment provider</div></div>
+          <button class="teya-connect-btn"><span class="is">Tengja</span><span class="en">Connect</span></button>
+        </div>
+      </div>
+
+      <p class="confirm-note is">Við sendum þér staðfestingu á tölvupóst og höfum samband innan 24 klst til að staðfesta tímann á þínum óskuðum tíma.</p>
+      <p class="confirm-note en">We will send you a confirmation email and be in touch within 24 hours to confirm the appointment at your preferred time.</p>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(4)"><span class="is">Til baka</span><span class="en">Back</span></button>
+        <button class="btn-next" onclick="submitBooking()"><span class="is">Senda bókunarbeiðni</span><span class="en">Send booking request</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="step" id="step-success">
+    <div class="step-card">
+      <div class="success-wrap">
+        <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h2 class="success-title is">Beiðni send!</h2>
+        <h2 class="success-title en">Request sent!</h2>
+        <p class="success-sub is">Við athugum hvort teymið sé laust og höfum samband við þig innan 24 klst til að staðfesta tímann á þínum óskuðum tíma.</p>
+        <p class="success-sub en">We will check availability and contact you within 24 hours to confirm the appointment at your preferred time.</p>
+        <div class="ref-box">
+          <div class="ref-label is">Tilvísunarnúmer</div>
+          <div class="ref-label en">Reference number</div>
+          <div class="ref-num" id="ref-num">HG-0000</div>
+        </div>
+        <button class="btn-outline" onclick="restart()"><span class="is">Bóka aftur</span><span class="en">Book again</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let lang = localStorage.getItem('hg-lang') || 'is';
+function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
+setLang(lang);
+
+let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
+let calY=2026,calM=3;
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  const target=document.getElementById('step'+n);
+  if(target)target.classList.add('active');
+  for(let i=1;i<=5;i++){
+    const p=document.getElementById('prog'+i);
+    if(!p)continue;
+    p.className='prog-step'+(i<n?' done':i===n?' active':'');
+  }
+  if(n===3)buildCal();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function selType(type,el){
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  state.type=type;
+}
+
+function selSqm(sqm,el,label){
+  document.querySelectorAll('.sqm-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  if(sqm===0){
+    document.getElementById('sqm-custom-wrap').style.display='block';
+    state.sqm=0;state.sqmLabel=label;state.basePrice=0;
+    updatePriceDisplay();
+  } else {
+    document.getElementById('sqm-custom-wrap').style.display='none';
+    state.sqm=sqm;state.sqmLabel=label;
+    state.basePrice=sqm*240;
+    updatePriceDisplay();
+  }
+}
+
+function calcCustomSqm(val){
+  const v=parseInt(val)||0;
+  state.sqm=v;state.sqmLabel=v+' m²';
+  state.basePrice=v*240;
+  updatePriceDisplay();
+}
+
+function updatePriceDisplay(){
+  state.total=state.basePrice+state.extrasTotal;
+  const pp=document.getElementById('price-preview');
+  const tb=document.getElementById('total-box');
+  if(state.basePrice>0){
+    pp.style.display='flex';
+    document.getElementById('base-price-display').textContent=state.basePrice.toLocaleString('is-IS')+' kr';
+    tb.style.display='flex';
+    document.getElementById('total-display').textContent=state.total.toLocaleString('is-IS')+' kr';
+  }
+}
+
+function toggleExtra(el,price,id){
+  el.classList.toggle('sel');
+  if(el.classList.contains('sel')){
+    state.extras.push({id,price});state.extrasTotal+=price;
+  } else {
+    state.extras=state.extras.filter(e=>e.id!==id);state.extrasTotal-=price;
+  }
+  updatePriceDisplay();
+}
+
+const monthsIs=['Janúar','Febrúar','Mars','Apríl','Maí','Júní','Júlí','Ágúst','September','Október','Nóvember','Desember'];
+const monthsEn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const daysIs=['Su','Má','Þr','Mi','Fi','La','Su'];
+const daysEn=['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function buildCal(){
+  document.getElementById('cal-label').textContent=(lang==='is'?monthsIs:monthsEn)[calM]+' '+calY;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  (lang==='is'?daysIs:daysEn).forEach(d=>{const el=document.createElement('div');el.className='cal-day-lbl';el.textContent=d;grid.appendChild(el);});
+  const first=new Date(calY,calM,1).getDay();
+  const total=new Date(calY,calM+1,0).getDate();
+  const today=new Date();
+  for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
+  for(let d=1;d<=total;d++){
+    const el=document.createElement('div');el.className='cal-day';el.textContent=d;
+    const dt=new Date(calY,calM,d);
+    const isToday=today.getDate()===d&&today.getMonth()===calM&&today.getFullYear()===calY;
+    const isPast=dt<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    if(isPast)el.classList.add('past');
+    else if(isToday)el.classList.add('today');
+    const ds=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    if(state.date===ds)el.classList.add('sel');
+    if(!isPast)el.onclick=()=>{document.querySelectorAll('.cal-day').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');state.date=ds;};
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(dir){calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}buildCal();}
+
+function selTime(el,val){document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');state.time=val;}
+
+function goConfirm(){
+  state.name=document.getElementById('f-name').value;
+  state.phone=document.getElementById('f-phone').value;
+  state.email=document.getElementById('f-email').value;
+  state.address=document.getElementById('f-address').value;
+  if(!state.name||!state.email||!state.address){
+    alert(lang==='is'?'Vinsamlegast fylltu út nafn, email og heimilisfang.':'Please fill in name, email and address.');
+    return;
+  }
+  const typeLabel=state.type==='home'?(lang==='is'?'Heimilisþrif':'Home cleaning'):'AirBnB þrif';
+  document.getElementById('c-type').textContent=typeLabel;
+  document.getElementById('c-sqm').textContent=state.sqmLabel||'—';
+  document.getElementById('c-extras').textContent=state.extras.length>0?state.extras.length+(lang==='is'?' þjónustur valdar':' services selected'):(lang==='is'?'Engar':'None');
+  document.getElementById('c-total').textContent=state.total>0?state.total.toLocaleString('is-IS')+' kr':'—';
+  document.getElementById('c-date').textContent=state.date||(lang==='is'?'Ekki tilgreint':'Not specified');
+  document.getElementById('c-time').textContent=state.time||(lang==='is'?'Ekki tilgreint':'Not specified');
+  document.getElementById('c-name').textContent=state.name;
+  document.getElementById('c-address').textContent=state.address;
+  goStep(5);
+}
+
+async function submitBooking(){
+  const ref='HG-'+Math.floor(1000+Math.random()*9000);
+  document.getElementById('ref-num').textContent=ref;
+
+  // SUPABASE PLACEHOLDER — uncomment when connected
+  // const { error } = await supabase.from('bookings').insert([{
+  //   ref, type: state.type, sqm: state.sqm, sqm_label: state.sqmLabel,
+  //   base_price: state.basePrice, extras_total: state.extrasTotal, total: state.total,
+  //   date: state.date, time: state.time,
+  //   name: state.name, phone: state.phone, email: state.email, address: state.address,
+  //   notes: document.getElementById('f-notes').value,
+  //   access: document.getElementById('f-access').value,
+  //   status: 'Pending', created_at: new Date().toISOString()
+  // }])
+
+  // GOOGLE CALENDAR PLACEHOLDER — uncomment when connected
+  // await addToGoogleCalendar({ title: 'Hrein Gæði þrif - '+state.name, date: state.date, time: state.time, address: state.address })
+
+  // SLING PLACEHOLDER — uncomment when connected
+  // await notifySling({ booking_ref: ref, date: state.date, address: state.address })
+
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.prog-step').forEach(p=>p.className='prog-step done');
+  document.getElementById('step-success').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restart(){
+  state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
+  document.querySelectorAll('.type-card,.sqm-btn,.extra-row,.time-slot,.cal-day').forEach(el=>el.classList.remove('sel'));
+  ['f-name','f-phone','f-email','f-address','f-zip','f-access','f-notes','time-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('price-preview').style.display='none';
+  document.getElementById('total-box').style.display='none';
+  document.getElementById('sqm-custom-wrap').style.display='none';
+  goStep(1);
+}
+
+buildCal();
+</script>
+</body>
+</html>
