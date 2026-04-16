@@ -134,7 +134,13 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// SUPABASE CONNECTION
+const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const userStr = localStorage.getItem('hg-user');
 if (!userStr) { window.location.href = 'login.html'; }
 const currentUser = JSON.parse(userStr || '{}');
@@ -261,7 +267,10 @@ function toggleCheck(ref, i) {
 function markDone() {
   const j = myJobs.find(j => j.ref === currentJobRef);
   if (j) { j.status = 'Done'; }
-  // SUPABASE PLACEHOLDER: await supabase.from('bookings').update({ status: 'Done' }).eq('ref', currentJobRef)
+  // SAVE TO SUPABASE
+  sb.from('bookings').update({ status: 'Done' }).eq('ref', currentJobRef).then(({ error }) => {
+    if (error) console.error('Error marking done:', error);
+  });
   document.getElementById('job-sheet').classList.remove('open');
   renderTodayJobs();
   renderUpcomingJobs();

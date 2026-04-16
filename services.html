@@ -430,7 +430,7 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
       <div class="footer-col-title is">Samband</div><div class="footer-col-title en">Contact</div>
       <ul class="footer-links">
         <li><span style="color:rgba(255,255,255,0.45);">+354 xxx xxxx</span></li>
-        <li><a href="mailto:info@hreingaedi.is">info@hreingaedi.is</a></li>
+        <li><a href="mailto:hreingaedi@xn--hreingi-rxa4g.is">hreingaedi@hreingæði.is</a></li>
         <li><span style="color:rgba(255,255,255,0.45);">Reykjavík, Ísland</span></li>
       </ul>
     </div>
@@ -444,7 +444,13 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// SUPABASE CONNECTION
+const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 let lang='is';
 function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
 const savedLang=localStorage.getItem('hg-lang');if(savedLang)setLang(savedLang);
@@ -452,11 +458,33 @@ function toggleMenu(){document.getElementById('mobile-menu').classList.toggle('o
 const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
 
-function submitCompanyForm(){
+async function submitCompanyForm(){
   const company=document.getElementById('cf-company').value;
   const name=document.getElementById('cf-name').value;
   const email=document.getElementById('cf-email').value;
   if(!company||!name||!email){alert(lang==='is'?'Vinsamlegast fylltu út nauðsynlegar upplýsingar.':'Please fill in the required fields.');return;}
+  try {
+    const { error } = await sb.from('company_quotes').insert([{
+      company: company,
+      kennitala: document.getElementById('cf-kt').value,
+      name: name,
+      email: email,
+      phone: document.getElementById('cf-phone').value,
+      size: parseInt(document.getElementById('cf-size').value) || null,
+      frequency: document.getElementById('cf-freq').value,
+      notes: document.getElementById('cf-notes').value,
+      status: 'new'
+    }]);
+    if (error) {
+      console.error('Supabase error:', error);
+      alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
+      return;
+    }
+  } catch (err) {
+    console.error('Error:', err);
+    alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
+    return;
+  }
   document.getElementById('company-form').style.display='none';
   document.getElementById('company-success').style.display='block';
 }

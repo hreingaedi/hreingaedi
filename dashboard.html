@@ -426,7 +426,13 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// SUPABASE CONNECTION
+const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // AUTH CHECK
 const userStr = localStorage.getItem('hg-user');
 if (!userStr) { window.location.href = 'login.html'; }
@@ -443,21 +449,39 @@ const now = new Date();
 const dateStr = now.toLocaleDateString('is-IS', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 document.getElementById('today-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 
-// DEMO DATA
+// WORKERS (will be replaced with real data from Supabase once workers table is populated)
 const workers = [
-  { id:'w1', name:'Anna Sigurðardóttir', shifts:12, hourlyRate:2800, color:'#1a56db' },
-  { id:'w2', name:'Siggi Björnsson',     shifts:8,  hourlyRate:2800, color:'#057a55' },
-  { id:'w3', name:'Katrín Magnúsdóttir', shifts:10, hourlyRate:2800, color:'#7c3aed' },
+  { id:'w1', name:'Anna Sigurðardóttir', shifts:0, hourlyRate:2800, color:'#1a56db' },
+  { id:'w2', name:'Siggi Björnsson',     shifts:0, hourlyRate:2800, color:'#057a55' },
+  { id:'w3', name:'Katrín Magnúsdóttir', shifts:0, hourlyRate:2800, color:'#7c3aed' },
 ];
 
-let bookings = [
-  { ref:'HG-4821', name:'Sigríður Björnsdóttir', type:'home',    service:'Heimilisþrif', sqm:'76–100 m²', total:21600, date:'2026-04-12', time:'8:00–10:00',   address:'Hverfisgata 42, Reykjavík',  worker:'w1', status:'Pending'  },
-  { ref:'HG-3107', name:'Kaupfélag Reykjavíkur', type:'company', service:'Fyrirtækjaþrif',sqm:'200+ m²',  total:48000, date:'2026-04-12', time:'Eftirmiðdagur', address:'Borgartún 21, Reykjavík',    worker:'w2', status:'Confirmed'},
-  { ref:'HG-2984', name:'Arna Helgadóttir',       type:'home',    service:'Heimilisþrif', sqm:'51–75 m²', total:15600, date:'2026-04-14', time:'10:00–12:00',  address:'Laugavegur 88, Reykjavík',   worker:'w1', status:'Confirmed'},
-  { ref:'HG-2210', name:'Guesthouse Vaka',        type:'airbnb',  service:'AirBnB þrif',  sqm:'51–75 m²', total:18000, date:'2026-04-15', time:'Morgunn',      address:'Skólavörðustígur 14',        worker:'w3', status:'Pending'  },
-  { ref:'HG-1893', name:'Þór Gunnarsson',         type:'home',    service:'Heimilisþrif', sqm:'0–50 m²',  total:12000, date:'2026-04-08', time:'8:00–10:00',   address:'Melgata 5, Kópavogur',       worker:'w2', status:'Done'    },
-  { ref:'HG-1650', name:'Ísafold ehf.',           type:'company', service:'Fyrirtækjaþrif',sqm:'101–150 m²',total:36000, date:'2026-04-07', time:'Kvöld',      address:'Armúli 8, Reykjavík',        worker:'w1', status:'Done'    },
-];
+// BOOKINGS — loaded from Supabase on page load
+let bookings = [];
+
+async function loadBookings() {
+  try {
+    const { data, error } = await sb.from('bookings').select('*').order('created_at', { ascending: false });
+    if (error) { console.error('Error loading bookings:', error); return; }
+    // Map Supabase data to dashboard format
+    bookings = (data || []).map(b => ({
+      ref: b.ref,
+      name: b.name,
+      type: b.type,
+      service: b.service || (b.type === 'home' ? 'Heimilisþrif' : b.type === 'airbnb' ? 'AirBnB þrif' : 'Fyrirtækjaþrif'),
+      sqm: b.sqm,
+      total: b.total,
+      date: b.date,
+      time: b.time,
+      address: b.address,
+      worker: b.worker_id || '',
+      status: b.status
+    }));
+    renderAll();
+  } catch (err) {
+    console.error('Failed to load bookings:', err);
+  }
+}
 
 let currentFilter = 'all';
 let selectedBookingRef = null;
@@ -582,7 +606,10 @@ function filterBookings(filter, btn) {
 function assignWorker(ref, workerId) {
   const b = bookings.find(b => b.ref === ref);
   if (b) { b.worker = workerId; }
-  // SLING PLACEHOLDER: await notifySling({ ref, worker_id: workerId, date: b.date, address: b.address })
+  // SAVE TO SUPABASE
+  sb.from('bookings').update({ worker_id: workerId }).eq('ref', ref).then(({ error }) => {
+    if (error) console.error('Error assigning worker:', error);
+  });
 }
 
 function renderChart(barsId, labelsId) {
@@ -703,7 +730,10 @@ function openModal(ref) {
 function updateStatus(ref, status) {
   const b = bookings.find(b => b.ref === ref);
   if (b) { b.status = status; }
-  // SUPABASE PLACEHOLDER: await supabase.from('bookings').update({ status }).eq('ref', ref)
+  // SAVE TO SUPABASE
+  sb.from('bookings').update({ status }).eq('ref', ref).then(({ error }) => {
+    if (error) console.error('Error updating status:', error);
+  });
   closeModal();
   renderAll();
 }
@@ -720,7 +750,8 @@ function renderAll() {
 
 function openAddWorker() { alert('Hér mun koma form til að bæta við nýjum starfsmanni þegar Supabase Auth er tengt.'); }
 
-renderAll();
+// Load real data from Supabase on page load
+loadBookings();
 </script>
 </body>
 </html>

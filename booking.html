@@ -416,7 +416,13 @@ body.lang-en .is{display:none;}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// SUPABASE CONNECTION
+const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 let lang = localStorage.getItem('hg-lang') || 'is';
 function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
 setLang(lang);
@@ -544,22 +550,41 @@ async function submitBooking(){
   const ref='HG-'+Math.floor(1000+Math.random()*9000);
   document.getElementById('ref-num').textContent=ref;
 
-  // SUPABASE PLACEHOLDER — uncomment when connected
-  // const { error } = await supabase.from('bookings').insert([{
-  //   ref, type: state.type, sqm: state.sqm, sqm_label: state.sqmLabel,
-  //   base_price: state.basePrice, extras_total: state.extrasTotal, total: state.total,
-  //   date: state.date, time: state.time,
-  //   name: state.name, phone: state.phone, email: state.email, address: state.address,
-  //   notes: document.getElementById('f-notes').value,
-  //   access: document.getElementById('f-access').value,
-  //   status: 'Pending', created_at: new Date().toISOString()
-  // }])
+  // SAVE BOOKING TO SUPABASE
+  try {
+    const { error } = await sb.from('bookings').insert([{
+      ref: ref,
+      type: state.type,
+      service: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
+      sqm: state.sqmLabel,
+      sqm_value: state.sqm,
+      base_price: state.basePrice,
+      extras_total: state.extrasTotal,
+      total: state.total,
+      date: state.date,
+      time: state.time,
+      name: state.name,
+      phone: state.phone,
+      email: state.email,
+      address: state.address,
+      zip: document.getElementById('f-zip').value,
+      access_notes: document.getElementById('f-access').value,
+      notes: document.getElementById('f-notes').value,
+      status: 'Pending'
+    }]);
+    if (error) {
+      console.error('Supabase error:', error);
+      alert(lang === 'is' ? 'Villa kom upp við að senda bókunina. Vinsamlegast reyndu aftur eða hafðu samband við okkur.' : 'An error occurred. Please try again or contact us.');
+      return;
+    }
+  } catch (err) {
+    console.error('Error saving booking:', err);
+    alert(lang === 'is' ? 'Villa kom upp. Vinsamlegast reyndu aftur.' : 'An error occurred. Please try again.');
+    return;
+  }
 
   // GOOGLE CALENDAR PLACEHOLDER — uncomment when connected
   // await addToGoogleCalendar({ title: 'Hrein Gæði þrif - '+state.name, date: state.date, time: state.time, address: state.address })
-
-  // SLING PLACEHOLDER — uncomment when connected
-  // await notifySling({ booking_ref: ref, date: state.date, address: state.address })
 
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.prog-step').forEach(p=>p.className='prog-step done');
