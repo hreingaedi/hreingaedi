@@ -44,11 +44,14 @@ body.lang-en .is{display:none;}
 .step-subhead{font-size:13px;color:var(--steel);margin-bottom:2rem;line-height:1.6;}
 
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.type-grid.four{grid-template-columns:1fr 1fr;}
 .type-card{border:1.5px solid var(--mist);border-radius:var(--radius-lg);padding:1.5rem;cursor:pointer;text-align:center;transition:var(--transition);background:var(--white);}
 .type-card:hover,.type-card.sel{border-color:var(--accent);background:var(--accent-light);}
 .type-card .icon{font-size:32px;margin-bottom:8px;}
 .type-card .label{font-size:15px;font-weight:500;color:var(--navy);}
 .type-card .sub{font-size:12px;color:var(--steel);margin-top:3px;}
+.quote-intro{background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--accent-hover);line-height:1.6;}
+.quote-intro svg{width:16px;height:16px;stroke:var(--accent);flex-shrink:0;margin-top:2px;}
 
 .sqm-section{margin-bottom:1.5rem;}
 .sqm-label{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:0.75rem;}
@@ -210,20 +213,30 @@ body.lang-en .is{display:none;}
       <h2 class="step-heading en">What type of clean?</h2>
       <p class="step-subhead is">Veldu tegund þrifanna sem þú ert að bóka.</p>
       <p class="step-subhead en">Select the type of cleaning you are booking.</p>
-      <div class="type-grid">
+      <div class="type-grid four">
         <div class="type-card" onclick="selType('home',this)">
           <div class="icon">🏠</div>
           <div class="label is">Heimilisþrif</div><div class="label en">Home cleaning</div>
-          <div class="sub is">Almenn viðhaldsþrif</div><div class="sub en">Standard maintenance</div>
+          <div class="sub is">Almenn viðhaldsþrif · 240 kr/m²</div><div class="sub en">Standard maintenance · 240 kr/m²</div>
         </div>
         <div class="type-card" onclick="selType('airbnb',this)">
           <div class="icon">🛎️</div>
           <div class="label">AirBnB þrif</div>
           <div class="sub is">Þrif milli gesta</div><div class="sub en">Between guests</div>
         </div>
+        <div class="type-card" onclick="selType('company',this)">
+          <div class="icon">🏢</div>
+          <div class="label is">Fyrirtækjaþrif</div><div class="label en">Commercial cleaning</div>
+          <div class="sub is">Sérsniðið tilboð</div><div class="sub en">Custom quote</div>
+        </div>
+        <div class="type-card" onclick="selType('husfelag',this)">
+          <div class="icon">🏗️</div>
+          <div class="label is">Húsfélög</div><div class="label en">Housing associations</div>
+          <div class="sub is">Sérsniðið tilboð</div><div class="sub en">Custom quote</div>
+        </div>
       </div>
       <div class="step-actions">
-        <button class="btn-next" onclick="goStep(2)"><span class="is">Áfram</span><span class="en">Continue</span></button>
+        <button class="btn-next" onclick="continueFromType()"><span class="is">Áfram</span><span class="en">Continue</span></button>
       </div>
     </div>
   </div>
@@ -396,6 +409,85 @@ body.lang-en .is{display:none;}
     </div>
   </div>
 
+  <!-- QUOTE FLOW STEP Q1: NEEDS -->
+  <div class="step" id="stepQ1">
+    <div class="step-card">
+      <h2 class="step-heading is" id="q1-title">Segðu okkur frá þörfum þínum</h2>
+      <h2 class="step-heading en">Tell us about your needs</h2>
+      <p class="step-subhead is">Við gerum sérsniðið tilboð fyrir þig. Fylltu út eftirfarandi og við höfum samband innan 24 klst.</p>
+      <p class="step-subhead en">We'll prepare a custom quote for you. Fill in the details below and we'll be in touch within 24 hours.</p>
+
+      <div class="quote-intro">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="is" id="q-intro-is">Fyrirtækja- og húsfélagaþrif eru alltaf sérsniðin eftir stærð, tíðni og aðstæðum.</span>
+        <span class="en" id="q-intro-en">Commercial and housing association cleaning is always tailored to size, frequency and circumstances.</span>
+      </div>
+
+      <div class="form-group" id="q-company-group">
+        <label class="form-label is">Nafn fyrirtækis / húsfélags *</label>
+        <label class="form-label en">Company / association name *</label>
+        <input class="form-input" id="q-company" placeholder="Kaupfélag ehf."/>
+      </div>
+      <div class="form-group">
+        <label class="form-label is">Heimilisfang húsnæðis *</label>
+        <label class="form-label en">Property address *</label>
+        <input class="form-input" id="q-address" placeholder="Laugavegur 1, Reykjavík"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label is">Stærð (m²)</label>
+          <label class="form-label en">Size (m²)</label>
+          <input class="form-input" id="q-size" type="number" placeholder="250"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label is">Tíðni</label>
+          <label class="form-label en">Frequency</label>
+          <select class="form-input" id="q-freq">
+            <option value="" disabled selected><span class="is">Veldu tíðni</span></option>
+            <option value="daily" class="is">Daglega</option>
+            <option value="weekly" class="is">Vikulega</option>
+            <option value="biweekly" class="is">Tvisvar í viku</option>
+            <option value="monthly" class="is">Mánaðarlega</option>
+            <option value="once" class="is">Eitt skipti</option>
+            <option value="custom" class="is">Annað</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label is">Aðrar upplýsingar (valkvætt)</label>
+        <label class="form-label en">Other information (optional)</label>
+        <textarea class="form-textarea" id="q-notes" placeholder="..."></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(1)"><span class="is">Til baka</span><span class="en">Back</span></button>
+        <button class="btn-next" onclick="goStepQ2()"><span class="is">Áfram</span><span class="en">Continue</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUOTE FLOW STEP Q2: CONTACT INFO -->
+  <div class="step" id="stepQ2">
+    <div class="step-card">
+      <h2 class="step-heading is">Þínar tengiliðaupplýsingar</h2>
+      <h2 class="step-heading en">Your contact details</h2>
+      <p class="step-subhead is">Við notum þessar upplýsingar til að hafa samband við þig með tilboð.</p>
+      <p class="step-subhead en">We use these details to send you the quote.</p>
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label is">Fullt nafn *</label><label class="form-label en">Full name *</label><input class="form-input" id="q-name" placeholder="Jón Jónsson"/></div>
+        <div class="form-group"><label class="form-label is">Sími *</label><label class="form-label en">Phone *</label><input class="form-input" id="q-phone" type="tel" placeholder="+354 xxx xxxx"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="q-email" type="email" placeholder="jon@fyrirtaeki.is"/></div>
+      <div class="form-group"><label class="form-label is">Kennitala (valkvætt)</label><label class="form-label en">Company ID (optional)</label><input class="form-input" id="q-kt" placeholder="000000-0000"/></div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep('Q1')"><span class="is">Til baka</span><span class="en">Back</span></button>
+        <button class="btn-next" onclick="submitQuote()"><span class="is">Senda tilboðsbeiðni</span><span class="en">Send quote request</span></button>
+      </div>
+    </div>
+  </div>
+
   <!-- SUCCESS -->
   <div class="step" id="step-success">
     <div class="step-card">
@@ -434,12 +526,110 @@ function goStep(n){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const target=document.getElementById('step'+n);
   if(target)target.classList.add('active');
+  // Handle progress dots — only update for numeric steps 1-5
+  if (typeof n === 'number') {
+    for(let i=1;i<=5;i++){
+      const p=document.getElementById('prog'+i);
+      if(!p)continue;
+      p.className='prog-step'+(i<n?' done':i===n?' active':'');
+    }
+  } else {
+    // For Q1/Q2 quote flow: show progress as step 1 done, quote step active
+    for(let i=1;i<=5;i++){
+      const p=document.getElementById('prog'+i);
+      if(!p)continue;
+      if (i === 1) p.className='prog-step done';
+      else if (i === 2) p.className='prog-step active';
+      else p.className='prog-step';
+    }
+  }
+  if(n===3)buildCal();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function continueFromType(){
+  if (!state.type) {
+    alert(lang==='is'?'Vinsamlegast veldu tegund þrifanna.':'Please select a cleaning type.');
+    return;
+  }
+  // Route to appropriate flow
+  if (state.type === 'home' || state.type === 'airbnb') {
+    goStep(2); // standard booking flow
+  } else {
+    // company or husfelag → quote flow
+    // Customize the intro text based on service
+    const introIs = state.type === 'company'
+      ? 'Fyrirtækjaþrif eru alltaf sérsniðin eftir stærð, tíðni og aðstæðum.'
+      : 'Húsfélagaþrif eru alltaf sérsniðin eftir stærð sameignar og tíðni.';
+    const introEn = state.type === 'company'
+      ? 'Commercial cleaning is always tailored to size, frequency and circumstances.'
+      : 'Housing association cleaning is always tailored to property size and frequency.';
+    document.getElementById('q-intro-is').textContent = introIs;
+    document.getElementById('q-intro-en').textContent = introEn;
+    goStep('Q1');
+  }
+}
+
+function goStepQ2(){
+  // Validate Q1
+  const company = document.getElementById('q-company').value;
+  const address = document.getElementById('q-address').value;
+  if (!company || !address) {
+    alert(lang==='is'?'Vinsamlegast fylltu út nafn og heimilisfang.':'Please fill in name and address.');
+    return;
+  }
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('stepQ2').classList.add('active');
+  // Progress: step 1 done, something like step 3 active
   for(let i=1;i<=5;i++){
     const p=document.getElementById('prog'+i);
     if(!p)continue;
-    p.className='prog-step'+(i<n?' done':i===n?' active':'');
+    if (i === 1) p.className='prog-step done';
+    else if (i === 2) p.className='prog-step done';
+    else if (i === 3) p.className='prog-step active';
+    else p.className='prog-step';
   }
-  if(n===3)buildCal();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function submitQuote(){
+  const name = document.getElementById('q-name').value;
+  const email = document.getElementById('q-email').value;
+  const phone = document.getElementById('q-phone').value;
+  if (!name || !email || !phone) {
+    alert(lang==='is'?'Vinsamlegast fylltu út nafn, síma og email.':'Please fill in name, phone and email.');
+    return;
+  }
+  const ref = 'HG-'+Math.floor(1000+Math.random()*9000);
+  document.getElementById('ref-num').textContent = ref;
+
+  try {
+    const { error } = await sb.from('company_quotes').insert([{
+      company: document.getElementById('q-company').value,
+      kennitala: document.getElementById('q-kt').value,
+      name: name,
+      email: email,
+      phone: phone,
+      size: parseInt(document.getElementById('q-size').value) || null,
+      frequency: document.getElementById('q-freq').value,
+      address: document.getElementById('q-address').value,
+      notes: 'Tegund: ' + (state.type === 'company' ? 'Fyrirtækjaþrif' : 'Húsfélög') + '\n\n' + document.getElementById('q-notes').value,
+      status: 'new'
+    }]);
+    if (error) {
+      console.error('Supabase error:', error);
+      alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
+      return;
+    }
+  } catch (err) {
+    console.error('Error:', err);
+    alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
+    return;
+  }
+
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.prog-step').forEach(p=>p.className='prog-step done');
+  document.getElementById('step-success').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -595,7 +785,7 @@ async function submitBooking(){
 function restart(){
   state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
   document.querySelectorAll('.type-card,.sqm-btn,.extra-row,.time-slot,.cal-day').forEach(el=>el.classList.remove('sel'));
-  ['f-name','f-phone','f-email','f-address','f-zip','f-access','f-notes','time-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-name','f-phone','f-email','f-address','f-zip','f-access','f-notes','time-notes','q-company','q-address','q-size','q-notes','q-name','q-phone','q-email','q-kt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('price-preview').style.display='none';
   document.getElementById('total-box').style.display='none';
   document.getElementById('sqm-custom-wrap').style.display='none';
