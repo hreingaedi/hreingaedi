@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     }
 
     const { data: sent, error } = await resend.emails.send({
-      from: 'Hrein Gæði <hreingaedi@hreingæði.is>',
+      from: 'Hrein Gæði <hreingaedi@hreingaedi.is>',
       to: [NOTIFICATION_EMAIL],
       subject,
       html,
