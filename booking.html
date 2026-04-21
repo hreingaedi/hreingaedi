@@ -627,6 +627,27 @@ async function submitQuote(){
     return;
   }
 
+  try {
+    await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'company_quote',
+        data: {
+          service: state.type === 'company' ? 'Fyrirtækjaþrif' : 'Húsfélög',
+          company_name: document.getElementById('q-company').value,
+          name: name,
+          phone: phone,
+          email: email,
+          address: document.getElementById('q-address').value,
+          message: document.getElementById('q-notes').value
+        }
+      })
+    });
+  } catch (e) {
+    console.error('Notification failed:', e);
+  }
+
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.prog-step').forEach(p=>p.className='prog-step done');
   document.getElementById('step-success').classList.add('active');
@@ -771,6 +792,31 @@ async function submitBooking(){
     console.error('Error saving booking:', err);
     alert(lang === 'is' ? 'Villa kom upp. Vinsamlegast reyndu aftur.' : 'An error occurred. Please try again.');
     return;
+  }
+
+  try {
+    await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'booking',
+        data: {
+          service: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
+          name: state.name,
+          phone: state.phone,
+          email: state.email,
+          address: state.address,
+          size: state.sqm + ' m²',
+          frequency: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
+          date: state.date,
+          time: state.time,
+          notes: [document.getElementById('f-access').value, document.getElementById('f-notes').value].filter(Boolean).join('\n\n'),
+          estimated_price: state.total
+        }
+      })
+    });
+  } catch (e) {
+    console.error('Notification failed:', e);
   }
 
   // GOOGLE CALENDAR PLACEHOLDER — uncomment when connected

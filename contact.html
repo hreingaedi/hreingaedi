@@ -232,6 +232,25 @@ async function submitContact(){
     alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
     return;
   }
+
+  try {
+    await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contact',
+        data: {
+          name: name,
+          phone: document.getElementById('c-phone').value,
+          email: email,
+          message: msg
+        }
+      })
+    });
+  } catch (e) {
+    console.error('Notification failed:', e);
+  }
+
   document.getElementById('contact-form').style.display='none';
   document.getElementById('contact-success').style.display='block';
 }
