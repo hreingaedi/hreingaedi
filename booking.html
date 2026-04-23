@@ -819,6 +819,29 @@ async function submitBooking(){
     console.error('Notification failed:', e);
   }
 
+  try {
+    await fetch('/api/calendar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          service: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
+          name: state.name,
+          phone: state.phone,
+          email: state.email,
+          address: state.address,
+          size: state.sqm + ' m²',
+          date: state.date,
+          time: state.time,
+          notes: [document.getElementById('f-access').value, document.getElementById('f-notes').value].filter(Boolean).join('\n\n'),
+          estimated_price: state.total
+        }
+      })
+    });
+  } catch (e) {
+    console.error('Calendar failed:', e);
+  }
+
   // GOOGLE CALENDAR PLACEHOLDER — uncomment when connected
   // await addToGoogleCalendar({ title: 'Hrein Gæði þrif - '+state.name, date: state.date, time: state.time, address: state.address })
 

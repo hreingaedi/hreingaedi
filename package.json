@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/hreingaedi/hreingaedi#readme",
   "dependencies": {
+    "googleapis": "^171.4.0",
     "resend": "^6.12.2"
   }
 }
