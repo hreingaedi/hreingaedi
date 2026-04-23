@@ -467,6 +467,8 @@ async function loadBookings() {
     bookings = (data || []).map(b => ({
       ref: b.ref,
       name: b.name,
+      email: b.email || '',
+      phone: b.phone || '',
       type: b.type,
       service: b.service || (b.type === 'home' ? 'Heimilisþrif' : b.type === 'airbnb' ? 'AirBnB þrif' : 'Fyrirtækjaþrif'),
       sqm: b.sqm,
@@ -475,7 +477,8 @@ async function loadBookings() {
       time: b.time,
       address: b.address,
       worker: b.worker_id || '',
-      status: b.status
+      status: b.status,
+      calendar_event_id: b.calendar_event_id || null
     }));
     renderAll();
   } catch (err) {
@@ -727,15 +730,65 @@ function openModal(ref) {
   document.getElementById('booking-modal').classList.add('open');
 }
 
-function updateStatus(ref, status) {
+async function updateStatus(ref, status) {
   const b = bookings.find(b => b.ref === ref);
   if (b) { b.status = status; }
-  // SAVE TO SUPABASE
-  sb.from('bookings').update({ status }).eq('ref', ref).then(({ error }) => {
-    if (error) console.error('Error updating status:', error);
-  });
   closeModal();
   renderAll();
+
+  // SAVE TO SUPABASE
+  const { error } = await sb.from('bookings').update({ status }).eq('ref', ref);
+  if (error) console.error('Error updating status:', error);
+
+  if (!b) return;
+
+  if (status === 'Confirmed') {
+    try {
+      if (b.calendar_event_id) {
+        await fetch('/api/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'confirm',
+            eventId: b.calendar_event_id,
+            data: { service: b.service, name: b.name, phone: b.phone, email: b.email, address: b.address, date: b.date, time: b.time, ref: b.ref }
+          })
+        });
+      }
+    } catch (e) { console.error('Calendar confirm failed:', e); }
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'customer_confirmation',
+          data: { name: b.name, email: b.email, service: b.service, date: b.date, time: b.time, address: b.address, ref: b.ref }
+        })
+      });
+    } catch (e) { console.error('Confirmation email failed:', e); }
+  }
+
+  if (status === 'Cancelled') {
+    try {
+      if (b.calendar_event_id) {
+        await fetch('/api/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'cancel', eventId: b.calendar_event_id })
+        });
+      }
+    } catch (e) { console.error('Calendar cancel failed:', e); }
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'customer_cancellation',
+          data: { name: b.name, email: b.email, service: b.service, date: b.date, time: b.time, ref: b.ref }
+        })
+      });
+    } catch (e) { console.error('Cancellation email failed:', e); }
+  }
 }
 
 function closeModal() { document.getElementById('booking-modal').classList.remove('open'); }

@@ -820,11 +820,13 @@ async function submitBooking(){
   }
 
   try {
-    await fetch('/api/calendar', {
+    const calRes = await fetch('/api/calendar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'create',
         data: {
+          ref: ref,
           service: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
           name: state.name,
           phone: state.phone,
@@ -838,6 +840,10 @@ async function submitBooking(){
         }
       })
     });
+    const calJson = await calRes.json();
+    if (calJson.eventId) {
+      await sb.from('bookings').update({ calendar_event_id: calJson.eventId }).eq('ref', ref);
+    }
   } catch (e) {
     console.error('Calendar failed:', e);
   }

@@ -72,6 +72,53 @@ export default async function handler(req, res) {
         ${row('Email', data.email)}
         ${row('Skilaboð', data.message)}
       `);
+    } else if (type === 'customer_confirmation') {
+      const toEmail = data.email;
+      if (!toEmail) return res.status(400).json({ error: 'Missing customer email' });
+      subject = `✅ Bókun staðfest — Hrein Gæði`;
+      html = wrapper('Bókunin þín er staðfest!', `
+        ${row('Sæl/l', data.name)}
+        ${row('', 'Við höfum staðfest bókunina þína og hlökkum til að mæta. Hér eru upplýsingarnar:')}
+        ${row('Þjónusta', data.service)}
+        ${row('Dagsetning', data.date)}
+        ${row('Tími', data.time)}
+        ${row('Heimilisfang', data.address)}
+        ${row('Bókunarnúmer', data.ref)}
+        ${row('', '')}
+        ${row('', 'Ef þú þarft að breyta eða afbóka, hafðu samband við okkur í tíma á hreingaedi@hreingaedi.is')}
+        ${row('', 'Takk fyrir traustið! — Hrein Gæði')}
+      `);
+      const { data: sentConf, error: errConf } = await resend.emails.send({
+        from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
+        to: [toEmail],
+        subject,
+        html,
+      });
+      if (errConf) return res.status(500).json({ error: errConf.message });
+      return res.status(200).json({ success: true, id: sentConf.id });
+    } else if (type === 'customer_cancellation') {
+      const toEmail = data.email;
+      if (!toEmail) return res.status(400).json({ error: 'Missing customer email' });
+      subject = `Bókun afbókuð — Hrein Gæði`;
+      html = wrapper('Bókunin þín hefur verið afbókuð', `
+        ${row('Sæl/l', data.name)}
+        ${row('', 'Bókunin þín hefur verið afbókuð. Hér eru upplýsingarnar sem voru skráðar:')}
+        ${row('Þjónusta', data.service)}
+        ${row('Dagsetning', data.date)}
+        ${row('Tími', data.time)}
+        ${row('Bókunarnúmer', data.ref)}
+        ${row('', '')}
+        ${row('', 'Hafðu samband ef þú vilt bóka aftur á öðrum tíma: hreingaedi@hreingaedi.is')}
+        ${row('', 'Með kveðju, Hrein Gæði')}
+      `);
+      const { data: sentCanc, error: errCanc } = await resend.emails.send({
+        from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
+        to: [toEmail],
+        subject,
+        html,
+      });
+      if (errCanc) return res.status(500).json({ error: errCanc.message });
+      return res.status(200).json({ success: true, id: sentCanc.id });
     } else {
       return res.status(400).json({ error: 'Unknown notification type' });
     }
