@@ -658,6 +658,7 @@ function selType(type,el){
   document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   state.type=type;
+  setTimeout(continueFromType, 200);
 }
 
 function selSqm(sqm,el,label){
@@ -727,14 +728,14 @@ function buildCal(){
     else if(isToday)el.classList.add('today');
     const ds=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     if(state.date===ds)el.classList.add('sel');
-    if(!isPast)el.onclick=()=>{document.querySelectorAll('.cal-day').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');state.date=ds;};
+    if(!isPast)el.onclick=()=>{document.querySelectorAll('.cal-day').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');state.date=ds;if(state.date&&state.time)setTimeout(()=>goStep(4),200);};
     grid.appendChild(el);
   }
 }
 
 function changeMonth(dir){calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}buildCal();}
 
-function selTime(el,val){document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');state.time=val;}
+function selTime(el,val){document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');state.time=val;if(state.date&&state.time)setTimeout(()=>goStep(4),200);}
 
 function goConfirm(){
   state.name=document.getElementById('f-name').value;
