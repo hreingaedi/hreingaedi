@@ -841,8 +841,14 @@ async function submitBooking(){
       })
     });
     const calJson = await calRes.json();
-    if (calJson.eventId) {
-      await sb.from('bookings').update({ calendar_event_id: calJson.eventId }).eq('ref', ref);
+    console.log('Calendar API status:', calRes.status, 'body:', calJson);
+    if (!calRes.ok) {
+      console.error('Calendar API error:', calJson);
+    } else if (calJson.eventId) {
+      const upd = await sb.from('bookings').update({ calendar_event_id: calJson.eventId }).eq('ref', ref);
+      console.log('Supabase calendar_event_id update:', upd);
+    } else {
+      console.warn('Calendar API succeeded but no eventId in response:', calJson);
     }
   } catch (e) {
     console.error('Calendar failed:', e);
