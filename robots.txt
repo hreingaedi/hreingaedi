@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /login.html
+Disallow: /worker.html
+Disallow: /api/
+
+Sitemap: https://hreingaedi.is/sitemap.xml
