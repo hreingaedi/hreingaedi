@@ -75,9 +75,10 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
 .ring-bar{flex:1;height:4px;background:var(--light);border-radius:2px;}
 .ring-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.3s ease;}
 .ring-label{font-size:11px;color:var(--steel);}
+body.auth-loading{visibility:hidden;}
 </style>
 </head>
-<body>
+<body class="auth-loading">
 
 <div class="worker-header">
   <div class="header-top">
@@ -141,34 +142,77 @@ const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const userStr = localStorage.getItem('hg-user');
-if (!userStr) { window.location.href = 'login.html'; }
-const currentUser = JSON.parse(userStr || '{}');
+// AUTH
+window.currentUser = null;
+window.myJobs = [];
+window.todayStr = new Date().toISOString().split('T')[0];
 
-function logout() { localStorage.removeItem('hg-user'); window.location.href = 'login.html'; }
+async function initAuth() {
+  const { data: { session }, error } = await sb.auth.getSession();
+  if (error || !session) { window.location.replace('login.html'); return; }
 
-// GREETING
-const hour = new Date().getHours();
-const greeting = hour < 12 ? 'Góðan morgun' : hour < 18 ? 'Góðan dag' : 'Gott kvöld';
-document.getElementById('greeting').textContent = greeting + ', ' + (currentUser.name || 'Starfsmaður') + '!';
-const now = new Date();
-document.getElementById('worker-date').textContent = now.toLocaleDateString('is-IS', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const { data: meta, error: metaError } = await sb
+    .from('users_meta').select('role, full_name').eq('user_id', session.user.id).single();
 
-// DEMO JOBS for this worker
-const myJobs = [
-  { ref:'HG-4821', name:'Sigríður Björnsdóttir', service:'Heimilisþrif', sqm:'76–100 m²', total:21600, date:'2026-04-11', time:'8:00–10:00',   address:'Hverfisgata 42, Reykjavík', status:'Confirmed', notes:'Hund í húsinu' },
-  { ref:'HG-2984', name:'Arna Helgadóttir',       service:'Heimilisþrif', sqm:'51–75 m²', total:15600, date:'2026-04-11', time:'13:00–15:00',  address:'Laugavegur 88, Reykjavík',  status:'Confirmed', notes:'' },
-  { ref:'HG-5201', name:'Björn Einarsson',         service:'Heimilisþrif', sqm:'76–100 m²',total:21600, date:'2026-04-14', time:'9:00–11:00',   address:'Skógarhlíð 12, Reykjavík',  status:'Confirmed', notes:'' },
-  { ref:'HG-5340', name:'Helga Kristjánsdóttir',   service:'Heimilisþrif', sqm:'0–50 m²',  total:12000, date:'2026-04-15', time:'14:00–16:00',  address:'Árbæjarlaut 3, Reykjavík',  status:'Pending',   notes:'Útidyr eru á hliðinni' },
-];
+  const role = meta?.role;
 
-const todayStr = '2026-04-11';
-const todayJobs = myJobs.filter(j => j.date === todayStr);
-const upcomingJobs = myJobs.filter(j => j.date > todayStr).slice(0,3);
+  if (metaError || !role) { await sb.auth.signOut(); window.location.replace('login.html'); return; }
+  if (role !== 'worker') { window.location.replace('dashboard.html'); return; }
 
-document.getElementById('ws-today').textContent = todayJobs.length;
-document.getElementById('ws-week').textContent = myJobs.filter(j => j.date >= todayStr && j.date <= '2026-04-17').length;
-document.getElementById('ws-month').textContent = myJobs.length;
+  window.currentUser = { id: session.user.id, role, full_name: meta.full_name };
+
+  const firstName = (meta.full_name || '').split(' ')[0] || 'Starfsmaður';
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Góðan morgun' : hour < 18 ? 'Góðan dag' : 'Gott kvöld';
+  document.getElementById('greeting').textContent = greet + ', ' + firstName + '!';
+  const now = new Date();
+  document.getElementById('worker-date').textContent = now.toLocaleDateString('is-IS', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  document.body.classList.remove('auth-loading');
+  await loadJobs();
+}
+
+async function logout() { await sb.auth.signOut(); window.location.replace('login.html'); }
+
+async function loadJobs() {
+  const todayStr = window.todayStr;
+  const weekEnd = new Date();
+  weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay() || 7));
+  const weekEndStr = weekEnd.toISOString().split('T')[0];
+
+  const { data, error } = await sb
+    .from('bookings')
+    .select('*')
+    .eq('worker_id', window.currentUser.id)
+    .gte('date', todayStr)
+    .order('date')
+    .order('time');
+
+  if (error) { console.error('Error loading jobs:', error); return; }
+
+  window.myJobs = (data || []).map(b => ({
+    ref: b.ref,
+    name: b.name,
+    service: b.service || (b.type === 'home' ? 'Heimilisþrif' : b.type === 'airbnb' ? 'AirBnB þrif' : 'Fyrirtækjaþrif'),
+    sqm: b.sqm,
+    total: b.total,
+    date: b.date,
+    time: b.time,
+    address: b.address,
+    status: b.status,
+    notes: b.notes || '',
+  }));
+
+  const todayJobs = window.myJobs.filter(j => j.date === todayStr);
+  const upcomingJobs = window.myJobs.filter(j => j.date > todayStr).slice(0, 3);
+
+  document.getElementById('ws-today').textContent = todayJobs.length;
+  document.getElementById('ws-week').textContent = window.myJobs.filter(j => j.date >= todayStr && j.date <= weekEndStr).length;
+  document.getElementById('ws-month').textContent = window.myJobs.length;
+
+  renderTodayJobs(todayJobs);
+  renderUpcomingJobs(upcomingJobs);
+}
 
 const checklistItems = [
   'Ryksugað á öllum gólfum og teppum',
@@ -182,9 +226,9 @@ const checklistItems = [
 let checkState = {};
 let currentJobRef = null;
 
-function renderTodayJobs() {
+function renderTodayJobs(todayJobs) {
   const container = document.getElementById('today-jobs');
-  if (todayJobs.length === 0) {
+  if (!todayJobs || todayJobs.length === 0) {
     container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><p>Engin verkefni í dag</p></div>`;
     return;
   }
@@ -202,8 +246,9 @@ function renderTodayJobs() {
   `).join('');
 }
 
-function renderUpcomingJobs() {
+function renderUpcomingJobs(upcomingJobs) {
   const container = document.getElementById('upcoming-jobs');
+  if (!upcomingJobs || upcomingJobs.length === 0) { container.innerHTML = ''; return; }
   container.innerHTML = upcomingJobs.map(j => `
     <div class="job-item" onclick="openJob('${j.ref}')">
       <div class="job-top">
@@ -219,7 +264,7 @@ function renderUpcomingJobs() {
 
 function openJob(ref) {
   currentJobRef = ref;
-  const j = myJobs.find(j => j.ref === ref);
+  const j = (window.myJobs || []).find(j => j.ref === ref);
   document.getElementById('sheet-title').textContent = j.name;
   document.getElementById('sheet-addr-btn').textContent = j.address;
   document.getElementById('sheet-content').innerHTML = `
@@ -265,20 +310,20 @@ function toggleCheck(ref, i) {
 }
 
 function markDone() {
-  const j = myJobs.find(j => j.ref === currentJobRef);
+  const j = (window.myJobs || []).find(j => j.ref === currentJobRef);
   if (j) { j.status = 'Done'; }
-  // SAVE TO SUPABASE
   sb.from('bookings').update({ status: 'Done' }).eq('ref', currentJobRef).then(({ error }) => {
     if (error) console.error('Error marking done:', error);
   });
   document.getElementById('job-sheet').classList.remove('open');
-  renderTodayJobs();
-  renderUpcomingJobs();
+  const ts = window.todayStr;
+  renderTodayJobs((window.myJobs || []).filter(j => j.date === ts));
+  renderUpcomingJobs((window.myJobs || []).filter(j => j.date > ts).slice(0, 3));
   alert('Verkið ' + currentJobRef + ' hefur verið merkt sem lokið!');
 }
 
 function openMaps() {
-  const j = myJobs.find(j => j.ref === currentJobRef);
+  const j = (window.myJobs || []).find(j => j.ref === currentJobRef);
   if (j) window.open('https://maps.google.com?q=' + encodeURIComponent(j.address));
 }
 
@@ -286,8 +331,7 @@ document.getElementById('job-sheet').addEventListener('click', e => {
   if (e.target === e.currentTarget) document.getElementById('job-sheet').classList.remove('open');
 });
 
-renderTodayJobs();
-renderUpcomingJobs();
+initAuth();
 </script>
 </body>
 </html>

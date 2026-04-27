@@ -172,9 +172,34 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
 
 @media(max-width:1024px){.stats-grid{grid-template-columns:1fr 1fr;}.dashboard-grid,.dashboard-grid.three{grid-template-columns:1fr;}}
 @media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;}.stats-grid{grid-template-columns:1fr 1fr;}}
+.topbar-user{font-size:12px;color:var(--steel);white-space:nowrap;}
+body.auth-loading{visibility:hidden;}
+/* INVITE SECTION */
+.invite-list{display:flex;flex-direction:column;}
+.invite-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--light);flex-wrap:wrap;}
+.invite-row:last-child{border-bottom:none;}
+.invite-info{flex:1;min-width:0;}
+.invite-email{font-size:13px;font-weight:500;color:var(--navy);}
+.invite-meta{font-size:11px;color:var(--steel);margin-top:2px;}
+.invite-btns{display:flex;gap:6px;flex-shrink:0;}
+.invite-empty{font-size:13px;color:var(--steel);padding:1.25rem 0;text-align:center;}
+.modal-field{margin-bottom:1rem;}
+.modal-label{font-size:12px;color:var(--slate);margin-bottom:5px;display:block;letter-spacing:0.02em;}
+.modal-input{width:100%;padding:10px 12px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:13px;color:var(--navy);background:var(--white);transition:var(--transition);}
+.modal-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.modal-error{font-size:12px;color:var(--red);margin-bottom:1rem;display:none;}
+.modal-error.show{display:block;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 22px;border-radius:50px;font-size:13px;opacity:0;transition:opacity 0.3s ease;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+.dash-lang{display:flex;gap:4px;}
+.dash-lang-btn{background:none;border:1px solid var(--mist);border-radius:50px;padding:4px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--slate);cursor:pointer;transition:var(--transition);}
+.dash-lang-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+span.is,span.en{display:none;}
+body.lang-is span.is{display:inline;}
+body.lang-en span.en{display:inline;}
 </style>
 </head>
-<body>
+<body class="auth-loading lang-is">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -211,6 +236,10 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Vaktaáætlun
     </a>
+    <a class="nav-item admin-only" onclick="showView('staff')">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      <span class="is">Boðsmiðar</span><span class="en">Invites</span>
+    </a>
 
     <div class="nav-section-label">Kerfið</div>
     <a class="nav-item" href="index.html">
@@ -236,6 +265,11 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
     <div class="topbar-title" id="topbar-title">Yfirlit</div>
     <div class="topbar-right">
       <span class="topbar-date" id="today-date"></span>
+      <span class="topbar-user" id="topbar-user"></span>
+      <div class="dash-lang">
+        <button class="dash-lang-btn active" id="dlbtn-is" onclick="setLang('is')">IS</button>
+        <button class="dash-lang-btn" id="dlbtn-en" onclick="setLang('en')">EN</button>
+      </div>
       <a href="booking.html" class="btn-sm" target="_blank">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Ný bókun
@@ -411,6 +445,19 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
       </div>
     </div>
 
+    <!-- STAFF / INVITES VIEW -->
+    <div id="view-staff" class="admin-only" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="is">Starfsfólk — Boðsmiðar</span><span class="en">Staff — Invites</span></span>
+          <button class="btn-sm" onclick="openInviteModal()">+ <span class="is">Bjóða nýjum starfsmanni</span><span class="en">Invite new staff member</span></button>
+        </div>
+        <div class="card-body">
+          <div id="pending-invites-list"><div class="invite-empty"><span class="is">Hleður…</span><span class="en">Loading…</span></div></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </main>
 
@@ -426,6 +473,39 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
   </div>
 </div>
 
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="invite-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title"><span class="is">Bjóða nýjum starfsmanni</span><span class="en">Invite new staff member</span></span>
+      <button class="modal-close" onclick="closeInviteModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Email *</label>
+      <input class="modal-input" id="inv-email" type="email" placeholder="starfsm@hreingaedi.is" autocomplete="off"/>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label"><span class="is">Fullt nafn</span><span class="en">Full name</span> *</label>
+      <input class="modal-input" id="inv-name" type="text" placeholder="Anna Jónsdóttir" autocomplete="off"/>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label"><span class="is">Hlutverk</span><span class="en">Role</span> *</label>
+      <select class="modal-input" id="inv-role">
+        <option value="worker">Starfsmaður</option>
+        <option value="manager">Stjórnandi</option>
+      </select>
+    </div>
+    <div class="modal-error" id="inv-error"></div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="closeInviteModal()"><span class="is">Hætta við</span><span class="en">Cancel</span></button>
+      <button class="btn-action confirm" id="inv-submit-btn" onclick="createInvite()"><span class="is">Búa til boðsmiða</span><span class="en">Create invite</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // SUPABASE CONNECTION
@@ -433,16 +513,43 @@ const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// AUTH CHECK
-const userStr = localStorage.getItem('hg-user');
-if (!userStr) { window.location.href = 'login.html'; }
-const currentUser = JSON.parse(userStr || '{}');
-document.getElementById('user-name').textContent = currentUser.name || 'Admin';
-document.getElementById('user-avatar').textContent = (currentUser.name || 'A')[0].toUpperCase();
-document.getElementById('user-role-label').textContent = currentUser.role === 'admin' ? 'Stjórnandi' : currentUser.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður';
-document.getElementById('sidebar-role').textContent = currentUser.role === 'admin' ? 'Admin' : currentUser.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður';
+// AUTH
+window.currentUser = null;
 
-function logout() { localStorage.removeItem('hg-user'); window.location.href = 'login.html'; }
+async function initAuth() {
+  const { data: { session }, error } = await sb.auth.getSession();
+  if (error || !session) { window.location.replace('login.html'); return; }
+
+  const { data: meta, error: metaError } = await sb
+    .from('users_meta').select('role, full_name').eq('user_id', session.user.id).single();
+
+  const role = meta?.role;
+
+  if (metaError || !role) { await sb.auth.signOut(); window.location.replace('login.html'); return; }
+  if (role === 'worker') { window.location.replace('worker.html'); return; }
+  if (role !== 'admin' && role !== 'manager') { await sb.auth.signOut(); window.location.replace('login.html'); return; }
+
+  window.currentUser = { id: session.user.id, role, full_name: meta.full_name };
+
+  const name = meta.full_name || session.user.email;
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+  document.getElementById('user-role-label').textContent = 'Stjórnandi';
+  document.getElementById('sidebar-role').textContent = role === 'admin' ? 'Admin' : 'Stjórnandi';
+  document.getElementById('topbar-user').textContent = 'Skráð(ur) inn sem: ' + name + ' · ' + (role === 'admin' ? 'Admin' : 'Stjórnandi');
+
+  applyRoleVisibility();
+  document.body.classList.remove('auth-loading');
+  loadBookings();
+  if (role === 'admin') loadPendingInvites();
+}
+
+function applyRoleVisibility() {
+  const isAdmin = window.currentUser?.role === 'admin';
+  document.querySelectorAll('.admin-only').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+}
+
+async function logout() { await sb.auth.signOut(); window.location.replace('login.html'); }
 
 // DATE
 const now = new Date();
@@ -504,17 +611,27 @@ function getWorkerColor(id) { const w = workers.find(w => w.id === id); return w
 
 function fmt(n) { return n.toLocaleString('is-IS') + ' kr'; }
 
+function setLang(lang) {
+  document.body.classList.remove('lang-is', 'lang-en');
+  document.body.classList.add('lang-' + lang);
+  document.getElementById('dlbtn-is').classList.toggle('active', lang === 'is');
+  document.getElementById('dlbtn-en').classList.toggle('active', lang === 'en');
+  document.documentElement.lang = lang;
+}
+
 function showView(view) {
-  ['overview','bookings','finance','workers','schedule'].forEach(v => {
-    document.getElementById('view-'+v).style.display = v === view ? 'block' : 'none';
+  ['overview','bookings','finance','workers','schedule','staff'].forEach(v => {
+    const el = document.getElementById('view-'+v);
+    if (el) el.style.display = v === view ? 'block' : 'none';
   });
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const titles = { overview:'Yfirlit', bookings:'Bókanir', finance:'Fjármál', workers:'Starfsmenn', schedule:'Vaktaáætlun' };
+  const titles = { overview:'Yfirlit', bookings:'Bókanir', finance:'Fjármál', workers:'Starfsmenn', schedule:'Vaktaáætlun', staff:'Starfsfólk' };
   document.getElementById('topbar-title').textContent = titles[view] || 'Yfirlit';
   if (view === 'bookings') renderAllBookings();
   if (view === 'finance') renderFinance();
   if (view === 'workers') renderWorkers();
   if (view === 'schedule') renderSchedule();
+  if (view === 'staff') loadPendingInvites();
 }
 
 function renderStats() {
@@ -801,10 +918,141 @@ function renderAll() {
   renderChart('chart-bars', 'chart-labels');
 }
 
-function openAddWorker() { alert('Hér mun koma form til að bæta við nýjum starfsmanni þegar Supabase Auth er tengt.'); }
+function generateInviteToken() {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
-// Load real data from Supabase on page load
-loadBookings();
+function openInviteModal() {
+  document.getElementById('inv-email').value = '';
+  document.getElementById('inv-name').value = '';
+  document.getElementById('inv-role').value = 'worker';
+  document.getElementById('inv-error').classList.remove('show');
+  document.getElementById('inv-error').textContent = '';
+  document.getElementById('invite-modal').classList.add('open');
+}
+
+function closeInviteModal() {
+  document.getElementById('invite-modal').classList.remove('open');
+}
+document.getElementById('invite-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeInviteModal(); });
+
+async function createInvite() {
+  const email = document.getElementById('inv-email').value.trim();
+  const fullName = document.getElementById('inv-name').value.trim();
+  const role = document.getElementById('inv-role').value;
+  const errEl = document.getElementById('inv-error');
+  const submitBtn = document.getElementById('inv-submit-btn');
+
+  errEl.classList.remove('show');
+
+  if (!email || !fullName) {
+    errEl.textContent = 'Netfang og fullt nafn eru nauðsynleg.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Netfangið er ekki gilt.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  const token = generateInviteToken();
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { error } = await sb.from('invites').insert({
+    token,
+    email,
+    full_name: fullName,
+    role,
+    expires_at: expiresAt,
+    created_by: window.currentUser.id
+  });
+
+  submitBtn.disabled = false;
+
+  if (error) {
+    errEl.textContent = 'Eitthvað fór úrskeiðis. Reyndu aftur.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  closeInviteModal();
+  showToast('Boðsmiði búinn til!');
+  loadPendingInvites();
+}
+
+async function loadPendingInvites() {
+  const container = document.getElementById('pending-invites-list');
+  if (!container) return;
+  container.innerHTML = '<div class="invite-empty"><span class="is">Hleður…</span><span class="en">Loading…</span></div>';
+
+  const now = new Date().toISOString();
+  const { data, error } = await sb
+    .from('invites')
+    .select('id, email, full_name, role, token, expires_at, created_at')
+    .is('used_at', null)
+    .gt('expires_at', now)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    container.innerHTML = '<div class="invite-empty">Villa við að sækja boðsmiða.</div>';
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div class="invite-empty"><span class="is">Engir ónotaðir boðsmiðar.</span><span class="en">No pending invites.</span></div>';
+    return;
+  }
+
+  const lang = document.body.classList.contains('lang-en') ? 'en' : 'is';
+  container.innerHTML = '<div class="invite-list">' + data.map(inv => {
+    const roleLabel = inv.role === 'admin' ? 'Admin' : inv.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður';
+    const expires = new Date(inv.expires_at).toLocaleDateString('is-IS');
+    return `<div class="invite-row">
+      <div class="invite-info">
+        <div class="invite-email">${inv.email}</div>
+        <div class="invite-meta">${inv.full_name} · ${roleLabel} · ${lang === 'is' ? 'Rennur út' : 'Expires'} ${expires}</div>
+      </div>
+      <div class="invite-btns">
+        <button class="btn-sm-outline" onclick="copyInviteLink('${inv.token}')">${lang === 'is' ? 'Afrita hlekk' : 'Copy link'}</button>
+        <button class="btn-action cancel" style="flex:none;padding:7px 12px;font-size:12px;" onclick="deleteInvite('${inv.id}')">${lang === 'is' ? 'Eyða' : 'Delete'}</button>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function copyInviteLink(token) {
+  const link = 'https://hreingaedi.is/signup.html?token=' + token;
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('Hlekkur afritaður!');
+  }).catch(() => {
+    prompt('Afritaðu hlekk:', link);
+  });
+}
+
+async function deleteInvite(id) {
+  const lang = document.body.classList.contains('lang-en') ? 'en' : 'is';
+  const msg = lang === 'is' ? 'Eyða þessum boðsmiða?' : 'Delete this invite?';
+  if (!confirm(msg)) return;
+  const { error } = await sb.from('invites').delete().eq('id', id);
+  if (error) { showToast('Villa við að eyða.'); return; }
+  showToast(lang === 'is' ? 'Boðsmiða eytt.' : 'Invite deleted.');
+  loadPendingInvites();
+}
+
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+initAuth();
 </script>
 </body>
 </html>
