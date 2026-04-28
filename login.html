@@ -180,7 +180,7 @@ async function redirectByRole(userId) {
   const { data, error } = await sb
     .from('users_meta')
     .select('role')
-    .eq('user_id', userId)
+    .eq('id', userId)
     .single();
 
   const role = data?.role;

@@ -272,7 +272,7 @@ async function doSignup() {
 
     // 2. Insert users_meta
     const { error: metaError } = await sb.from('users_meta').insert({
-      user_id: userId,
+      id: userId,
       full_name: invite.full_name,
       role: invite.role,
     });

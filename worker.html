@@ -152,7 +152,7 @@ async function initAuth() {
   if (error || !session) { window.location.replace('login.html'); return; }
 
   const { data: meta, error: metaError } = await sb
-    .from('users_meta').select('role, full_name').eq('user_id', session.user.id).single();
+    .from('users_meta').select('role, full_name').eq('id', session.user.id).single();
 
   const role = meta?.role;
 
