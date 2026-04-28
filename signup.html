@@ -259,38 +259,56 @@ async function doSignup() {
   text.style.display = 'none';
   spinner.style.display = 'block';
 
+  // Step 1: Create auth user
+  let authData;
   try {
-    // 1. Create auth user
-    const { data: authData, error: authError } = await sb.auth.signUp({
+    const { data, error: authError } = await sb.auth.signUp({
       email: invite.email,
       password: pw,
     });
-
-    if (authError) throw authError;
-
-    const userId = authData.user.id;
-
-    // 2. Insert users_meta
-    const { error: metaError } = await sb.from('users_meta').insert({
-      id: userId,
-      full_name: invite.full_name,
-      role: invite.role,
-    });
-
-    if (metaError) throw metaError;
-
-    // 3. Mark invite as used
-    await sb.from('invites').update({ used_at: new Date().toISOString() }).eq('token', invite.token);
-
-    // 4. Redirect to login with success flag
-    window.location.href = 'login.html?signup=success';
-
+    if (authError) { console.error('[signup] step 1 signUp error:', authError); throw authError; }
+    if (!data.user) { console.error('[signup] step 1: signUp returned no user', data); throw new Error('No user returned from signUp'); }
+    authData = data;
   } catch (err) {
     spinner.style.display = 'none';
     text.style.display = 'block';
     btn.disabled = false;
     errGeneral.classList.add('show');
+    return;
   }
+
+  const userId = authData.user.id;
+  console.log('[signup] step 1 ok — userId:', userId);
+
+  // Step 2: Insert users_meta
+  try {
+    const { error: metaError } = await sb.from('users_meta').insert({
+      id: userId,
+      full_name: invite.full_name,
+      role: invite.role,
+    });
+    if (metaError) { console.error('[signup] step 2 users_meta insert error:', metaError); throw metaError; }
+    console.log('[signup] step 2 ok — users_meta inserted');
+  } catch (err) {
+    spinner.style.display = 'none';
+    text.style.display = 'block';
+    btn.disabled = false;
+    errGeneral.classList.add('show');
+    return;
+  }
+
+  // Step 3: Mark invite as used
+  try {
+    const { error: inviteError } = await sb.from('invites').update({ used_at: new Date().toISOString() }).eq('token', invite.token);
+    if (inviteError) console.error('[signup] step 3 invites update error:', inviteError);
+    else console.log('[signup] step 3 ok — invite marked used');
+  } catch (err) {
+    console.error('[signup] step 3 threw:', err);
+    // non-fatal — proceed to redirect even if this fails
+  }
+
+  // Step 4: Redirect
+  window.location.href = 'login.html?signup=success';
 }
 
 document.addEventListener('keydown', e => {
