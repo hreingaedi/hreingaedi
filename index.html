@@ -200,6 +200,9 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
 .footer-links a:hover{color:#fff;}
 .footer-bottom{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:1.75rem;font-size:12px;flex-wrap:wrap;gap:1rem;}
 .footer-social{display:flex;gap:1rem;}
+.footer-right{display:flex;align-items:center;gap:1.25rem;}
+.footer-login{font-size:11px;color:rgba(255,255,255,0.22);text-decoration:none;transition:color var(--transition);}
+.footer-login:hover{color:rgba(255,255,255,0.55);text-decoration:underline;}
 .social-link{width:34px;height:34px;background:rgba(255,255,255,0.07);border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:var(--transition);}
 .social-link:hover{background:rgba(255,255,255,0.15);}
 .social-link svg{width:15px;height:15px;fill:none;stroke:rgba(255,255,255,0.6);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
@@ -533,9 +536,12 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Hrein Gæði ehf. <span class="is">Öll réttindi áskilin.</span><span class="en">All rights reserved.</span></span>
-    <div class="footer-social">
-      <a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
-      <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    <div class="footer-right">
+      <a href="login.html" class="footer-login">Innskráning</a>
+      <div class="footer-social">
+        <a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      </div>
     </div>
   </div>
 </footer>
