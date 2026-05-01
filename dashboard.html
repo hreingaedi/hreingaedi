@@ -578,7 +578,7 @@ let bookings = [];
 
 async function loadStaff() {
   try {
-    const { data, error } = await sb.from('users_meta').select('id, full_name, role').order('full_name');
+    const { data, error } = await sb.rpc('get_all_staff');
     if (error) { console.error('Error loading staff:', error); return; }
     staffMembers = data || [];
   } catch (err) {
