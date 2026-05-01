@@ -513,6 +513,19 @@ const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function normalizeEmail(email) {
+  if (!email || !email.includes('@')) return email;
+  const [local, domain] = email.split('@');
+  if (!domain) return email;
+  if (/^[\x00-\x7F]+$/.test(domain)) return email;
+  try {
+    const url = new URL('https://' + domain);
+    return local + '@' + url.hostname;
+  } catch {
+    return email;
+  }
+}
+
 // AUTH
 window.currentUser = null;
 
@@ -939,7 +952,7 @@ function closeInviteModal() {
 document.getElementById('invite-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeInviteModal(); });
 
 async function createInvite() {
-  const email = document.getElementById('inv-email').value.trim();
+  const email = normalizeEmail(document.getElementById('inv-email').value.trim());
   const fullName = document.getElementById('inv-name').value.trim();
   const role = document.getElementById('inv-role').value;
   const errEl = document.getElementById('inv-error');
