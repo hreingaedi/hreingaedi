@@ -553,6 +553,7 @@ async function initAuth() {
 
   applyRoleVisibility();
   document.body.classList.remove('auth-loading');
+  await loadStaff();
   loadBookings();
   if (role === 'admin') loadPendingInvites();
 }
@@ -569,15 +570,21 @@ const now = new Date();
 const dateStr = now.toLocaleDateString('is-IS', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 document.getElementById('today-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 
-// WORKERS (will be replaced with real data from Supabase once workers table is populated)
-const workers = [
-  { id:'w1', name:'Anna Sigurðardóttir', shifts:0, hourlyRate:2800, color:'#1a56db' },
-  { id:'w2', name:'Siggi Björnsson',     shifts:0, hourlyRate:2800, color:'#057a55' },
-  { id:'w3', name:'Katrín Magnúsdóttir', shifts:0, hourlyRate:2800, color:'#7c3aed' },
-];
+// STAFF — loaded from Supabase after auth
+let staffMembers = [];
 
 // BOOKINGS — loaded from Supabase on page load
 let bookings = [];
+
+async function loadStaff() {
+  try {
+    const { data, error } = await sb.from('users_meta').select('id, full_name, role').order('full_name');
+    if (error) { console.error('Error loading staff:', error); return; }
+    staffMembers = data || [];
+  } catch (err) {
+    console.error('Failed to load staff:', err);
+  }
+}
 
 async function loadBookings() {
   try {
@@ -596,7 +603,7 @@ async function loadBookings() {
       date: b.date,
       time: b.time,
       address: b.address,
-      worker: b.worker_id || '',
+      worker_id: b.worker_id || null,
       status: b.status,
       calendar_event_id: b.calendar_event_id || null
     }));
@@ -619,8 +626,18 @@ const revenueData = [
   { month:'Apr', amount:174000 },
 ];
 
-function getWorkerName(id) { const w = workers.find(w => w.id === id); return w ? w.name.split(' ')[0] : '—'; }
-function getWorkerColor(id) { const w = workers.find(w => w.id === id); return w ? w.color : '#888'; }
+function getWorkerName(id) {
+  if (!id) return '—';
+  if (id === 'general') return 'Hrein Gæði — Almenn vakt';
+  const s = staffMembers.find(s => s.id === id);
+  return s ? s.full_name.split(' ')[0] : 'Óþekktur';
+}
+
+function buildWorkerOptions(selectedId) {
+  return `<option value="">Veldu starfsmann…</option>
+    <option value="general" ${selectedId === 'general' ? 'selected' : ''}>Hrein Gæði — Almenn vakt</option>
+    ${staffMembers.map(s => `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${s.full_name}</option>`).join('')}`;
+}
 
 function fmt(n) { return n.toLocaleString('is-IS') + ' kr'; }
 
@@ -652,14 +669,14 @@ function renderStats() {
   const todayBk = bookings.filter(b => b.date === today);
   const pending = bookings.filter(b => b.status === 'Pending');
   const monthRevenue = bookings.filter(b => b.status === 'Done' || b.status === 'Confirmed').reduce((s,b) => s+b.total, 0);
-  const totalWages = workers.reduce((s,w) => s + w.shifts * 5 * w.hourlyRate, 0);
+  const totalWages = 0;
   const profit = monthRevenue - totalWages - 23000;
 
   document.getElementById('st-today').textContent = todayBk.length;
   document.getElementById('st-today-sub').textContent = todayBk.length > 0 ? todayBk.length + ' bókanir í dag' : 'Engar bókanir í dag';
   document.getElementById('st-pending-count').textContent = pending.length + ' í bið';
   document.getElementById('st-revenue').textContent = fmt(monthRevenue);
-  document.getElementById('st-workers').textContent = workers.length;
+  document.getElementById('st-workers').textContent = staffMembers.length;
   document.getElementById('st-profit').textContent = fmt(profit);
   document.getElementById('pending-badge').textContent = pending.length;
   document.getElementById('pending-count-label').textContent = pending.length;
@@ -681,7 +698,7 @@ function renderUpcoming() {
       <div class="upcoming-body">
         <div class="upcoming-name">${b.name}</div>
         <div class="upcoming-detail">${b.service} · ${b.sqm}</div>
-        <div class="upcoming-worker">Starfsm: ${getWorkerName(b.worker)}</div>
+        <div class="upcoming-worker">Starfsm: ${getWorkerName(b.worker_id)}</div>
       </div>
       <span class="badge badge-${b.status.toLowerCase()}">${b.status === 'Pending' ? 'Í bið' : b.status === 'Confirmed' ? 'Staðfest' : 'Lokið'}</span>
     </div>
@@ -698,8 +715,7 @@ function renderPending() {
       <td class="booking-date">${b.date}</td>
       <td>
         <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
-          <option value="">— Veldu —</option>
-          ${workers.map(w => `<option value="${w.id}" ${b.worker===w.id?'selected':''}>${w.name.split(' ')[0]}</option>`).join('')}
+          ${buildWorkerOptions(b.worker_id)}
         </select>
       </td>
       <td><span class="badge badge-pending">Í bið</span></td>
@@ -720,8 +736,7 @@ function renderAllBookings() {
       <td class="booking-date">${b.date} · ${b.time}</td>
       <td>
         <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
-          <option value="">— Veldu —</option>
-          ${workers.map(w => `<option value="${w.id}" ${b.worker===w.id?'selected':''}>${w.name.split(' ')[0]}</option>`).join('')}
+          ${buildWorkerOptions(b.worker_id)}
         </select>
       </td>
       <td><span class="badge badge-${b.status.toLowerCase()}">${b.status === 'Pending' ? 'Í bið' : b.status === 'Confirmed' ? 'Staðfest' : b.status === 'Done' ? 'Lokið' : 'Afbókað'}</span></td>
@@ -736,13 +751,23 @@ function filterBookings(filter, btn) {
   renderAllBookings();
 }
 
-function assignWorker(ref, workerId) {
+async function assignWorker(ref, workerId) {
+  const value = workerId || null;
+
+  const { error } = await sb
+    .from('bookings')
+    .update({ worker_id: value })
+    .eq('ref', ref);
+
+  if (error) {
+    alert('Villa: ' + error.message);
+    return;
+  }
+
   const b = bookings.find(b => b.ref === ref);
-  if (b) { b.worker = workerId; }
-  // SAVE TO SUPABASE
-  sb.from('bookings').update({ worker_id: workerId }).eq('ref', ref).then(({ error }) => {
-    if (error) console.error('Error assigning worker:', error);
-  });
+  if (b) b.worker_id = value;
+
+  renderAll();
 }
 
 function renderChart(barsId, labelsId) {
@@ -769,7 +794,7 @@ function renderFinance() {
   const compRev = done.filter(b => b.type === 'company').reduce((s,b) => s+b.total, 0);
   const airRev  = done.filter(b => b.type === 'airbnb').reduce((s,b) => s+b.total, 0);
   const totalRev = homeRev + compRev + airRev;
-  const wages = workers.reduce((s,w) => s + w.shifts * 5 * w.hourlyRate, 0);
+  const wages = 0;
   const profit = totalRev - wages - 23000;
   document.getElementById('fi-home').textContent = fmt(homeRev);
   document.getElementById('fi-company').textContent = fmt(compRev);
@@ -781,20 +806,18 @@ function renderFinance() {
 
 function renderWorkers() {
   const list = document.getElementById('workers-list');
-  list.innerHTML = workers.map(w => {
-    const earnings = w.shifts * 5 * w.hourlyRate;
-    return `<div class="worker-card">
-      <div class="worker-avatar" style="background:${w.color};">${w.name[0]}</div>
-      <div class="worker-info">
-        <div class="worker-name">${w.name}</div>
-        <div class="worker-shifts">${w.shifts} vaktir þessa mánuð · ${w.hourlyRate.toLocaleString('is-IS')} kr/klst</div>
-      </div>
-      <div class="worker-earnings">
-        <div class="worker-amount">${fmt(earnings)}</div>
-        <div class="worker-label">Laun mánaðarins</div>
-      </div>
-    </div>`;
-  }).join('');
+  if (staffMembers.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--steel);padding:1rem 0;">Engir starfsmenn skráðir.</div>';
+    return;
+  }
+  const colors = ['#1a56db','#057a55','#7c3aed','#d97706','#dc2626','#0891b2'];
+  list.innerHTML = staffMembers.map((s, i) => `<div class="worker-card">
+    <div class="worker-avatar" style="background:${colors[i % colors.length]};">${s.full_name[0]}</div>
+    <div class="worker-info">
+      <div class="worker-name">${s.full_name}</div>
+      <div class="worker-shifts">${s.role === 'admin' ? 'Admin' : s.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður'}</div>
+    </div>
+  </div>`).join('');
 }
 
 function renderSchedule() {
@@ -803,13 +826,15 @@ function renderSchedule() {
   grid.innerHTML = `
     <div style="background:var(--navy);color:#fff;padding:8px;font-size:11px;font-weight:500;">Starfsmaður</div>
     ${days.map(d => `<div style="background:var(--navy);color:rgba(255,255,255,0.7);padding:8px;font-size:11px;text-align:center;">${d}</div>`).join('')}
-    ${workers.map(w => `
-      <div style="background:var(--white);padding:8px;font-size:12px;font-weight:500;color:var(--navy);border-right:1px solid var(--light);">${w.name.split(' ')[0]}</div>
+    ${staffMembers.map((s, idx) => {
+      const color = ['#1a56db','#057a55','#7c3aed','#d97706','#dc2626','#0891b2'][idx % 6];
+      return `
+      <div style="background:var(--white);padding:8px;font-size:12px;font-weight:500;color:var(--navy);border-right:1px solid var(--light);">${s.full_name.split(' ')[0]}</div>
       ${days.map((d,i) => {
-        const hasBk = bookings.filter(b => b.worker === w.id && b.status !== 'Done').length > 0 && i < 5;
-        return `<div style="background:var(--white);padding:6px;text-align:center;">${hasBk && Math.random()>0.4 ? `<div style="background:${w.color}20;color:${w.color};border-radius:4px;padding:2px 4px;font-size:10px;">${Math.floor(Math.random()*2+1)} verk</div>` : ''}</div>`;
-      }).join('')}
-    `).join('')}
+        const hasBk = bookings.filter(b => b.worker_id === s.id && b.status !== 'Done').length > 0 && i < 5;
+        return `<div style="background:var(--white);padding:6px;text-align:center;">${hasBk ? `<div style="background:${color}20;color:${color};border-radius:4px;padding:2px 4px;font-size:10px;">verk</div>` : ''}</div>`;
+      }).join('')}`;
+    }).join('')}
   `;
 }
 
@@ -829,8 +854,7 @@ function openModal(ref) {
     <div class="detail-row"><span class="detail-label">Tími</span><span class="detail-val">${b.time}</span></div>
     <div class="detail-row"><span class="detail-label">Starfsmaður</span><span class="detail-val">
       <select class="assign-select" onchange="assignWorker('${b.ref}',this.value)" style="font-size:13px;padding:5px 8px;">
-        <option value="">— Veldu starfsmann —</option>
-        ${workers.map(w => `<option value="${w.id}" ${b.worker===w.id?'selected':''}>${w.name}</option>`).join('')}
+        ${buildWorkerOptions(b.worker_id)}
       </select>
     </span></div>
   `;
