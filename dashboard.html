@@ -206,6 +206,8 @@ body.lang-en span.en{display:inline;}
 .finance-amount{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
 .booking-ref{font-family:'JetBrains Mono',monospace;}
 .chart-month{font-family:'JetBrains Mono',monospace;}
+.row-check,#select-all-pending{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);margin:0;flex-shrink:0;}
+#pending-table th:first-child,#pending-table td:first-child{width:40px;padding-left:16px;padding-right:0;}
 </style>
 </head>
 <body class="auth-loading lang-is">
@@ -350,7 +352,7 @@ body.lang-en span.en{display:inline;}
           </div>
           <div class="card-body" style="padding:0 1.5rem;">
             <table class="bookings-table" id="pending-table">
-              <thead><tr><th>Viðskiptavinur</th><th>Þjónusta</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
+              <thead><tr><th><input type="checkbox" id="select-all-pending"></th><th>Viðskiptavinur</th><th>Þjónusta</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
               <tbody id="pending-tbody"></tbody>
             </table>
           </div>
@@ -605,6 +607,7 @@ let staffMembers = [];
 
 // BOOKINGS — loaded from Supabase on page load
 let bookings = [];
+let selectedBookings = new Set();
 
 async function loadStaff() {
   try {
@@ -745,8 +748,14 @@ function renderPending() {
   const pending = bookings
     .filter(b => b.status === 'Pending')
     .sort((a,b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
+
+  // Prune selectedBookings — remove refs that no longer exist as pending
+  const pendingRefs = new Set(pending.map(b => b.ref));
+  for (const ref of selectedBookings) { if (!pendingRefs.has(ref)) selectedBookings.delete(ref); }
+
   tbody.innerHTML = pending.map(b => `
     <tr onclick="openModal('${b.ref}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check" data-ref="${b.ref}" ${selectedBookings.has(b.ref) ? 'checked' : ''}></td>
       <td><div class="booking-name">${b.name}</div><div class="booking-ref">${b.ref}</div></td>
       <td class="booking-svc">${b.service}</td>
       <td class="booking-date">${formatDate(b.date)} · ${normalizeTime(b.time)}</td>
@@ -757,7 +766,9 @@ function renderPending() {
       </td>
       <td><span class="badge badge-pending">Í bið</span></td>
     </tr>
-  `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--steel);padding:1.5rem 0;font-size:13px;">Engar bókanir í bið</td></tr>';
+  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--steel);padding:1.5rem 0;font-size:13px;">Engar bókanir í bið</td></tr>';
+
+  updateSelectAllState();
 }
 
 function renderAllBookings() {
@@ -985,6 +996,36 @@ async function updateStatus(ref, status) {
 
 function closeModal() { document.getElementById('booking-modal').classList.remove('open'); }
 document.getElementById('booking-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+function updateSelectAllState() {
+  const header = document.getElementById('select-all-pending');
+  if (!header) return;
+  const checks = document.querySelectorAll('#pending-tbody .row-check');
+  if (checks.length === 0) { header.checked = false; header.indeterminate = false; return; }
+  const checkedCount = [...checks].filter(c => c.checked).length;
+  if (checkedCount === 0) { header.checked = false; header.indeterminate = false; }
+  else if (checkedCount === checks.length) { header.checked = true; header.indeterminate = false; }
+  else { header.checked = false; header.indeterminate = true; }
+}
+
+// Event delegation on pending table — survives re-renders
+document.getElementById('pending-table').addEventListener('change', e => {
+  if (e.target.classList.contains('row-check')) {
+    const ref = e.target.dataset.ref;
+    if (e.target.checked) selectedBookings.add(ref);
+    else selectedBookings.delete(ref);
+    updateSelectAllState();
+  }
+  if (e.target.id === 'select-all-pending') {
+    const checks = document.querySelectorAll('#pending-tbody .row-check');
+    if (e.target.checked) {
+      checks.forEach(c => { selectedBookings.add(c.dataset.ref); c.checked = true; });
+    } else {
+      checks.forEach(c => { selectedBookings.delete(c.dataset.ref); c.checked = false; });
+    }
+    updateSelectAllState();
+  }
+});
 
 function renderAll() {
   renderStats();
