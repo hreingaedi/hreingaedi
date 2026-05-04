@@ -208,6 +208,20 @@ body.lang-en span.en{display:inline;}
 .chart-month{font-family:'JetBrains Mono',monospace;}
 .row-check,#select-all-pending{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);margin:0;flex-shrink:0;}
 #pending-table th:first-child,#pending-table td:first-child{width:40px;padding:12px 12px 12px 16px;}
+.bulk-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);display:flex;gap:16px;align-items:center;z-index:300;font-family:'Inter',sans-serif;}
+.bulk-bar-info{font-weight:500;font-size:14px;}
+.bulk-bar-actions{display:flex;gap:8px;align-items:center;}
+.bulk-select{padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;}
+.bulk-select option{background:#111827;color:white;}
+.bulk-btn{padding:8px 14px;border-radius:6px;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.bulk-btn-primary{background:#1a56db;color:white;}
+.bulk-btn-primary:hover{background:#1e40af;}
+.bulk-btn-primary:disabled{background:#475569;cursor:not-allowed;}
+.bulk-btn-danger{background:rgba(239,68,68,0.9);color:white;}
+.bulk-btn-danger:hover{background:rgb(220,38,38);}
+.bulk-btn-danger:disabled{background:#475569;cursor:not-allowed;}
+.bulk-btn-ghost{background:transparent;color:rgba(255,255,255,0.7);}
+.bulk-btn-ghost:hover{color:white;}
 </style>
 </head>
 <body class="auth-loading lang-is">
@@ -768,6 +782,7 @@ function renderPending() {
   `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--steel);padding:1.5rem 0;font-size:13px;">Engar bókanir í bið</td></tr>';
 
   updateSelectAllState();
+  updateBulkBar();
 }
 
 function renderAllBookings() {
@@ -1007,6 +1022,68 @@ function updateSelectAllState() {
   else { header.checked = false; header.indeterminate = true; }
 }
 
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-action-bar');
+  if (selectedBookings.size === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('bulk-count').textContent = selectedBookings.size;
+  document.getElementById('bulk-worker-select').innerHTML = buildWorkerOptions('');
+}
+
+document.getElementById('bulk-assign-btn').addEventListener('click', async () => {
+  const select = document.getElementById('bulk-worker-select');
+  const workerId = select.value;
+  if (!workerId) { alert('Veldu starfsmann fyrst'); return; }
+
+  const refsToAssign = Array.from(selectedBookings);
+  const alreadyAssigned = refsToAssign.filter(ref => {
+    const b = bookings.find(b => b.ref === ref);
+    return b && b.worker_id;
+  });
+  if (alreadyAssigned.length > 0) {
+    const ok = confirm(`${alreadyAssigned.length} af ${refsToAssign.length} bókunum hafa þegar starfsmann. Yfirskrifa?`);
+    if (!ok) return;
+  }
+
+  const btn = document.getElementById('bulk-assign-btn');
+  btn.disabled = true;
+  btn.textContent = 'Vinnur...';
+
+  const results = { success: [], failed: [] };
+  const value = workerId === 'general' ? 'general' : workerId;
+
+  for (const ref of refsToAssign) {
+    try {
+      const { error } = await sb.from('bookings').update({ worker_id: value }).eq('ref', ref);
+      if (error) { results.failed.push({ ref, error: error.message }); }
+      else {
+        results.success.push(ref);
+        const b = bookings.find(b => b.ref === ref);
+        if (b) b.worker_id = value;
+      }
+    } catch (err) { results.failed.push({ ref, error: err.message }); }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Úthluta starfsmanni';
+
+  if (results.failed.length === 0) {
+    alert(`✓ ${results.success.length} bókunum úthlutað`);
+  } else {
+    alert(`${results.success.length} tókst, ${results.failed.length} mistókst.\n\nMistök:\n${results.failed.map(f => `${f.ref}: ${f.error}`).join('\n')}`);
+  }
+
+  selectedBookings.clear();
+  renderAll();
+  updateBulkBar();
+});
+
+document.getElementById('bulk-clear-btn').addEventListener('click', () => {
+  selectedBookings.clear();
+  renderAll();
+  updateBulkBar();
+});
+
 // Event delegation on pending table — survives re-renders
 document.getElementById('pending-table').addEventListener('change', e => {
   if (e.target.classList.contains('row-check')) {
@@ -1014,6 +1091,7 @@ document.getElementById('pending-table').addEventListener('change', e => {
     if (e.target.checked) selectedBookings.add(ref);
     else selectedBookings.delete(ref);
     updateSelectAllState();
+    updateBulkBar();
   }
   if (e.target.id === 'select-all-pending') {
     const checks = document.querySelectorAll('#pending-tbody .row-check');
@@ -1023,6 +1101,7 @@ document.getElementById('pending-table').addEventListener('change', e => {
       checks.forEach(c => { selectedBookings.delete(c.dataset.ref); c.checked = false; });
     }
     updateSelectAllState();
+    updateBulkBar();
   }
 });
 
@@ -1169,5 +1248,15 @@ function showToast(msg) {
 
 initAuth();
 </script>
+
+<div id="bulk-action-bar" class="bulk-bar" style="display:none;">
+  <div class="bulk-bar-info"><span id="bulk-count">0</span> valdar</div>
+  <div class="bulk-bar-actions">
+    <select id="bulk-worker-select" class="bulk-select"></select>
+    <button id="bulk-assign-btn" class="bulk-btn bulk-btn-primary">Úthluta starfsmanni</button>
+    <button id="bulk-cancel-btn" class="bulk-btn bulk-btn-danger" disabled>Aflýsa</button>
+    <button id="bulk-clear-btn" class="bulk-btn bulk-btn-ghost">Hreinsa val</button>
+  </div>
+</div>
 </body>
 </html>
