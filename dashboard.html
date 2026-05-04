@@ -48,7 +48,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
-.stat-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);padding:1.25rem 1.5rem;transition:var(--transition);}
+.stat-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);padding:1.25rem 1.75rem;transition:var(--transition);}
 .stat-card:hover{box-shadow:var(--shadow);}
 .stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;}
 .stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
@@ -61,7 +61,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-
 .stat-trend.up{background:var(--green-light);color:var(--green);}
 .stat-trend.pending{background:var(--amber-light);color:var(--amber);}
 .stat-label{font-size:12px;color:var(--steel);margin-bottom:4px;}
-.stat-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
 .stat-sub{font-size:11px;color:var(--steel);margin-top:4px;}
 
 /* LAYOUT GRIDS */
@@ -534,6 +534,16 @@ function formatDate(dateInput) {
 
 const IS_DAYS = ['Sunnudagur','Mánudagur','Þriðjudagur','Miðvikudagur','Fimmtudagur','Föstudagur','Laugardagur'];
 
+function normalizeTime(timeStr) {
+  if (!timeStr) return '';
+  if (/^\d{1,2}:\d{2}$/.test(timeStr)) return timeStr;
+  const slotMap = {'Morgunn':'09:00','morgunn':'09:00','Síðdegis':'13:00','síðdegis':'13:00','Kvöld':'17:00','kvöld':'17:00'};
+  if (slotMap[timeStr]) return slotMap[timeStr];
+  const rangeMatch = timeStr.match(/^(\d{1,2}:\d{2})/);
+  if (rangeMatch) return rangeMatch[1];
+  return timeStr;
+}
+
 function normalizeEmail(email) {
   if (!email || !email.includes('@')) return email;
   const [local, domain] = email.split('@');
@@ -718,7 +728,7 @@ function renderUpcoming() {
     <div class="upcoming-item" onclick="openModal('${b.ref}')" style="cursor:pointer;">
       <div class="upcoming-time">
         <div class="upcoming-date">${formatDate(b.date)}</div>
-        <div class="upcoming-hour">${b.time.split('–')[0] || b.time}</div>
+        <div class="upcoming-hour">${normalizeTime(b.time)}</div>
       </div>
       <div class="upcoming-body">
         <div class="upcoming-name">${b.name}</div>
@@ -739,7 +749,7 @@ function renderPending() {
     <tr onclick="openModal('${b.ref}')">
       <td><div class="booking-name">${b.name}</div><div class="booking-ref">${b.ref}</div></td>
       <td class="booking-svc">${b.service}</td>
-      <td class="booking-date">${formatDate(b.date)}</td>
+      <td class="booking-date">${formatDate(b.date)} · ${normalizeTime(b.time)}</td>
       <td>
         <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
           ${buildWorkerOptions(b.worker_id)}
@@ -761,7 +771,7 @@ function renderAllBookings() {
       <td class="booking-svc">${b.service}</td>
       <td class="booking-svc">${b.sqm}</td>
       <td class="booking-svc">${fmt(b.total)}</td>
-      <td class="booking-date">${formatDate(b.date)} · ${b.time}</td>
+      <td class="booking-date">${formatDate(b.date)} · ${normalizeTime(b.time)}</td>
       <td>
         <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
           ${buildWorkerOptions(b.worker_id)}
