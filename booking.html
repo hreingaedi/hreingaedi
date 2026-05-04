@@ -543,6 +543,8 @@ setLang(lang);
 let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
 let calY=2026,calM=3;
 
+function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
+
 function goStep(n){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const target=document.getElementById('step'+n);
@@ -728,15 +730,15 @@ function toggleExtra(el,price,id){
 
 const monthsIs=['Janúar','Febrúar','Mars','Apríl','Maí','Júní','Júlí','Ágúst','September','Október','Nóvember','Desember'];
 const monthsEn=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const daysIs=['Su','Má','Þr','Mi','Fi','La','Su'];
-const daysEn=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const daysIs=['Má','Þr','Mi','Fi','Fö','La','Su'];
+const daysEn=['Mo','Tu','We','Th','Fr','Sa','Su'];
 
 function buildCal(){
   document.getElementById('cal-label').textContent=(lang==='is'?monthsIs:monthsEn)[calM]+' '+calY;
   const grid=document.getElementById('cal-grid');
   grid.innerHTML='';
   (lang==='is'?daysIs:daysEn).forEach(d=>{const el=document.createElement('div');el.className='cal-day-lbl';el.textContent=d;grid.appendChild(el);});
-  const first=new Date(calY,calM,1).getDay();
+  const first=(new Date(calY,calM,1).getDay()+6)%7;
   const total=new Date(calY,calM+1,0).getDate();
   const today=new Date();
   for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
@@ -772,7 +774,7 @@ function goConfirm(){
   document.getElementById('c-sqm').textContent=state.sqmLabel||'—';
   document.getElementById('c-extras').textContent=state.extras.length>0?state.extras.length+(lang==='is'?' þjónustur valdar':' services selected'):(lang==='is'?'Engar':'None');
   document.getElementById('c-total').textContent=state.total>0?state.total.toLocaleString('is-IS')+' kr':'—';
-  document.getElementById('c-date').textContent=state.date||(lang==='is'?'Ekki tilgreint':'Not specified');
+  document.getElementById('c-date').textContent=state.date?formatDate(state.date):(lang==='is'?'Ekki tilgreint':'Not specified');
   document.getElementById('c-time').textContent=state.time||(lang==='is'?'Ekki tilgreint':'Not specified');
   document.getElementById('c-name').textContent=state.name;
   document.getElementById('c-address').textContent=state.address;

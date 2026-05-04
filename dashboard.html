@@ -567,8 +567,7 @@ async function logout() { await sb.auth.signOut(); window.location.replace('logi
 
 // DATE
 const now = new Date();
-const dateStr = now.toLocaleDateString('is-IS', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-document.getElementById('today-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+document.getElementById('today-date').textContent = IS_DAYS[now.getDay()] + ', ' + formatDate(now);
 
 // STAFF — loaded from Supabase after auth
 let staffMembers = [];
@@ -605,6 +604,7 @@ async function loadBookings() {
       address: b.address,
       worker_id: b.worker_id || null,
       status: b.status,
+      created_at: b.created_at || null,
       calendar_event_id: b.calendar_event_id || null
     }));
     renderAll();
@@ -640,6 +640,18 @@ function buildWorkerOptions(selectedId) {
 }
 
 function fmt(n) { return n.toLocaleString('is-IS') + ' kr'; }
+
+function formatDate(dateInput) {
+  if (!dateInput) return '';
+  const d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+  if (isNaN(d)) return String(dateInput);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+}
+
+const IS_DAYS = ['Sunnudagur','Mánudagur','Þriðjudagur','Miðvikudagur','Fimmtudagur','Föstudagur','Laugardagur'];
 
 function setLang(lang) {
   document.body.classList.remove('lang-is', 'lang-en');
@@ -688,11 +700,15 @@ function renderStats() {
 
 function renderUpcoming() {
   const list = document.getElementById('upcoming-list');
-  const upcoming = bookings.filter(b => b.status !== 'Done').sort((a,b) => a.date.localeCompare(b.date)).slice(0,5);
+  const todayIso = new Date().toISOString().split('T')[0];
+  const upcoming = bookings
+    .filter(b => b.status !== 'Done' && b.date >= todayIso)
+    .sort((a,b) => (a.date + (a.time||'')).localeCompare(b.date + (b.time||'')))
+    .slice(0, 5);
   list.innerHTML = upcoming.map(b => `
     <div class="upcoming-item" onclick="openModal('${b.ref}')" style="cursor:pointer;">
       <div class="upcoming-time">
-        <div class="upcoming-date">${b.date.slice(5).replace('-','/')}</div>
+        <div class="upcoming-date">${formatDate(b.date)}</div>
         <div class="upcoming-hour">${b.time.split('–')[0] || b.time}</div>
       </div>
       <div class="upcoming-body">
@@ -707,12 +723,14 @@ function renderUpcoming() {
 
 function renderPending() {
   const tbody = document.getElementById('pending-tbody');
-  const pending = bookings.filter(b => b.status === 'Pending');
+  const pending = bookings
+    .filter(b => b.status === 'Pending')
+    .sort((a,b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
   tbody.innerHTML = pending.map(b => `
     <tr onclick="openModal('${b.ref}')">
       <td><div class="booking-name">${b.name}</div><div class="booking-ref">${b.ref}</div></td>
       <td class="booking-svc">${b.service}</td>
-      <td class="booking-date">${b.date}</td>
+      <td class="booking-date">${formatDate(b.date)}</td>
       <td>
         <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
           ${buildWorkerOptions(b.worker_id)}
@@ -724,7 +742,8 @@ function renderPending() {
 }
 
 function renderAllBookings() {
-  const filtered = currentFilter === 'all' ? bookings : bookings.filter(b => b.status === currentFilter);
+  const filtered = [...(currentFilter === 'all' ? bookings : bookings.filter(b => b.status === currentFilter))]
+    .sort((a,b) => b.date.localeCompare(a.date));
   document.getElementById('bookings-count').textContent = filtered.length + ' bókanir';
   const tbody = document.getElementById('all-bookings-tbody');
   tbody.innerHTML = filtered.map(b => `
@@ -733,7 +752,7 @@ function renderAllBookings() {
       <td class="booking-svc">${b.service}</td>
       <td class="booking-svc">${b.sqm}</td>
       <td class="booking-svc">${fmt(b.total)}</td>
-      <td class="booking-date">${b.date} · ${b.time}</td>
+      <td class="booking-date">${formatDate(b.date)} · ${b.time}</td>
       <td>
         <select class="assign-select" onclick="event.stopPropagation()" onchange="assignWorker('${b.ref}',this.value)">
           ${buildWorkerOptions(b.worker_id)}
@@ -850,7 +869,7 @@ function openModal(ref) {
     <div class="detail-row"><span class="detail-label">Stærð</span><span class="detail-val">${b.sqm}</span></div>
     <div class="detail-row"><span class="detail-label">Heildarverð</span><span class="detail-val">${fmt(b.total)}</span></div>
     <div class="detail-row"><span class="detail-label">Heimilisfang</span><span class="detail-val">${b.address}</span></div>
-    <div class="detail-row"><span class="detail-label">Dagsetning</span><span class="detail-val">${b.date}</span></div>
+    <div class="detail-row"><span class="detail-label">Dagsetning</span><span class="detail-val">${formatDate(b.date)}</span></div>
     <div class="detail-row"><span class="detail-label">Tími</span><span class="detail-val">${b.time}</span></div>
     <div class="detail-row"><span class="detail-label">Starfsmaður</span><span class="detail-val">
       <select class="assign-select" onchange="assignWorker('${b.ref}',this.value)" style="font-size:13px;padding:5px 8px;">
@@ -1047,7 +1066,7 @@ async function loadPendingInvites() {
   const lang = document.body.classList.contains('lang-en') ? 'en' : 'is';
   container.innerHTML = '<div class="invite-list">' + data.map(inv => {
     const roleLabel = inv.role === 'admin' ? 'Admin' : inv.role === 'manager' ? 'Stjórnandi' : 'Starfsmaður';
-    const expires = new Date(inv.expires_at).toLocaleDateString('is-IS');
+    const expires = formatDate(inv.expires_at);
     return `<div class="invite-row">
       <div class="invite-info">
         <div class="invite-email">${inv.email}</div>

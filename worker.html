@@ -142,6 +142,16 @@ const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function formatDate(dateInput) {
+  if (!dateInput) return '';
+  const d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+  if (isNaN(d)) return String(dateInput);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+}
+
 // AUTH
 window.currentUser = null;
 window.myJobs = [];
@@ -252,7 +262,7 @@ function renderUpcomingJobs(upcomingJobs) {
   container.innerHTML = upcomingJobs.map(j => `
     <div class="job-item" onclick="openJob('${j.ref}')">
       <div class="job-top">
-        <div><div class="job-name">${j.name}</div><div class="job-ref">${j.ref} · ${j.date}</div></div>
+        <div><div class="job-name">${j.name}</div><div class="job-ref">${j.ref} · ${formatDate(j.date)}</div></div>
         <span class="badge badge-${j.status.toLowerCase()}">${j.status === 'Confirmed' ? 'Staðfest' : 'Í bið'}</span>
       </div>
       <div class="job-svc">${j.service} · ${j.sqm}</div>
@@ -270,7 +280,7 @@ function openJob(ref) {
   document.getElementById('sheet-content').innerHTML = `
     <div class="detail-row"><span class="detail-label">Þjónusta</span><span class="detail-val">${j.service}</span></div>
     <div class="detail-row"><span class="detail-label">Stærð</span><span class="detail-val">${j.sqm}</span></div>
-    <div class="detail-row"><span class="detail-label">Dagsetning</span><span class="detail-val">${j.date}</span></div>
+    <div class="detail-row"><span class="detail-label">Dagsetning</span><span class="detail-val">${formatDate(j.date)}</span></div>
     <div class="detail-row"><span class="detail-label">Tími</span><span class="detail-val">${j.time}</span></div>
     <div class="detail-row"><span class="detail-label">Heimilisfang</span><span class="detail-val">${j.address}</span></div>
     ${j.notes ? `<div class="detail-row"><span class="detail-label">Athugasemdir</span><span class="detail-val" style="color:var(--amber);">${j.notes}</span></div>` : ''}

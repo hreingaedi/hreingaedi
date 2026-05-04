@@ -1,6 +1,16 @@
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+function formatDate(dateInput) {
+  if (!dateInput) return '';
+  const d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+  if (isNaN(d)) return String(dateInput);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+}
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
 
 export default async function handler(req, res) {
@@ -48,7 +58,7 @@ export default async function handler(req, res) {
         ${row('Heimilisfang', data.address)}
         ${row('Stærð', data.size ? data.size + ' m²' : null)}
         ${row('Tíðni', data.frequency)}
-        ${row('Dagsetning', data.date)}
+        ${row('Dagsetning', formatDate(data.date))}
         ${row('Tími', data.time)}
         ${row('Athugasemdir', data.notes)}
         ${row('Verð áætlað', data.estimated_price ? data.estimated_price + ' kr' : null)}
@@ -80,7 +90,7 @@ export default async function handler(req, res) {
         ${row('Sæl/l', data.name)}
         ${row('', 'Við höfum staðfest bókunina þína og hlökkum til að mæta. Hér eru upplýsingarnar:')}
         ${row('Þjónusta', data.service)}
-        ${row('Dagsetning', data.date)}
+        ${row('Dagsetning', formatDate(data.date))}
         ${row('Tími', data.time)}
         ${row('Heimilisfang', data.address)}
         ${row('Bókunarnúmer', data.ref)}
@@ -104,7 +114,7 @@ export default async function handler(req, res) {
         ${row('Sæl/l', data.name)}
         ${row('', 'Bókunin þín hefur verið afbókuð. Hér eru upplýsingarnar sem voru skráðar:')}
         ${row('Þjónusta', data.service)}
-        ${row('Dagsetning', data.date)}
+        ${row('Dagsetning', formatDate(data.date))}
         ${row('Tími', data.time)}
         ${row('Bókunarnúmer', data.ref)}
         ${row('', '')}
