@@ -513,6 +513,18 @@ const SUPABASE_URL = 'https://chngznufxfphhppwaafk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobmd6bnVmeGZwaGhwcHdhYWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTk2NjgsImV4cCI6MjA5MTA3NTY2OH0.-dyFOhRmI0Ze4gGzcsBnbD_wN_i5XRQLXabiewJXGOk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function formatDate(dateInput) {
+  if (!dateInput) return '';
+  const d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+  if (isNaN(d)) return String(dateInput);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+}
+
+const IS_DAYS = ['Sunnudagur','Mánudagur','Þriðjudagur','Miðvikudagur','Fimmtudagur','Föstudagur','Laugardagur'];
+
 function normalizeEmail(email) {
   if (!email || !email.includes('@')) return email;
   const [local, domain] = email.split('@');
@@ -640,18 +652,6 @@ function buildWorkerOptions(selectedId) {
 }
 
 function fmt(n) { return n.toLocaleString('is-IS') + ' kr'; }
-
-function formatDate(dateInput) {
-  if (!dateInput) return '';
-  const d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
-  if (isNaN(d)) return String(dateInput);
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const yyyy = d.getFullYear();
-  return `${dd}.${mm}.${yyyy}`;
-}
-
-const IS_DAYS = ['Sunnudagur','Mánudagur','Þriðjudagur','Miðvikudagur','Fimmtudagur','Föstudagur','Laugardagur'];
 
 function setLang(lang) {
   document.body.classList.remove('lang-is', 'lang-en');
