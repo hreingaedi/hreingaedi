@@ -541,7 +541,7 @@ function setLang(l){lang=l;document.body.className='lang-'+l;document.documentEl
 setLang(lang);
 
 let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
-let calY=2026,calM=3;
+const _today=new Date();let calY=_today.getFullYear(),calM=_today.getMonth();
 
 function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
 
