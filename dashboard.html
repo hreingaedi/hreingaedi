@@ -352,7 +352,7 @@ body.lang-en span.en{display:inline;}
           </div>
           <div class="card-body" style="padding:0 1.5rem;">
             <table class="bookings-table" id="pending-table">
-              <thead><tr><th><input type="checkbox" id="select-all-pending"></th><th>Viðskiptavinur</th><th>Þjónusta</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
+              <thead><tr><th><input type="checkbox" id="select-all-pending"></th><th>Viðskiptavinur</th><th>Þjónusta</th><th>Dagsetning</th><th>Starfsm.</th></tr></thead>
               <tbody id="pending-tbody"></tbody>
             </table>
           </div>
@@ -764,9 +764,8 @@ function renderPending() {
           ${buildWorkerOptions(b.worker_id)}
         </select>
       </td>
-      <td><span class="badge badge-pending">Í bið</span></td>
     </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--steel);padding:1.5rem 0;font-size:13px;">Engar bókanir í bið</td></tr>';
+  `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--steel);padding:1.5rem 0;font-size:13px;">Engar bókanir í bið</td></tr>';
 
   updateSelectAllState();
 }
