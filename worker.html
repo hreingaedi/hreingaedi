@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Starfsmannasvæði – Hrein Gæði</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--white:#fff;--off:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--green:#057a55;--green-light:#ecfdf5;--amber:#d97706;--amber-light:#fffbeb;--radius:12px;--radius-lg:18px;--shadow:0 4px 24px rgba(17,24,39,0.08);--transition:0.25s ease;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:'cv02','cv03','cv04','cv11';}
 .worker-header{background:var(--navy);padding:1.5rem 1.25rem 4rem;position:relative;overflow:hidden;}
 .worker-header::after{content:'';position:absolute;bottom:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,0.04);border-radius:50%;}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
-.header-brand{font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(255,255,255,0.7);}
-.logout-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-family:'Outfit',sans-serif;font-size:12px;display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:50px;transition:var(--transition);}
+.header-brand{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:-0.01em;}
+.logout-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:12px;display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:50px;transition:var(--transition);}
 .logout-btn:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.3);}
 .logout-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-.worker-greeting{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;margin-bottom:4px;}
+.worker-greeting{font-family:'Inter',sans-serif;font-size:22px;font-weight:600;color:#fff;margin-bottom:4px;letter-spacing:-0.02em;}
 .worker-sub{font-size:13px;color:rgba(255,255,255,0.5);}
 .content{max-width:480px;margin:-2.5rem auto 0;padding:0 1.25rem 3rem;position:relative;z-index:10;}
 .today-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--shadow);}
@@ -42,7 +42,7 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
 .section-title{font-size:12px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;margin-top:1.5rem;}
 .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.25rem;}
 .mini-stat{background:var(--white);border:1px solid var(--mist);border-radius:var(--radius);padding:1rem;text-align:center;}
-.mini-stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--navy);line-height:1;}
+.mini-stat-num{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
 .mini-stat-label{font-size:10px;color:var(--steel);margin-top:4px;letter-spacing:0.03em;}
 
 /* JOB DETAIL SHEET */
@@ -66,7 +66,7 @@ body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min
 .check-label{font-size:13px;color:var(--slate);transition:var(--transition);}
 .check-item.done .check-label{color:var(--steel);text-decoration:line-through;}
 .sheet-actions{display:flex;flex-direction:column;gap:8px;margin-top:1.5rem;}
-.btn-full{width:100%;padding:13px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:var(--transition);}
+.btn-full{width:100%;padding:13px;border-radius:50px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:var(--transition);}
 .btn-complete{background:var(--green);color:#fff;}
 .btn-complete:hover{background:#046c4e;}
 .btn-maps{background:var(--off);color:var(--navy);border:1px solid var(--mist);}
