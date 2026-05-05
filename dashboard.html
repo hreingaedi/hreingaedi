@@ -537,7 +537,7 @@ body.lang-en span.en{display:inline;}
   <div class="bulk-bar-actions">
     <select id="bulk-worker-select" class="bulk-select"></select>
     <button id="bulk-assign-btn" class="bulk-btn bulk-btn-primary">Úthluta starfsmanni</button>
-    <button id="bulk-cancel-btn" class="bulk-btn bulk-btn-danger" disabled>Aflýsa</button>
+    <button id="bulk-cancel-btn" class="bulk-btn bulk-btn-danger">Aflýsa</button>
     <button id="bulk-clear-btn" class="bulk-btn bulk-btn-ghost">Hreinsa val</button>
   </div>
 </div>
@@ -1039,6 +1039,7 @@ function updateBulkBar() {
   bar.style.display = 'flex';
   document.getElementById('bulk-count').textContent = selectedBookings.size;
   document.getElementById('bulk-worker-select').innerHTML = buildWorkerOptions('');
+  document.getElementById('bulk-cancel-btn').disabled = (selectedBookings.size === 0);
 }
 
 document.getElementById('bulk-assign-btn').addEventListener('click', async () => {
@@ -1090,6 +1091,84 @@ document.getElementById('bulk-assign-btn').addEventListener('click', async () =>
 });
 
 document.getElementById('bulk-clear-btn').addEventListener('click', () => {
+  selectedBookings.clear();
+  renderAll();
+  updateBulkBar();
+});
+
+document.getElementById('bulk-cancel-btn').addEventListener('click', async () => {
+  const refsToCancel = Array.from(selectedBookings);
+
+  const validRefs = refsToCancel.filter(ref => {
+    const b = bookings.find(b => b.ref === ref);
+    return b && b.status !== 'Cancelled';
+  });
+
+  if (validRefs.length === 0) { alert('Engar gildar bókanir til að afbóka.'); return; }
+
+  const emailCount = validRefs.filter(ref => bookings.find(b => b.ref === ref)?.email).length;
+  const calendarCount = validRefs.filter(ref => bookings.find(b => b.ref === ref)?.calendar_event_id).length;
+
+  const message =
+    `Aflýsa ${validRefs.length} bókun${validRefs.length === 1 ? '' : 'um'}?\n\n` +
+    `• ${emailCount} viðskiptavin${emailCount === 1 ? 'ur fær' : 'ir fá'} tilkynningarpóst\n` +
+    `• ${calendarCount} dagatalsfærsl${calendarCount === 1 ? 'a verður eytt' : 'ur verða eyttar'}\n\n` +
+    `Þessi aðgerð verður ekki afturkölluð.`;
+
+  if (!confirm(message)) return;
+
+  const btn = document.getElementById('bulk-cancel-btn');
+  btn.disabled = true;
+  btn.textContent = 'Afbókar...';
+
+  const results = { success: [], failed: [] };
+
+  for (const ref of validRefs) {
+    const b = bookings.find(bk => bk.ref === ref);
+    if (!b) { results.failed.push({ ref, error: 'Booking not found' }); continue; }
+
+    try {
+      const { error: updateError } = await sb.from('bookings').update({ status: 'Cancelled' }).eq('ref', ref);
+      if (updateError) { results.failed.push({ ref, error: 'DB: ' + updateError.message }); continue; }
+
+      b.status = 'Cancelled';
+
+      if (b.calendar_event_id) {
+        try {
+          await fetch('/api/calendar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'cancel', eventId: b.calendar_event_id })
+          });
+        } catch (calErr) { console.warn(`Calendar delete failed for ${ref}:`, calErr); }
+      }
+
+      if (b.email) {
+        try {
+          await fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'customer_cancellation',
+              data: { name: b.name, email: b.email, service: b.service, date: b.date, time: b.time, ref: b.ref }
+            })
+          });
+        } catch (emailErr) { console.warn(`Email send failed for ${ref}:`, emailErr); }
+      }
+
+      results.success.push(ref);
+    } catch (err) { results.failed.push({ ref, error: err.message }); }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Aflýsa';
+
+  if (results.failed.length === 0) {
+    alert(`✓ ${results.success.length} bókun${results.success.length === 1 ? ' afbókuð' : 'um afbókað'}.`);
+  } else {
+    alert(`${results.success.length} tókst, ${results.failed.length} mistókst.\n\nMistök:\n${results.failed.map(f => `${f.ref}: ${f.error}`).join('\n')}`);
+  }
+
   selectedBookings.clear();
   renderAll();
   updateBulkBar();
