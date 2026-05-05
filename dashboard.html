@@ -531,6 +531,17 @@ body.lang-en span.en{display:inline;}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- BULK ACTION BAR -->
+<div id="bulk-action-bar" class="bulk-bar" style="display:none;">
+  <div class="bulk-bar-info"><span id="bulk-count">0</span> valdar</div>
+  <div class="bulk-bar-actions">
+    <select id="bulk-worker-select" class="bulk-select"></select>
+    <button id="bulk-assign-btn" class="bulk-btn bulk-btn-primary">Úthluta starfsmanni</button>
+    <button id="bulk-cancel-btn" class="bulk-btn bulk-btn-danger" disabled>Aflýsa</button>
+    <button id="bulk-clear-btn" class="bulk-btn bulk-btn-ghost">Hreinsa val</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // SUPABASE CONNECTION
@@ -1249,14 +1260,5 @@ function showToast(msg) {
 initAuth();
 </script>
 
-<div id="bulk-action-bar" class="bulk-bar" style="display:none;">
-  <div class="bulk-bar-info"><span id="bulk-count">0</span> valdar</div>
-  <div class="bulk-bar-actions">
-    <select id="bulk-worker-select" class="bulk-select"></select>
-    <button id="bulk-assign-btn" class="bulk-btn bulk-btn-primary">Úthluta starfsmanni</button>
-    <button id="bulk-cancel-btn" class="bulk-btn bulk-btn-danger" disabled>Aflýsa</button>
-    <button id="bulk-clear-btn" class="bulk-btn bulk-btn-ghost">Hreinsa val</button>
-  </div>
-</div>
 </body>
 </html>
