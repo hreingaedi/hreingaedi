@@ -207,7 +207,8 @@ body.lang-en span.en{display:inline;}
 .booking-ref{font-family:'JetBrains Mono',monospace;}
 .chart-month{font-family:'JetBrains Mono',monospace;}
 .row-check,#select-all-pending{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);margin:0;flex-shrink:0;}
-#pending-table th:first-child,#pending-table td:first-child{width:40px;padding:12px 12px 12px 16px;}
+#pending-table th:first-child,#pending-table td:first-child,
+#all-bookings-table th:first-child,#all-bookings-table td:first-child{width:40px;padding:12px 12px 12px 16px;}
 .bulk-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);display:flex;gap:16px;align-items:center;z-index:300;font-family:'Inter',sans-serif;}
 .bulk-bar-info{font-weight:500;font-size:14px;}
 .bulk-bar-actions{display:flex;gap:8px;align-items:center;}
@@ -406,8 +407,8 @@ body.lang-en span.en{display:inline;}
           <span class="card-action" id="bookings-count">0 bókanir</span>
         </div>
         <div class="card-body" style="padding:0 1.5rem;">
-          <table class="bookings-table">
-            <thead><tr><th>Viðskiptavinur</th><th>Þjónusta</th><th>Stærð</th><th>Verð</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
+          <table class="bookings-table" id="all-bookings-table">
+            <thead><tr><th><input type="checkbox" id="select-all-bookings"></th><th>Viðskiptavinur</th><th>Þjónusta</th><th>Stærð</th><th>Verð</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
             <tbody id="all-bookings-tbody"></tbody>
           </table>
         </div>
@@ -774,9 +775,9 @@ function renderPending() {
     .filter(b => b.status === 'Pending')
     .sort((a,b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
 
-  // Prune selectedBookings — remove refs that no longer exist as pending
-  const pendingRefs = new Set(pending.map(b => b.ref));
-  for (const ref of selectedBookings) { if (!pendingRefs.has(ref)) selectedBookings.delete(ref); }
+  // Prune selectedBookings — remove refs that no longer exist in bookings at all
+  const allRefs = new Set(bookings.map(b => b.ref));
+  for (const ref of selectedBookings) { if (!allRefs.has(ref)) selectedBookings.delete(ref); }
 
   tbody.innerHTML = pending.map(b => `
     <tr onclick="openModal('${b.ref}')">
@@ -803,6 +804,7 @@ function renderAllBookings() {
   const tbody = document.getElementById('all-bookings-tbody');
   tbody.innerHTML = filtered.map(b => `
     <tr onclick="openModal('${b.ref}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check" data-ref="${b.ref}" ${selectedBookings.has(b.ref) ? 'checked' : ''}></td>
       <td><div class="booking-name">${b.name}</div><div class="booking-ref">${b.ref}</div></td>
       <td class="booking-svc">${b.service}</td>
       <td class="booking-svc">${b.sqm}</td>
@@ -816,6 +818,8 @@ function renderAllBookings() {
       <td><span class="badge badge-${b.status.toLowerCase()}">${b.status === 'Pending' ? 'Í bið' : b.status === 'Confirmed' ? 'Staðfest' : b.status === 'Done' ? 'Lokið' : 'Afbókað'}</span></td>
     </tr>
   `).join('');
+  updateSelectAllBookingsState();
+  updateBulkBar();
 }
 
 function filterBookings(filter, btn) {
@@ -1101,16 +1105,23 @@ document.getElementById('bulk-cancel-btn').addEventListener('click', async () =>
 
   const validRefs = refsToCancel.filter(ref => {
     const b = bookings.find(b => b.ref === ref);
-    return b && b.status !== 'Cancelled';
+    return b && b.status !== 'Cancelled' && b.status !== 'Done';
   });
 
   if (validRefs.length === 0) { alert('Engar gildar bókanir til að afbóka.'); return; }
 
   const emailCount = validRefs.filter(ref => bookings.find(b => b.ref === ref)?.email).length;
   const calendarCount = validRefs.filter(ref => bookings.find(b => b.ref === ref)?.calendar_event_id).length;
+  const pendingCount = validRefs.filter(ref => bookings.find(b => b.ref === ref)?.status === 'Pending').length;
+  const confirmedCount = validRefs.filter(ref => bookings.find(b => b.ref === ref)?.status === 'Confirmed').length;
+
+  const statusTypes = (pendingCount > 0 ? 1 : 0) + (confirmedCount > 0 ? 1 : 0);
+  const headline = statusTypes > 1
+    ? `Aflýsa ${validRefs.length} bókun${validRefs.length === 1 ? '' : 'um'} — ${pendingCount} Í bið · ${confirmedCount} Staðfestar?`
+    : `Aflýsa ${validRefs.length} bókun${validRefs.length === 1 ? '' : 'um'}?`;
 
   const message =
-    `Aflýsa ${validRefs.length} bókun${validRefs.length === 1 ? '' : 'um'}?\n\n` +
+    `${headline}\n\n` +
     `• ${emailCount} viðskiptavin${emailCount === 1 ? 'ur fær' : 'ir fá'} tilkynningarpóst\n` +
     `• ${calendarCount} dagatalsfærsl${calendarCount === 1 ? 'a verður eytt' : 'ur verða eyttar'}\n\n` +
     `Þessi aðgerð verður ekki afturkölluð.`;
@@ -1191,6 +1202,38 @@ document.getElementById('pending-table').addEventListener('change', e => {
       checks.forEach(c => { selectedBookings.delete(c.dataset.ref); c.checked = false; });
     }
     updateSelectAllState();
+    updateBulkBar();
+  }
+});
+
+function updateSelectAllBookingsState() {
+  const header = document.getElementById('select-all-bookings');
+  if (!header) return;
+  const checks = document.querySelectorAll('#all-bookings-tbody .row-check');
+  if (checks.length === 0) { header.checked = false; header.indeterminate = false; return; }
+  const checkedCount = [...checks].filter(c => c.checked).length;
+  if (checkedCount === 0) { header.checked = false; header.indeterminate = false; }
+  else if (checkedCount === checks.length) { header.checked = true; header.indeterminate = false; }
+  else { header.checked = false; header.indeterminate = true; }
+}
+
+// Event delegation on all-bookings table — survives re-renders
+document.getElementById('all-bookings-table').addEventListener('change', e => {
+  if (e.target.classList.contains('row-check')) {
+    const ref = e.target.dataset.ref;
+    if (e.target.checked) selectedBookings.add(ref);
+    else selectedBookings.delete(ref);
+    updateSelectAllBookingsState();
+    updateBulkBar();
+  }
+  if (e.target.id === 'select-all-bookings') {
+    const checks = document.querySelectorAll('#all-bookings-tbody .row-check');
+    if (e.target.checked) {
+      checks.forEach(c => { selectedBookings.add(c.dataset.ref); c.checked = true; });
+    } else {
+      checks.forEach(c => { selectedBookings.delete(c.dataset.ref); c.checked = false; });
+    }
+    updateSelectAllBookingsState();
     updateBulkBar();
   }
 });
