@@ -40,6 +40,8 @@ header{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--header-h);di
 .logo-icon{width:40px;height:40px;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;}
 .logo-icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--navy);}
+.logo-img{height:44px;width:auto;display:block;}
+.brand-logo{display:inline-flex;align-items:center;text-decoration:none;}
 nav{display:flex;align-items:center;gap:2.5rem;}
 nav a{font-size:14px;color:var(--slate);text-decoration:none;letter-spacing:0.03em;transition:color var(--transition);}
 nav a:hover{color:var(--navy);}nav a.active{color:var(--navy);font-weight:500;}
@@ -123,7 +125,7 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
 
 <header>
   <div class="header-inner">
-    <a href="index.html" class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="logo-text">Hrein Gæði</span></a>
+    <a href="/" class="brand-logo"><img src="/logo.png" alt="Hrein Gæði" class="logo-img"></a>
     <nav>
       <a href="services.html"><span class="is">Þjónusta</span><span class="en">Services</span></a>
       <a href="services.html#pricing"><span class="is">Verðskrá</span><span class="en">Pricing</span></a>
