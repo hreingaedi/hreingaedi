@@ -34,15 +34,20 @@ export default async function handler(req, res) {
     let html = '';
 
     const wrapper = (title, rows) => `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#111827;">
-        <div style="border-bottom:2px solid #1a56db;padding-bottom:12px;margin-bottom:24px;">
-          <h1 style="font-size:20px;font-weight:600;margin:0;color:#111827;">Hrein Gæði</h1>
-          <p style="font-size:13px;color:#6b7280;margin:4px 0 0;">${title}</p>
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;color:#111827;">
+        <div style="background-color:#ffffff;text-align:center;padding:24px 16px;border-bottom:1px solid #e5e7eb;">
+          <img src="https://hreingaedi.is/logo.png" alt="Hrein Gæði" style="max-width:200px;height:auto;display:inline-block;" width="200" />
         </div>
-        <table style="width:100%;border-collapse:collapse;">
-          ${rows}
-        </table>
-        <p style="font-size:12px;color:#9ca3af;margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb;">Sent from hreingaedi.is</p>
+        <div style="padding:24px;">
+          <div style="border-bottom:2px solid #1a56db;padding-bottom:12px;margin-bottom:24px;">
+            <h1 style="font-size:20px;font-weight:600;margin:0;color:#111827;">Hrein Gæði</h1>
+            <p style="font-size:13px;color:#6b7280;margin:4px 0 0;">${title}</p>
+          </div>
+          <table style="width:100%;border-collapse:collapse;">
+            ${rows}
+          </table>
+          <p style="font-size:12px;color:#9ca3af;margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb;">Sent from hreingaedi.is</p>
+        </div>
       </div>
     `;
 
