@@ -649,21 +649,47 @@ document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
   }
   window.addEventListener('scroll', checkScroll, { passive: true });
 
-  // Form submit — Stage 3 will wire to Supabase + email sending
+  // Form submit — wired to /api/subscribe
   document.getElementById('newsletter-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('newsletter-email').value.trim();
     if (!email) return;
 
-    document.querySelector('.newsletter-popup-form').style.display = 'none';
-    document.querySelector('.newsletter-popup-fineprint').style.display = 'none';
-    document.getElementById('newsletter-success').style.display = 'block';
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Skráir...';
 
     try {
-      localStorage.setItem(STORAGE_KEY, Date.now().toString());
-    } catch (e) {}
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'popup' })
+      });
 
-    setTimeout(() => closeNewsletterPopup(), 4000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        alert(data.error || 'Villa kom upp. Vinsamlegast reyndu aftur.');
+        return;
+      }
+
+      document.querySelector('.newsletter-popup-form').style.display = 'none';
+      document.querySelector('.newsletter-popup-fineprint').style.display = 'none';
+      document.getElementById('newsletter-success').style.display = 'block';
+
+      try {
+        localStorage.setItem(STORAGE_KEY, Date.now().toString());
+      } catch (e) {}
+
+      setTimeout(() => closeNewsletterPopup(), 4000);
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      alert('Villa kom upp. Vinsamlegast reyndu aftur.');
+    }
   });
 
   // ESC key to close
