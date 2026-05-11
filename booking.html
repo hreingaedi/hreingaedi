@@ -190,6 +190,22 @@ body.lang-en .is{display:none;}
   .progress-wrap{padding:1rem;}
   .prog-label{display:none;}
 }
+/* DISCOUNT */
+.discount-section{margin:16px 0;padding:16px;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;}
+.discount-label{display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:8px;}
+.discount-input-row{display:flex;gap:8px;}
+.discount-input{flex:1;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;font-family:inherit;text-transform:uppercase;}
+.discount-input:focus{outline:none;border-color:#1a56db;box-shadow:0 0 0 3px rgba(26,86,219,0.15);}
+.discount-input:disabled{background:#f3f4f6;color:#6b7280;}
+.discount-apply-btn{padding:10px 16px;background:#1a56db;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
+.discount-apply-btn:hover{background:#1e40af;}
+.discount-apply-btn:disabled{background:#9ca3af;cursor:not-allowed;}
+.discount-remove-btn{padding:10px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
+.discount-remove-btn:hover{background:#dc2626;}
+.discount-feedback{margin-top:10px;padding:8px 12px;border-radius:8px;font-size:13px;}
+.discount-feedback.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+.discount-feedback.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.discount-line-total{display:flex;justify-content:space-between;font-size:14px;color:#065f46;padding:4px 0;margin-bottom:4px;}
 </style>
 </head>
 <body class="lang-is">
@@ -408,6 +424,15 @@ body.lang-en .is{display:none;}
       <p class="step-subhead is">Farðu yfir upplýsingarnar áður en þú sendir beiðnina.</p>
       <p class="step-subhead en">Review your details before submitting the request.</p>
 
+      <div id="discount-section" class="discount-section">
+        <label for="discount-code-input" class="discount-label">Afsláttarkóði (valfrjálst)</label>
+        <div class="discount-input-row">
+          <input type="text" id="discount-code-input" class="discount-input" placeholder="t.d. VELKOMIN10" maxlength="32" autocomplete="off" />
+          <button type="button" id="apply-discount-btn" class="discount-apply-btn">Nota kóða</button>
+        </div>
+        <div id="discount-feedback" class="discount-feedback" style="display:none;"></div>
+      </div>
+
       <div class="confirm-card">
         <div class="confirm-row"><span class="confirm-label is">Tegund</span><span class="confirm-label en">Type</span><span class="confirm-value" id="c-type">—</span></div>
         <div class="confirm-row"><span class="confirm-label is">Stærð</span><span class="confirm-label en">Size</span><span class="confirm-value" id="c-sqm">—</span></div>
@@ -549,7 +574,7 @@ let lang = localStorage.getItem('hg-lang') || 'is';
 function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
 setLang(lang);
 
-let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
+let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
 const _today=new Date();let calY=_today.getFullYear(),calM=_today.getMonth();
 
 function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
@@ -716,7 +741,8 @@ function calcCustomSqm(val){
 }
 
 function updatePriceDisplay(){
-  state.total=state.basePrice+state.extrasTotal;
+  const subtotal=state.basePrice+state.extrasTotal;
+  state.total=Math.max(0,subtotal-state.discountAmount);
   const pp=document.getElementById('price-preview');
   const tb=document.getElementById('total-box');
   if(state.basePrice>0){
@@ -724,7 +750,23 @@ function updatePriceDisplay(){
     document.getElementById('base-price-display').textContent=state.basePrice.toLocaleString('is-IS')+' kr';
     tb.style.display='flex';
     document.getElementById('total-display').textContent=state.total.toLocaleString('is-IS')+' kr';
+    // Discount line above total-box
+    let discountLine=document.getElementById('discount-line');
+    if(state.discountAmount>0){
+      if(!discountLine){
+        discountLine=document.createElement('div');
+        discountLine.id='discount-line';
+        discountLine.className='discount-line-total';
+        tb.parentNode.insertBefore(discountLine,tb);
+      }
+      discountLine.innerHTML=`<span>Afsláttur (${state.discountCode})</span><span>-${state.discountAmount.toLocaleString('is-IS')} kr</span>`;
+    } else if(discountLine){
+      discountLine.remove();
+    }
   }
+  // Keep confirm summary in sync if already on step 5
+  const cTotal=document.getElementById('c-total');
+  if(cTotal&&cTotal.textContent!=='—') cTotal.textContent=state.total>0?state.total.toLocaleString('is-IS')+' kr':'—';
 }
 
 function toggleExtra(el,price,id){
@@ -804,6 +846,8 @@ async function submitBooking(){
       sqm_value: state.sqm,
       base_price: state.basePrice,
       extras_total: state.extrasTotal,
+      discount_code: state.discountCode || null,
+      discount_amount: state.discountAmount || 0,
       total: state.total,
       date: state.date,
       time: state.time,
@@ -825,6 +869,15 @@ async function submitBooking(){
     console.error('Error saving booking:', err);
     alert(lang === 'is' ? 'Villa kom upp. Vinsamlegast reyndu aftur.' : 'An error occurred. Please try again.');
     return;
+  }
+
+  // Increment discount code use count (best effort)
+  if (state.discountCode) {
+    try {
+      await sb.rpc('increment_discount_use', { code_param: state.discountCode });
+    } catch (e) {
+      console.warn('Failed to increment discount use count:', e);
+    }
   }
 
   try {
@@ -897,13 +950,85 @@ async function submitBooking(){
 }
 
 function restart(){
-  state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:''};
+  state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
   document.querySelectorAll('.type-card,.sqm-btn,.extra-row,.time-slot,.cal-day').forEach(el=>el.classList.remove('sel'));
   ['f-name','f-phone','f-email','f-address','f-zip','f-access','f-notes','time-notes','q-company','q-address','q-size','q-notes','q-name','q-phone','q-email','q-kt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('price-preview').style.display='none';
   document.getElementById('total-box').style.display='none';
   document.getElementById('sqm-custom-wrap').style.display='none';
+  const discInput=document.getElementById('discount-code-input');
+  const discBtn=document.getElementById('apply-discount-btn');
+  const discFb=document.getElementById('discount-feedback');
+  if(discInput){discInput.value='';discInput.disabled=false;}
+  if(discBtn){discBtn.textContent='Nota kóða';discBtn.classList.remove('discount-remove-btn');discBtn.classList.add('discount-apply-btn');}
+  if(discFb){discFb.style.display='none';}
+  const discLine=document.getElementById('discount-line');
+  if(discLine)discLine.remove();
   goStep(1);
+}
+
+// Discount code apply
+document.getElementById('apply-discount-btn').addEventListener('click', async function() {
+  if (this.classList.contains('discount-remove-btn')) return; // handled by delegated listener
+  const input=document.getElementById('discount-code-input');
+  const code=input.value.trim().toUpperCase();
+  if(!code){showDiscountFeedback('Vinsamlegast sláðu inn kóða',false);return;}
+  this.disabled=true;
+  this.textContent='Athugar...';
+  try {
+    const subtotal=state.basePrice+state.extrasTotal;
+    const response=await fetch('/api/validate-discount',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code,service:state.type||'',total:subtotal})
+    });
+    const data=await response.json();
+    if(!data.valid){
+      showDiscountFeedback(data.error||'Ógildur kóði',false);
+      this.disabled=false;this.textContent='Nota kóða';
+      return;
+    }
+    state.discountCode=data.code;
+    state.discountAmount=data.discount_amount;
+    state.discountType=data.discount_type;
+    state.discountValue=data.discount_value;
+    input.disabled=true;
+    this.textContent='Fjarlægja';
+    this.disabled=false;
+    this.classList.remove('discount-apply-btn');
+    this.classList.add('discount-remove-btn');
+    const label=data.discount_type==='percent'
+      ?`${data.discount_value}% afsláttur`
+      :`${data.discount_value.toLocaleString('is-IS')} kr afsláttur`;
+    showDiscountFeedback(`✓ Kóði samþykktur — ${label} (-${data.discount_amount.toLocaleString('is-IS')} kr)`,true);
+    updatePriceDisplay();
+  } catch(err) {
+    showDiscountFeedback('Tókst ekki að staðfesta kóða',false);
+    this.disabled=false;this.textContent='Nota kóða';
+  }
+});
+
+// Discount code remove (delegated — button class changes dynamically)
+document.addEventListener('click',function(e){
+  if(e.target.id==='apply-discount-btn'&&e.target.classList.contains('discount-remove-btn')){
+    e.stopImmediatePropagation();
+    state.discountCode=null;state.discountAmount=0;state.discountType=null;state.discountValue=0;
+    const input=document.getElementById('discount-code-input');
+    const btn=document.getElementById('apply-discount-btn');
+    const fb=document.getElementById('discount-feedback');
+    input.disabled=false;input.value='';
+    btn.textContent='Nota kóða';
+    btn.classList.remove('discount-remove-btn');btn.classList.add('discount-apply-btn');
+    fb.style.display='none';
+    updatePriceDisplay();
+  }
+});
+
+function showDiscountFeedback(message,isSuccess){
+  const fb=document.getElementById('discount-feedback');
+  fb.textContent=message;
+  fb.className='discount-feedback '+(isSuccess?'success':'error');
+  fb.style.display='block';
 }
 
 buildCal();
