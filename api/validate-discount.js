@@ -48,29 +48,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ valid: false, error: 'Kóðinn hefur verið notaður upp' });
     }
 
-    if (service && Array.isArray(discount.applies_to) && discount.applies_to.length > 0) {
-      const serviceKey = String(service).toLowerCase()
-        .replace('þrif', '')
-        .replace('þrifi', '')
-        .replace('þrifum', '')
-        .replace('þ', 'p')
-        .replace(/é/g, 'e')
-        .replace(/ó/g, 'o')
-        .replace(/í/g, 'i')
-        .replace(/á/g, 'a')
-        .replace(/ð/g, 'd')
-        .replace(/ú/g, 'u')
-        .trim();
-
-      const matchesService = discount.applies_to.some(allowed =>
-        serviceKey.includes(allowed.toLowerCase()) || allowed.toLowerCase().includes(serviceKey)
-      );
-
-      if (!matchesService) {
-        return res.status(200).json({ valid: false, error: 'Kóðinn gildir ekki um þessa þjónustu' });
-      }
-    }
-
     if (discount.min_booking_amount && total && Number(total) < Number(discount.min_booking_amount)) {
       return res.status(200).json({
         valid: false,
