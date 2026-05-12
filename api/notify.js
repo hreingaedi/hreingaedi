@@ -134,6 +134,30 @@ export default async function handler(req, res) {
       });
       if (errCanc) return res.status(500).json({ error: errCanc.message });
       return res.status(200).json({ success: true, id: sentCanc.id });
+    } else if (type === 'customer_received') {
+      const toEmail = data.email;
+      if (!toEmail) return res.status(400).json({ error: 'Missing customer email' });
+      subject = `Við höfum móttekið pöntun þína — Hrein Gæði`;
+      html = wrapper('Takk fyrir bókunina!', `
+        ${row('Sæl/l', data.name)}
+        ${row('', 'Við höfum móttekið bókunarbeiðnina þína og munum hafa samband við þig innan 24 klukkustunda til að staðfesta tímann.')}
+        ${row('Þjónusta', data.service)}
+        ${row('Dagsetning', formatDate(data.date))}
+        ${row('Tími', data.time)}
+        ${row('Heimilisfang', data.address)}
+        ${row('Tilvísun', data.ref)}
+        ${row('', '')}
+        ${row('', 'Hafðu samband við okkur ef þú hefur einhverjar spurningar: <a href="mailto:hreingaedi@hreingaedi.is" style="color:#1a56db;">hreingaedi@hreingaedi.is</a>')}
+        ${row('', 'Með kveðju, Hrein Gæði')}
+      `);
+      const { data: sentRcv, error: errRcv } = await resend.emails.send({
+        from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
+        to: [toEmail],
+        subject,
+        html,
+      });
+      if (errRcv) return res.status(500).json({ error: errRcv.message });
+      return res.status(200).json({ success: true, id: sentRcv.id });
     } else {
       return res.status(400).json({ error: 'Unknown notification type' });
     }

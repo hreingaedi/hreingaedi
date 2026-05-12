@@ -905,6 +905,28 @@ async function submitBooking(){
     console.error('Notification failed:', e);
   }
 
+  // Customer auto-receipt (best-effort, don't fail booking on error)
+  try {
+    await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'customer_received',
+        data: {
+          name: state.name,
+          email: state.email,
+          service: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
+          date: state.date,
+          time: state.time,
+          address: state.address,
+          ref: ref
+        }
+      })
+    });
+  } catch (err) {
+    console.warn('Customer receipt email failed:', err);
+  }
+
   try {
     const calRes = await fetch('/api/calendar', {
       method: 'POST',
