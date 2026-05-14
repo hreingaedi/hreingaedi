@@ -230,6 +230,13 @@ body.lang-en span.en{display:inline;}
 .bulk-btn-danger:disabled{background:#475569;cursor:not-allowed;}
 .bulk-btn-ghost{background:transparent;color:rgba(255,255,255,0.7);}
 .bulk-btn-ghost:hover{color:white;}
+/* DISCOUNT CODES */
+.modal.modal-wide{max-width:640px;}
+.modal-form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.checkbox-field{display:flex;align-items:center;gap:8px;margin-bottom:1rem;font-size:13px;color:var(--slate);}
+.checkbox-field input[type="checkbox"]{width:auto;accent-color:var(--accent);}
+.required{color:var(--red);}
+.codes-empty{font-size:13px;color:var(--steel);padding:2rem;text-align:center;}
 </style>
 </head>
 <body class="auth-loading lang-is">
@@ -272,6 +279,10 @@ body.lang-en span.en{display:inline;}
     <a class="nav-item admin-only" onclick="showView('staff')">
       <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
       <span class="is">Boðsmiðar</span><span class="en">Invites</span>
+    </a>
+    <a class="nav-item admin-only" onclick="showView('codes')">
+      <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Afsláttarkóðar
     </a>
 
     <div class="nav-section-label">Kerfið</div>
@@ -491,6 +502,19 @@ body.lang-en span.en{display:inline;}
       </div>
     </div>
 
+    <!-- DISCOUNT CODES VIEW -->
+    <div id="view-codes" class="admin-only" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Afsláttarkóðar</span>
+          <button class="btn-sm" onclick="openCodeModal()">+ Nýr kóði</button>
+        </div>
+        <div class="card-body">
+          <div id="codes-list"><div class="codes-empty">Hleður…</div></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </main>
 
@@ -533,6 +557,72 @@ body.lang-en span.en{display:inline;}
       <button class="btn-action" onclick="closeInviteModal()"><span class="is">Hætta við</span><span class="en">Cancel</span></button>
       <button class="btn-action confirm" id="inv-submit-btn" onclick="createInvite()"><span class="is">Búa til boðsmiða</span><span class="en">Create invite</span></button>
     </div>
+  </div>
+</div>
+
+<!-- DISCOUNT CODE MODAL -->
+<div class="modal-overlay" id="code-modal">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <span class="modal-title" id="code-modal-title">Nýr afsláttarkóði</span>
+      <button class="modal-close" onclick="closeCodeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form id="code-form">
+      <input type="hidden" id="cm-id" />
+      <div class="modal-field">
+        <label class="modal-label">Kóði <span class="required">*</span></label>
+        <input class="modal-input" type="text" id="cm-code" required maxlength="32" placeholder="t.d. JOL2026" autocomplete="off" style="text-transform:uppercase;" />
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Lýsing (innra athugasemd)</label>
+        <input class="modal-input" type="text" id="cm-description" maxlength="200" placeholder="t.d. Jólaherferð 2026" />
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-field">
+          <label class="modal-label">Tegund afsláttar <span class="required">*</span></label>
+          <select class="modal-input" id="cm-type">
+            <option value="percent">Hlutfall (%)</option>
+            <option value="fixed">Föst upphæð (kr)</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Verðgildi <span class="required">*</span></label>
+          <input class="modal-input" type="number" id="cm-value" required min="0" step="0.01" />
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-field">
+          <label class="modal-label">Gildir frá</label>
+          <input class="modal-input" type="date" id="cm-valid-from" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Gildir til</label>
+          <input class="modal-input" type="date" id="cm-valid-until" />
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-field">
+          <label class="modal-label">Heildarfjöldi notkana (auður = ótakmarkað)</label>
+          <input class="modal-input" type="number" id="cm-max-uses" min="0" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Lágmarksupphæð bókunar (kr)</label>
+          <input class="modal-input" type="number" id="cm-min-amount" min="0" />
+        </div>
+      </div>
+      <div class="checkbox-field">
+        <input type="checkbox" id="cm-first-only" />
+        <label for="cm-first-only">Aðeins fyrir fyrstu bókun viðskiptavinar</label>
+      </div>
+      <div class="checkbox-field">
+        <input type="checkbox" id="cm-active" checked />
+        <label for="cm-active">Virkt</label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-action" onclick="closeCodeModal()">Hætta við</button>
+        <button type="submit" class="btn-action confirm">Vista</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -717,18 +807,19 @@ function setLang(lang) {
 }
 
 function showView(view) {
-  ['overview','bookings','finance','workers','schedule','staff'].forEach(v => {
+  ['overview','bookings','finance','workers','schedule','staff','codes'].forEach(v => {
     const el = document.getElementById('view-'+v);
     if (el) el.style.display = v === view ? 'block' : 'none';
   });
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const titles = { overview:'Yfirlit', bookings:'Bókanir', finance:'Fjármál', workers:'Starfsmenn', schedule:'Vaktaáætlun', staff:'Starfsfólk' };
+  const titles = { overview:'Yfirlit', bookings:'Bókanir', finance:'Fjármál', workers:'Starfsmenn', schedule:'Vaktaáætlun', staff:'Starfsfólk', codes:'Afsláttarkóðar' };
   document.getElementById('topbar-title').textContent = titles[view] || 'Yfirlit';
   if (view === 'bookings') renderAllBookings();
   if (view === 'finance') renderFinance();
   if (view === 'workers') renderWorkers();
   if (view === 'schedule') renderSchedule();
   if (view === 'staff') loadPendingInvites();
+  if (view === 'codes') loadCodes().then(renderCodes);
 }
 
 function renderStats() {
@@ -1385,6 +1476,130 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
+
+// ── DISCOUNT CODES ──────────────────────────────────────────
+let discountCodes = [];
+
+async function loadCodes() {
+  const { data, error } = await sb
+    .from('discount_codes')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('Failed to load codes:', error); return; }
+  discountCodes = data || [];
+}
+
+function renderCodes() {
+  const container = document.getElementById('codes-list');
+  if (!container) return;
+  if (discountCodes.length === 0) {
+    container.innerHTML = '<div class="codes-empty">Engir afsláttarkóðar enn. Smelltu á "+ Nýr kóði" til að búa til þinn fyrsta kóða.</div>';
+    return;
+  }
+  let html = `<table class="bookings-table"><thead><tr>
+    <th>Kóði</th><th>Tegund</th><th>Verðgildi</th><th>Notkun</th><th>Gildir til</th><th>Staða</th><th>Aðgerðir</th>
+  </tr></thead><tbody>`;
+  for (const c of discountCodes) {
+    const usage = c.max_uses !== null ? `${c.current_uses} / ${c.max_uses}` : `${c.current_uses} / ∞`;
+    const validUntil = c.valid_until ? formatDate(c.valid_until) : 'Engin lokadagsetning';
+    const valueDisplay = c.discount_type === 'percent'
+      ? `${c.discount_value}%`
+      : `${Number(c.discount_value).toLocaleString('is-IS')} kr`;
+    const status = c.active
+      ? '<span class="badge badge-confirmed">Virkt</span>'
+      : '<span class="badge badge-cancelled">Óvirkt</span>';
+    html += `<tr>
+      <td><span class="booking-ref">${c.code}</span></td>
+      <td>${c.discount_type === 'percent' ? 'Hlutfall' : 'Föst upphæð'}</td>
+      <td>${valueDisplay}</td>
+      <td>${usage}</td>
+      <td>${validUntil}</td>
+      <td>${status}</td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn-sm-outline" onclick="editCode('${c.id}')">Breyta</button>
+        <button class="btn-sm-outline" onclick="toggleCode('${c.id}')">${c.active ? 'Slökkva' : 'Virkja'}</button>
+      </td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+window.openCodeModal = function(codeId = null) {
+  const form = document.getElementById('code-form');
+  form.reset();
+  document.getElementById('cm-active').checked = true;
+  if (codeId) {
+    const c = discountCodes.find(c => c.id === codeId);
+    if (!c) return;
+    document.getElementById('code-modal-title').textContent = 'Breyta afsláttarkóða';
+    document.getElementById('cm-id').value = c.id;
+    document.getElementById('cm-code').value = c.code;
+    document.getElementById('cm-description').value = c.description || '';
+    document.getElementById('cm-type').value = c.discount_type;
+    document.getElementById('cm-value').value = c.discount_value;
+    document.getElementById('cm-valid-from').value = c.valid_from ? c.valid_from.split('T')[0] : '';
+    document.getElementById('cm-valid-until').value = c.valid_until ? c.valid_until.split('T')[0] : '';
+    document.getElementById('cm-max-uses').value = c.max_uses || '';
+    document.getElementById('cm-min-amount').value = c.min_booking_amount || '';
+    document.getElementById('cm-first-only').checked = !!c.first_booking_only;
+    document.getElementById('cm-active').checked = !!c.active;
+  } else {
+    document.getElementById('code-modal-title').textContent = 'Nýr afsláttarkóði';
+    document.getElementById('cm-id').value = '';
+  }
+  document.getElementById('code-modal').classList.add('open');
+};
+
+window.closeCodeModal = function() {
+  document.getElementById('code-modal').classList.remove('open');
+};
+
+window.editCode = function(id) { openCodeModal(id); };
+
+window.toggleCode = async function(id) {
+  const c = discountCodes.find(c => c.id === id);
+  if (!c) return;
+  if (!confirm(`${c.active ? 'Slökkva á' : 'Virkja'} kóðann ${c.code}?`)) return;
+  const { error } = await sb.from('discount_codes').update({ active: !c.active }).eq('id', id);
+  if (error) { alert('Villa: ' + error.message); return; }
+  await loadCodes();
+  renderCodes();
+  showToast(c.active ? 'Kóði óvirkur.' : 'Kóði virkur.');
+};
+
+document.getElementById('code-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('cm-id').value;
+  const payload = {
+    code: document.getElementById('cm-code').value.trim().toUpperCase(),
+    description: document.getElementById('cm-description').value.trim() || null,
+    discount_type: document.getElementById('cm-type').value,
+    discount_value: Number(document.getElementById('cm-value').value),
+    valid_from: document.getElementById('cm-valid-from').value || null,
+    valid_until: document.getElementById('cm-valid-until').value || null,
+    max_uses: document.getElementById('cm-max-uses').value ? Number(document.getElementById('cm-max-uses').value) : null,
+    min_booking_amount: document.getElementById('cm-min-amount').value ? Number(document.getElementById('cm-min-amount').value) : null,
+    first_booking_only: document.getElementById('cm-first-only').checked,
+    active: document.getElementById('cm-active').checked,
+  };
+  let result;
+  if (id) {
+    result = await sb.from('discount_codes').update(payload).eq('id', id);
+  } else {
+    payload.created_by = window.currentUser?.id || null;
+    result = await sb.from('discount_codes').insert(payload);
+  }
+  if (result.error) { alert('Villa: ' + result.error.message); return; }
+  closeCodeModal();
+  await loadCodes();
+  renderCodes();
+  showToast(id ? 'Kóði uppfærður.' : 'Nýr kóði búinn til.');
+});
+
+document.getElementById('code-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCodeModal();
+});
 
 initAuth();
 </script>
