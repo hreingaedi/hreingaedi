@@ -1497,7 +1497,7 @@ function renderCodes() {
     return;
   }
   let html = `<table class="bookings-table"><thead><tr>
-    <th>Kóði</th><th>Tegund</th><th>Verðgildi</th><th>Notkun</th><th>Gildir til</th><th>Staða</th><th>Aðgerðir</th>
+    <th>Kóði</th><th>Tegund</th><th>Verðgildi</th><th>Notkun</th><th>Gildir til</th><th>Staða</th><th>Búið til af</th><th>Aðgerðir</th>
   </tr></thead><tbody>`;
   for (const c of discountCodes) {
     const usage = c.max_uses !== null ? `${c.current_uses} / ${c.max_uses}` : `${c.current_uses} / ∞`;
@@ -1508,6 +1508,10 @@ function renderCodes() {
     const status = c.active
       ? '<span class="badge badge-confirmed">Virkt</span>'
       : '<span class="badge badge-cancelled">Óvirkt</span>';
+    const creator = !c.created_by ? '—' : (() => {
+      const s = staffMembers.find(s => s.id === c.created_by);
+      return s ? s.full_name.split(' ')[0] : 'Óþekktur';
+    })();
     html += `<tr>
       <td><span class="booking-ref">${c.code}</span></td>
       <td>${c.discount_type === 'percent' ? 'Hlutfall' : 'Föst upphæð'}</td>
@@ -1515,9 +1519,11 @@ function renderCodes() {
       <td>${usage}</td>
       <td>${validUntil}</td>
       <td>${status}</td>
+      <td>${creator}</td>
       <td style="display:flex;gap:6px;">
         <button class="btn-sm-outline" onclick="editCode('${c.id}')">Breyta</button>
         <button class="btn-sm-outline" onclick="toggleCode('${c.id}')">${c.active ? 'Slökkva' : 'Virkja'}</button>
+        <button class="btn-sm-outline" style="color:var(--red);border-color:var(--red);" onclick="deleteCode('${c.id}')">Eyða</button>
       </td>
     </tr>`;
   }
@@ -1566,6 +1572,21 @@ window.toggleCode = async function(id) {
   await loadCodes();
   renderCodes();
   showToast(c.active ? 'Kóði óvirkur.' : 'Kóði virkur.');
+};
+
+window.deleteCode = async function(id) {
+  const c = discountCodes.find(c => c.id === id);
+  if (!c) return;
+  if (c.current_uses > 0) {
+    alert(`Ekki er hægt að eyða kóðanum ${c.code} því hann hefur verið notaður ${c.current_uses} sinnum. Þú getur slökkt á honum í staðinn til að koma í veg fyrir frekari notkun.`);
+    return;
+  }
+  if (!confirm(`Eyða kóðanum ${c.code} varanlega? Þessi aðgerð verður ekki afturkölluð.`)) return;
+  const { error } = await sb.from('discount_codes').delete().eq('id', id);
+  if (error) { alert('Villa: ' + error.message); return; }
+  await loadCodes();
+  renderCodes();
+  showToast('Kóða eytt.');
 };
 
 document.getElementById('code-form').addEventListener('submit', async (e) => {
