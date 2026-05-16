@@ -929,6 +929,8 @@ function filterBookings(filter, btn) {
 
 async function assignWorker(ref, workerId) {
   const value = workerId || null;
+  const b = bookings.find(b => b.ref === ref);
+  const previousWorkerId = b ? b.worker_id : null;
 
   const { error } = await sb
     .from('bookings')
@@ -940,10 +942,44 @@ async function assignWorker(ref, workerId) {
     return;
   }
 
-  const b = bookings.find(b => b.ref === ref);
   if (b) b.worker_id = value;
-
   renderAll();
+
+  if (!b || b.status !== 'Confirmed') return;
+
+  const getWorkerInfo = (id) => {
+    if (!id || id === 'general') return null;
+    return staffMembers.find(s => s.id === id) || null;
+  };
+
+  const prevWorker = getWorkerInfo(previousWorkerId);
+  const newWorker = getWorkerInfo(value);
+
+  if (prevWorker && prevWorker.email && prevWorker.id !== (newWorker ? newWorker.id : null)) {
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'worker_unassignment',
+          data: { worker_email: prevWorker.email, worker_name: prevWorker.full_name, service: b.service, date: b.date, time: b.time, address: b.address, ref: b.ref }
+        })
+      });
+    } catch (e) { console.error('Worker unassignment email failed:', e); }
+  }
+
+  if (newWorker && newWorker.email) {
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'worker_assignment',
+          data: { worker_email: newWorker.email, worker_name: newWorker.full_name, service: b.service, date: b.date, time: b.time, address: b.address, customer_name: b.name, ref: b.ref }
+        })
+      });
+    } catch (e) { console.error('Worker assignment email failed:', e); }
+  }
 }
 
 function renderChart(barsId, labelsId) {
@@ -1096,6 +1132,22 @@ async function updateStatus(ref, status) {
         })
       });
     } catch (e) { console.error('Confirmation email failed:', e); }
+
+    if (b.worker_id && b.worker_id !== 'general') {
+      const worker = staffMembers.find(s => s.id === b.worker_id);
+      if (worker && worker.email) {
+        try {
+          await fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'worker_assignment',
+              data: { worker_email: worker.email, worker_name: worker.full_name, service: b.service, date: b.date, time: b.time, address: b.address, customer_name: b.name, ref: b.ref }
+            })
+          });
+        } catch (e) { console.error('Worker assignment email (on confirm) failed:', e); }
+      }
+    }
   }
 
   if (status === 'Cancelled') {
