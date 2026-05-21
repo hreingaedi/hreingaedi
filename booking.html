@@ -777,7 +777,7 @@ function updatePriceDisplay(){
   }
   // Keep confirm summary in sync if already on step 5
   const cTotal=document.getElementById('c-total');
-  if(cTotal&&cTotal.textContent!=='—') cTotal.textContent=state.total>0?state.total.toLocaleString('is-IS')+' kr':'—';
+  if(cTotal) cTotal.textContent=state.total>0?state.total.toLocaleString('is-IS')+' kr':'—';
 }
 
 function toggleExtra(el,price,id){
@@ -822,11 +822,24 @@ function changeMonth(dir){calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=1
 
 function selTime(el,val){document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');state.time=val;if(state.date&&state.time)setTimeout(()=>goStep(4),200);}
 
+function refreshStateBeforeConfirm(){
+  const customWrap=document.getElementById('sqm-custom-wrap');
+  if(customWrap&&customWrap.style.display!=='none'){
+    const v=parseInt(document.getElementById('sqm-custom-input').value,10);
+    if(!isNaN(v)&&v>0){
+      state.sqm=v;state.sqmLabel=v+' m²';state.basePrice=v*240;
+    }
+  }
+  const subtotal=state.basePrice+state.extrasTotal;
+  state.total=Math.max(0,subtotal-(state.discountAmount||0));
+}
+
 function goConfirm(){
-  state.name=document.getElementById('f-name').value;
-  state.phone=document.getElementById('f-phone').value;
-  state.email=document.getElementById('f-email').value;
-  state.address=document.getElementById('f-address').value;
+  state.name=document.getElementById('f-name').value.trim();
+  state.phone=document.getElementById('f-phone').value.trim();
+  state.email=document.getElementById('f-email').value.trim();
+  state.address=document.getElementById('f-address').value.trim();
+  refreshStateBeforeConfirm();
   if(!state.name||!state.email||!state.address){
     alert(lang==='is'?'Vinsamlegast fylltu út nafn, email og heimilisfang.':'Please fill in name, email and address.');
     return;
