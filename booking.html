@@ -211,7 +211,7 @@ body.lang-en .is{display:none;}
 <body class="lang-is">
 
 <header class="page-header">
-  <a href="index.html" class="back-link">
+  <a href="#" class="back-link" onclick="handleBackLink(event)">
     <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     <span class="is">Til baka</span><span class="en">Back</span>
   </a>
@@ -579,7 +579,9 @@ const _today=new Date();let calY=_today.getFullYear(),calM=_today.getMonth();
 
 function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
 
+let currentStep = 1;
 function goStep(n){
+  if(typeof n==='number')currentStep=n;
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const target=document.getElementById('step'+n);
   if(target)target.classList.add('active');
@@ -602,6 +604,15 @@ function goStep(n){
   }
   if(n===3)buildCal();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function handleBackLink(event) {
+  event.preventDefault();
+  if (currentStep > 1) {
+    goStep(currentStep - 1);
+  } else {
+    window.location.href = 'index.html';
+  }
 }
 
 function continueFromType(){
