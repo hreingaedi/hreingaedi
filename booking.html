@@ -146,6 +146,10 @@ body.lang-en .is{display:none;}
 .form-label{font-size:12px;color:var(--slate);margin-bottom:5px;display:block;letter-spacing:0.02em;}
 .form-input{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);background:var(--white);transition:var(--transition);}
 .form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.form-input.invalid{border-color:#dc2626;background:#fef2f2;}
+.form-input.invalid:focus{box-shadow:0 0 0 3px rgba(220,38,38,0.1);}
+.field-error{color:#dc2626;font-size:12px;margin-top:4px;display:none;}
+.field-error.visible{display:block;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
 .form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);resize:none;height:80px;transition:var(--transition);}
 .form-textarea:focus{outline:none;border-color:var(--accent);}
@@ -405,11 +409,27 @@ body.lang-en .is{display:none;}
       <p class="step-subhead is">Við notum þessar upplýsingar til að hafa samband við þig og staðfesta tímann.</p>
       <p class="step-subhead en">We will use these details to contact you and confirm the appointment.</p>
       <div class="form-row">
-        <div class="form-group"><label class="form-label is">Fullt nafn *</label><label class="form-label en">Full name *</label><input class="form-input" id="f-name" placeholder="Jón Jónsson"/></div>
-        <div class="form-group"><label class="form-label is">Sími *</label><label class="form-label en">Phone *</label><input class="form-input" id="f-phone" type="tel" placeholder="+354 xxx xxxx"/></div>
+        <div class="form-group">
+          <label class="form-label is">Fullt nafn *</label><label class="form-label en">Full name *</label>
+          <input class="form-input" id="f-name" placeholder="Jón Jónsson" autocomplete="name"/>
+          <div class="field-error" id="err-name"><span class="is">Vinsamlegast sláðu inn nafn</span><span class="en">Please enter your name</span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label is">Sími *</label><label class="form-label en">Phone *</label>
+          <input class="form-input" id="f-phone" type="tel" inputmode="tel" placeholder="+354 xxx xxxx" autocomplete="tel"/>
+          <div class="field-error" id="err-phone"><span class="is">Vinsamlegast sláðu inn gilt símanúmer (7+ tölustafir)</span><span class="en">Please enter a valid phone number (7+ digits)</span></div>
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="f-email" type="email" placeholder="jon@email.is"/></div>
-      <div class="form-group"><label class="form-label is">Heimilisfang *</label><label class="form-label en">Address *</label><input class="form-input" id="f-address" placeholder="Laugavegur 1, Reykjavík"/></div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input class="form-input" id="f-email" type="email" inputmode="email" placeholder="jon@email.is" autocomplete="email"/>
+        <div class="field-error" id="err-email"><span class="is">Vinsamlegast sláðu inn gilt netfang</span><span class="en">Please enter a valid email address</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label is">Heimilisfang *</label><label class="form-label en">Address *</label>
+        <input class="form-input" id="f-address" placeholder="Laugavegur 1, Reykjavík" autocomplete="street-address"/>
+        <div class="field-error" id="err-address"><span class="is">Vinsamlegast sláðu inn heimilisfang</span><span class="en">Please enter your address</span></div>
+      </div>
       <div class="form-group"><label class="form-label is">Póstnúmer</label><label class="form-label en">Postal code</label><input class="form-input" id="f-zip" placeholder="101"/></div>
       <div class="form-group"><label class="form-label is">Hvernig finnum við lykilinn? (valkvæmt)</label><label class="form-label en">How do we access the property? (optional)</label><textarea class="form-textarea" id="f-access" placeholder="..."></textarea></div>
       <div class="form-group"><label class="form-label is">Aðrar athugasemdir (valkvæmt)</label><label class="form-label en">Other notes (optional)</label><textarea class="form-textarea" id="f-notes" placeholder="..."></textarea></div>
@@ -843,6 +863,51 @@ function changeMonth(dir){calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=1
 
 function selTime(el,val){document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');state.time=val;if(state.date&&state.time)setTimeout(()=>goStep(4),200);}
 
+const validators = {
+  name:    v => v.length >= 2,
+  email:   v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+  phone:   v => /^[+\d\s\-]+$/.test(v) && v.replace(/\D/g,'').length >= 7,
+  address: v => v.length >= 5
+};
+
+function validateField(fieldId, errorId, validator){
+  const field = document.getElementById(fieldId);
+  const error = document.getElementById(errorId);
+  if(!field||!error) return true;
+  const value = field.value.trim();
+  const isValid = !value || validator(value);
+  if(value && !isValid){
+    field.classList.add('invalid');
+    error.classList.add('visible');
+  } else {
+    field.classList.remove('invalid');
+    error.classList.remove('visible');
+  }
+  return !!value && validator(value);
+}
+
+function validateAllFields(){
+  const r1 = validateField('f-name',    'err-name',    validators.name);
+  const r2 = validateField('f-phone',   'err-phone',   validators.phone);
+  const r3 = validateField('f-email',   'err-email',   validators.email);
+  const r4 = validateField('f-address', 'err-address', validators.address);
+  return r1 && r2 && r3 && r4;
+}
+
+['name','phone','email','address'].forEach(f => {
+  const el = document.getElementById('f-'+f);
+  if(!el) return;
+  el.addEventListener('blur', () => validateField('f-'+f,'err-'+f,validators[f]));
+  el.addEventListener('input', () => {
+    if(el.classList.contains('invalid')) validateField('f-'+f,'err-'+f,validators[f]);
+  });
+});
+
+const phoneEl = document.getElementById('f-phone');
+if(phoneEl) phoneEl.addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/[^\d\s+\-]/g,'');
+});
+
 function refreshStateBeforeConfirm(){
   const customWrap=document.getElementById('sqm-custom-wrap');
   if(customWrap&&customWrap.style.display!=='none'){
@@ -861,10 +926,7 @@ function goConfirm(){
   state.email=document.getElementById('f-email').value.trim();
   state.address=document.getElementById('f-address').value.trim();
   refreshStateBeforeConfirm();
-  if(!state.name||!state.email||!state.address){
-    alert(lang==='is'?'Vinsamlegast fylltu út nafn, email og heimilisfang.':'Please fill in name, email and address.');
-    return;
-  }
+  if(!validateAllFields()) return;
   const typeLabel=state.type==='home'?(lang==='is'?'Heimilisþrif':'Home cleaning'):'AirBnB þrif';
   document.getElementById('c-type').textContent=typeLabel;
   document.getElementById('c-sqm').textContent=state.sqmLabel||'—';
