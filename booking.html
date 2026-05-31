@@ -66,6 +66,10 @@ body.lang-en .is{display:none;}
 .prog-label{font-size:10px;color:var(--steel);letter-spacing:0.03em;text-align:center;}
 .prog-step.active .prog-label{color:var(--accent);}
 .prog-step.done .prog-label{color:var(--navy);}
+.prog-step[data-visited]:not(.active){cursor:pointer;}
+.prog-step[data-visited]:not(.active):hover .prog-dot{border-color:var(--accent);color:var(--accent);}
+.prog-step[data-visited]:not(.active):hover .prog-label{color:var(--navy);}
+.prog-step:not([data-visited]):not(.active){cursor:default;opacity:0.5;}
 
 .step{display:none;}
 .step.active{display:block;}
@@ -230,23 +234,23 @@ body.lang-en .is{display:none;}
 
   <!-- PROGRESS -->
   <div class="progress-wrap">
-    <div class="prog-step active" id="prog1">
+    <div class="prog-step active" id="prog1" data-step="1" data-visited="true" onclick="handleStepClick(1)">
       <div class="prog-dot">1</div>
       <span class="prog-label is">Tegund</span><span class="prog-label en">Type</span>
     </div>
-    <div class="prog-step" id="prog2">
+    <div class="prog-step" id="prog2" data-step="2" onclick="handleStepClick(2)">
       <div class="prog-dot">2</div>
       <span class="prog-label is">Stærð & Verð</span><span class="prog-label en">Size & Price</span>
     </div>
-    <div class="prog-step" id="prog3">
+    <div class="prog-step" id="prog3" data-step="3" onclick="handleStepClick(3)">
       <div class="prog-dot">3</div>
       <span class="prog-label is">Tími</span><span class="prog-label en">Time</span>
     </div>
-    <div class="prog-step" id="prog4">
+    <div class="prog-step" id="prog4" data-step="4" onclick="handleStepClick(4)">
       <div class="prog-dot">4</div>
       <span class="prog-label is">Upplýsingar</span><span class="prog-label en">Details</span>
     </div>
-    <div class="prog-step" id="prog5">
+    <div class="prog-step" id="prog5" data-step="5" onclick="handleStepClick(5)">
       <div class="prog-dot">5</div>
       <span class="prog-label is">Staðfesting</span><span class="prog-label en">Confirm</span>
     </div>
@@ -580,8 +584,23 @@ const _today=new Date();let calY=_today.getFullYear(),calM=_today.getMonth();
 function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
 
 let currentStep = 1;
+const visitedSteps = new Set([1]);
+
+function updateProgressDots(){
+  for(let i=1;i<=5;i++){
+    const p=document.getElementById('prog'+i);
+    if(!p)continue;
+    if(visitedSteps.has(i)) p.setAttribute('data-visited','true');
+    else p.removeAttribute('data-visited');
+  }
+}
+
+function handleStepClick(n){
+  if(visitedSteps.has(n)) goStep(n);
+}
+
 function goStep(n){
-  if(typeof n==='number')currentStep=n;
+  if(typeof n==='number'){currentStep=n;visitedSteps.add(n);}
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const target=document.getElementById('step'+n);
   if(target)target.classList.add('active');
@@ -602,6 +621,7 @@ function goStep(n){
       else p.className='prog-step';
     }
   }
+  updateProgressDots();
   if(n===3)buildCal();
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -726,6 +746,7 @@ function selType(type,el){
   document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   state.type=type;
+  visitedSteps.clear();visitedSteps.add(1);
   setTimeout(continueFromType, 200);
 }
 
