@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         ${row('Dagsetning', formatDate(data.date))}
         ${row('Tími', data.time)}
         ${row('Athugasemdir', data.notes)}
-        ${row('Verð áætlað', data.estimated_price ? data.estimated_price + ' kr' : null)}
+        ${row('Verð áætlað', data.estimated_price ? Number(data.estimated_price).toLocaleString('is-IS') + ' kr' : null)}
       `);
     } else if (type === 'company_quote') {
       subject = `💼 Ný fyrirspurn — ${data.company_name || data.name || 'Fyrirtæki'}`;
@@ -158,6 +158,53 @@ export default async function handler(req, res) {
       });
       if (errRcv) return res.status(500).json({ error: errRcv.message });
       return res.status(200).json({ success: true, id: sentRcv.id });
+    } else if (type === 'worker_assignment') {
+      const toEmail = data.worker_email;
+      if (!toEmail) return res.status(400).json({ error: 'Missing worker email' });
+      subject = `Nýtt verkefni úthlutað — Hrein Gæði`;
+      html = wrapper('Nýtt þrif úthlutað til þín', `
+        ${row('Sæl/l', data.worker_name)}
+        ${row('', 'Þú hefur fengið úthlutað nýju þrifi. Hér eru upplýsingarnar:')}
+        ${row('Þjónusta', data.service)}
+        ${row('Dagsetning', formatDate(data.date))}
+        ${row('Tími', data.time)}
+        ${row('Heimilisfang', data.address)}
+        ${row('Viðskiptavinur', data.customer_name)}
+        ${row('Tilvísun', data.ref)}
+        ${row('', '')}
+        ${row('', 'Hafðu samband við stjórnanda ef einhverjar spurningar koma upp: <a href="mailto:hreingaedi@hreingaedi.is" style="color:#1a56db;">hreingaedi@hreingaedi.is</a>')}
+      `);
+      const { data: sentAssign, error: errAssign } = await resend.emails.send({
+        from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
+        to: [toEmail],
+        subject,
+        html,
+      });
+      if (errAssign) return res.status(500).json({ error: errAssign.message });
+      return res.status(200).json({ success: true, id: sentAssign.id });
+    } else if (type === 'worker_unassignment') {
+      const toEmail = data.worker_email;
+      if (!toEmail) return res.status(400).json({ error: 'Missing worker email' });
+      subject = `Þú hefur verið fjarlægður af verkefni — Hrein Gæði`;
+      html = wrapper('Breyting á verkefni', `
+        ${row('Sæl/l', data.worker_name)}
+        ${row('', 'Stjórnandi hefur úthlutað verkefninu á annan starfsmann. Þú hefur verið fjarlægður af eftirfarandi verkefni:')}
+        ${row('Þjónusta', data.service)}
+        ${row('Dagsetning', formatDate(data.date))}
+        ${row('Tími', data.time)}
+        ${row('Heimilisfang', data.address)}
+        ${row('Tilvísun', data.ref)}
+        ${row('', '')}
+        ${row('', 'Hafðu samband við stjórnanda ef einhverjar spurningar koma upp: <a href="mailto:hreingaedi@hreingaedi.is" style="color:#1a56db;">hreingaedi@hreingaedi.is</a>')}
+      `);
+      const { data: sentUnassign, error: errUnassign } = await resend.emails.send({
+        from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
+        to: [toEmail],
+        subject,
+        html,
+      });
+      if (errUnassign) return res.status(500).json({ error: errUnassign.message });
+      return res.status(200).json({ success: true, id: sentUnassign.id });
     } else {
       return res.status(400).json({ error: 'Unknown notification type' });
     }
