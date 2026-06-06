@@ -65,6 +65,7 @@ export default async function handler(req, res) {
         ${row('Tíðni', data.frequency)}
         ${row('Dagsetning', formatDate(data.date))}
         ${row('Tími', data.time)}
+        ${row('Hreinsiefni', data.supplies ? ({company_all:'Hrein Gæði leggur til allt',customer_vacuum:'Hrein Gæði leggur til hreinsiefni, viðskiptavinur ryksugu',customer_all:'Viðskiptavinur leggur til hreinsiefni og ryksugu'}[data.supplies]||data.supplies) : null)}
         ${row('Athugasemdir', data.notes)}
         ${row('Verð áætlað', data.estimated_price ? Number(data.estimated_price).toLocaleString('is-IS') + ' kr' : null)}
       `);

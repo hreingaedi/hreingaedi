@@ -333,8 +333,7 @@ body.lang-en .is{display:none;}
           <div class="extra-row" onclick="toggleExtra(this,4500,'is-oven')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Bakaraofn þrifinn</span><span class="extra-row-name en">Oven cleaned</span></div><span class="extra-row-price">4.500 kr</span></div>
           <div class="extra-row" onclick="toggleExtra(this,3500,'is-fridge')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Ísskápur þrifinn</span><span class="extra-row-name en">Fridge cleaned</span></div><span class="extra-row-price">3.500 kr</span></div>
           <div class="extra-row" onclick="toggleExtra(this,1800,'is-windows')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Gluggar (3 glugg.)</span><span class="extra-row-name en">Windows (3 windows)</span></div><span class="extra-row-price">1.800 kr</span></div>
-          <div class="extra-row" onclick="toggleExtra(this,2000,'is-laundry')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Þvottavél keyrð</span><span class="extra-row-name en">Laundry washed</span></div><span class="extra-row-price">2.000 kr</span></div>
-          <div class="extra-row" onclick="toggleExtra(this,1500,'is-bed')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Rúm búið um</span><span class="extra-row-name en">Bed made</span></div><span class="extra-row-price">1.500 kr</span></div>
+          <div class="extra-row" onclick="toggleExtra(this,1500,'is-bed')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Búið um rúm</span><span class="extra-row-name en">Bed made</span></div><span class="extra-row-price">1.500 kr</span></div>
           <div class="extra-row" onclick="toggleExtra(this,5000,'is-bath')"><div class="extra-row-left"><div class="extra-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div><span class="extra-row-name is">Djúphreinsun baðherbergis</span><span class="extra-row-name en">Deep clean bathroom</span></div><span class="extra-row-price">5.000 kr</span></div>
         </div>
       </div>
@@ -441,7 +440,17 @@ body.lang-en .is{display:none;}
           <input class="form-input" id="f-city" type="text" readonly placeholder="Fylltist sjálfvirkt"/>
         </div>
       </div>
-      <div class="form-group"><label class="form-label is">Hvernig finnum við lykilinn? (valkvæmt)</label><label class="form-label en">How do we access the property? (optional)</label><textarea class="form-textarea" id="f-access" placeholder="..."></textarea></div>
+      <div class="form-group"><label class="form-label is">Aðgangur að heimili (valkvæmt)</label><label class="form-label en">Access to home (optional)</label><textarea class="form-textarea" id="f-access" placeholder="t.d. Hringdu á dyrabjölluna, lykill er undir mottu, kóði 1234..."></textarea></div>
+      <div class="form-group" id="supplies-group" style="display:none;">
+        <label class="form-label"><span class="is">Hreinsiefni og búnaður *</span><span class="en">Cleaning supplies and equipment *</span></label>
+        <select class="form-input" id="f-supplies">
+          <option value=""><span class="is">Veldu valkost...</span></option>
+          <option value="company_all">Notið ykkar eigin hreinsiefni og ryksugu</option>
+          <option value="customer_vacuum">Notið ykkar hreinsiefni, ég legg til ryksugu</option>
+          <option value="customer_all">Ég legg til hreinsiefni og ryksugu</option>
+        </select>
+        <div class="field-error" id="err-supplies"><span class="is">Vinsamlegast veldu valkost</span><span class="en">Please choose an option</span></div>
+      </div>
       <div class="form-group"><label class="form-label is">Aðrar athugasemdir (valkvæmt)</label><label class="form-label en">Other notes (optional)</label><textarea class="form-textarea" id="f-notes" placeholder="..."></textarea></div>
       <div class="step-actions">
         <button class="btn-back" onclick="goStep(3)"><span class="is">Til baka</span><span class="en">Back</span></button>
@@ -471,6 +480,7 @@ body.lang-en .is{display:none;}
         <div class="confirm-row"><span class="confirm-label is">Tegund</span><span class="confirm-label en">Type</span><span class="confirm-value" id="c-type">—</span></div>
         <div class="confirm-row"><span class="confirm-label is">Stærð</span><span class="confirm-label en">Size</span><span class="confirm-value" id="c-sqm">—</span></div>
         <div class="confirm-row"><span class="confirm-label is">Aukaþjónusta</span><span class="confirm-label en">Extras</span><span class="confirm-value" id="c-extras">—</span></div>
+        <div class="confirm-row" id="c-supplies-row" style="display:none;"><span class="confirm-label is">Hreinsiefni</span><span class="confirm-label en">Supplies</span><span class="confirm-value" id="c-supplies">—</span></div>
         <div class="confirm-row"><span class="confirm-label is">Heildarverð</span><span class="confirm-label en">Total price</span><span class="confirm-value" id="c-total">—</span></div>
         <div class="confirm-row"><span class="confirm-label is">Dagsetning</span><span class="confirm-label en">Date</span><span class="confirm-value" id="c-date">—</span></div>
         <div class="confirm-row"><span class="confirm-label is">Tími</span><span class="confirm-label en">Time</span><span class="confirm-value" id="c-time">—</span></div>
@@ -620,7 +630,17 @@ const POSTAL_CODES = {
   '270':'Mosfellsbær','271':'Mosfellsbær','276':'Mosfellsbær'
 };
 
-let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',postal:'',city:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
+let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',postal:'',city:'',supplies:null,discountCode:null,discountAmount:0,discountType:null,discountValue:0};
+
+function getSuppliesLabel(v){
+  return {'company_all':'Hrein Gæði leggur til allt','customer_vacuum':'Hrein Gæði leggur til hreinsiefni, viðskiptavinur ryksugu','customer_all':'Viðskiptavinur leggur til hreinsiefni og ryksugu'}[v]||'';
+}
+
+function updateSuppliesVisibility(){
+  const group=document.getElementById('supplies-group');
+  if(!group)return;
+  group.style.display=(state.type==='home'||state.type==='airbnb')?'':'none';
+}
 const _today=new Date();let calY=_today.getFullYear(),calM=_today.getMonth();
 
 function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
@@ -665,6 +685,7 @@ function goStep(n){
   }
   updateProgressDots();
   if(n===3)buildCal();
+  if(n===4)updateSuppliesVisibility();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -925,6 +946,20 @@ function validateAllFields(){
       allValid = false;
     }
   });
+  const suppliesGroup = document.getElementById('supplies-group');
+  if(suppliesGroup && suppliesGroup.style.display !== 'none'){
+    const sel = document.getElementById('f-supplies');
+    const errSup = document.getElementById('err-supplies');
+    const valid = ['company_all','customer_vacuum','customer_all'].includes(sel?.value);
+    if(valid){
+      sel.classList.remove('invalid');
+      errSup.classList.remove('visible');
+    } else {
+      sel.classList.add('invalid');
+      errSup.classList.add('visible');
+      allValid = false;
+    }
+  }
   if(!allValid){
     const first = document.querySelector('.form-input.invalid');
     if(first) first.scrollIntoView({behavior:'smooth',block:'center'});
@@ -984,6 +1019,10 @@ function goConfirm(){
   refreshStateBeforeConfirm();
   state.postal = document.getElementById('f-zip').value.trim();
   state.city = document.getElementById('f-city').value.trim();
+  const suppliesGroupEl = document.getElementById('supplies-group');
+  state.supplies = (suppliesGroupEl && suppliesGroupEl.style.display !== 'none')
+    ? (document.getElementById('f-supplies').value || null)
+    : null;
   if(!validateAllFields()) return;
   const typeLabel=state.type==='home'?(lang==='is'?'Heimilisþrif':'Home cleaning'):'AirBnB þrif';
   document.getElementById('c-type').textContent=typeLabel;
@@ -995,6 +1034,13 @@ function goConfirm(){
   document.getElementById('c-name').textContent=state.name;
   const fullAddress = state.address + (state.postal ? ', ' + state.postal + (state.city ? ' ' + state.city : '') : '');
   document.getElementById('c-address').textContent=fullAddress;
+  const suppliesRow = document.getElementById('c-supplies-row');
+  if(state.supplies){
+    document.getElementById('c-supplies').textContent = getSuppliesLabel(state.supplies);
+    if(suppliesRow) suppliesRow.style.display='';
+  } else {
+    if(suppliesRow) suppliesRow.style.display='none';
+  }
   goStep(5);
 }
 
@@ -1023,6 +1069,7 @@ async function submitBooking(){
       address: state.address,
       zip: state.postal,
       city: state.city,
+      supplies: state.supplies,
       access_notes: document.getElementById('f-access').value,
       notes: document.getElementById('f-notes').value,
       status: 'Pending'
@@ -1063,6 +1110,7 @@ async function submitBooking(){
           frequency: state.type === 'home' ? 'Heimilisþrif' : 'AirBnB þrif',
           date: state.date,
           time: state.time,
+          supplies: state.supplies || null,
           notes: [document.getElementById('f-access').value, document.getElementById('f-notes').value].filter(Boolean).join('\n\n'),
           estimated_price: state.total
         }
@@ -1141,7 +1189,8 @@ async function submitBooking(){
 function restart(){
   state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
   document.querySelectorAll('.type-card,.sqm-btn,.extra-row,.time-slot,.cal-day').forEach(el=>el.classList.remove('sel'));
-  ['f-name','f-phone','f-email','f-address','f-zip','f-city','f-access','f-notes','time-notes','q-company','q-address','q-size','q-notes','q-name','q-phone','q-email','q-kt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-name','f-phone','f-email','f-address','f-zip','f-city','f-supplies','f-access','f-notes','time-notes','q-company','q-address','q-size','q-notes','q-name','q-phone','q-email','q-kt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const sg=document.getElementById('supplies-group');if(sg)sg.style.display='none';;
   document.getElementById('price-preview').style.display='none';
   document.getElementById('total-box').style.display='none';
   document.getElementById('sqm-custom-wrap').style.display='none';
