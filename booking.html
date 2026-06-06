@@ -146,6 +146,7 @@ body.lang-en .is{display:none;}
 .form-label{font-size:12px;color:var(--slate);margin-bottom:5px;display:block;letter-spacing:0.02em;}
 .form-input{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);background:var(--white);transition:var(--transition);}
 .form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.form-input[readonly]{background:var(--off);color:var(--slate);cursor:default;}
 .form-input.invalid{border-color:#dc2626;background:#fef2f2;}
 .form-input.invalid:focus{box-shadow:0 0 0 3px rgba(220,38,38,0.1);}
 .field-error{color:#dc2626;font-size:12px;margin-top:4px;display:none;}
@@ -430,7 +431,16 @@ body.lang-en .is{display:none;}
         <input class="form-input" id="f-address" placeholder="Laugavegur 1, Reykjavík" autocomplete="street-address"/>
         <div class="field-error" id="err-address"><span class="is">Vinsamlegast sláðu inn heimilisfang</span><span class="en">Please enter your address</span></div>
       </div>
-      <div class="form-group"><label class="form-label is">Póstnúmer</label><label class="form-label en">Postal code</label><input class="form-input" id="f-zip" placeholder="101"/></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label is">Póstnúmer</label><label class="form-label en">Postal code</label>
+          <input class="form-input" id="f-zip" type="text" inputmode="numeric" maxlength="3" placeholder="101" autocomplete="postal-code"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label is">Staður</label><label class="form-label en">City</label>
+          <input class="form-input" id="f-city" type="text" readonly placeholder="Fylltist sjálfvirkt"/>
+        </div>
+      </div>
       <div class="form-group"><label class="form-label is">Hvernig finnum við lykilinn? (valkvæmt)</label><label class="form-label en">How do we access the property? (optional)</label><textarea class="form-textarea" id="f-access" placeholder="..."></textarea></div>
       <div class="form-group"><label class="form-label is">Aðrar athugasemdir (valkvæmt)</label><label class="form-label en">Other notes (optional)</label><textarea class="form-textarea" id="f-notes" placeholder="..."></textarea></div>
       <div class="step-actions">
@@ -598,7 +608,19 @@ let lang = localStorage.getItem('hg-lang') || 'is';
 function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
 setLang(lang);
 
-let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
+const POSTAL_CODES = {
+  '101':'Reykjavík','102':'Reykjavík','103':'Reykjavík','104':'Reykjavík','105':'Reykjavík',
+  '107':'Reykjavík','108':'Reykjavík','109':'Reykjavík','110':'Reykjavík','111':'Reykjavík',
+  '112':'Reykjavík','113':'Reykjavík','116':'Reykjavík (Kjalarnes)',
+  '170':'Seltjarnarnes','172':'Seltjarnarnes',
+  '200':'Kópavogur','201':'Kópavogur','202':'Kópavogur','203':'Kópavogur',
+  '210':'Garðabær','212':'Garðabær',
+  '220':'Hafnarfjörður','221':'Hafnarfjörður','222':'Hafnarfjörður',
+  '225':'Álftanes',
+  '270':'Mosfellsbær','271':'Mosfellsbær','276':'Mosfellsbær'
+};
+
+let state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',postal:'',city:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
 const _today=new Date();let calY=_today.getFullYear(),calM=_today.getMonth();
 
 function formatDate(dateInput){if(!dateInput)return'';const d=(dateInput instanceof Date)?dateInput:new Date(dateInput);if(isNaN(d))return String(dateInput);const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yyyy=d.getFullYear();return`${dd}.${mm}.${yyyy}`;}
@@ -924,6 +946,24 @@ if(phoneEl) phoneEl.addEventListener('input', e => {
   e.target.value = e.target.value.replace(/[^\d\s+\-]/g,'');
 });
 
+const zipEl = document.getElementById('f-zip');
+if(zipEl) zipEl.addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g,'').slice(0,3);
+  const code = e.target.value;
+  const cityInput = document.getElementById('f-city');
+  if(!cityInput) return;
+  if(code.length === 3 && POSTAL_CODES[code]){
+    cityInput.value = POSTAL_CODES[code];
+    cityInput.classList.remove('invalid');
+  } else if(code.length === 3){
+    cityInput.value = lang === 'is' ? 'Utan þjónustusvæðis' : 'Outside service area';
+    cityInput.classList.add('invalid');
+  } else {
+    cityInput.value = '';
+    cityInput.classList.remove('invalid');
+  }
+});
+
 function refreshStateBeforeConfirm(){
   const customWrap=document.getElementById('sqm-custom-wrap');
   if(customWrap&&customWrap.style.display!=='none'){
@@ -942,6 +982,8 @@ function goConfirm(){
   state.email=document.getElementById('f-email').value.trim();
   state.address=document.getElementById('f-address').value.trim();
   refreshStateBeforeConfirm();
+  state.postal = document.getElementById('f-zip').value.trim();
+  state.city = document.getElementById('f-city').value.trim();
   if(!validateAllFields()) return;
   const typeLabel=state.type==='home'?(lang==='is'?'Heimilisþrif':'Home cleaning'):'AirBnB þrif';
   document.getElementById('c-type').textContent=typeLabel;
@@ -951,7 +993,8 @@ function goConfirm(){
   document.getElementById('c-date').textContent=state.date?formatDate(state.date):(lang==='is'?'Ekki tilgreint':'Not specified');
   document.getElementById('c-time').textContent=state.time||(lang==='is'?'Ekki tilgreint':'Not specified');
   document.getElementById('c-name').textContent=state.name;
-  document.getElementById('c-address').textContent=state.address;
+  const fullAddress = state.address + (state.postal ? ', ' + state.postal + (state.city ? ' ' + state.city : '') : '');
+  document.getElementById('c-address').textContent=fullAddress;
   goStep(5);
 }
 
@@ -978,7 +1021,8 @@ async function submitBooking(){
       phone: state.phone,
       email: state.email,
       address: state.address,
-      zip: document.getElementById('f-zip').value,
+      zip: state.postal,
+      city: state.city,
       access_notes: document.getElementById('f-access').value,
       notes: document.getElementById('f-notes').value,
       status: 'Pending'
@@ -1097,7 +1141,7 @@ async function submitBooking(){
 function restart(){
   state={type:'',sqm:0,sqmLabel:'',basePrice:0,extras:[],extrasTotal:0,total:0,date:'',time:'',name:'',phone:'',email:'',address:'',discountCode:null,discountAmount:0,discountType:null,discountValue:0};
   document.querySelectorAll('.type-card,.sqm-btn,.extra-row,.time-slot,.cal-day').forEach(el=>el.classList.remove('sel'));
-  ['f-name','f-phone','f-email','f-address','f-zip','f-access','f-notes','time-notes','q-company','q-address','q-size','q-notes','q-name','q-phone','q-email','q-kt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-name','f-phone','f-email','f-address','f-zip','f-city','f-access','f-notes','time-notes','q-company','q-address','q-size','q-notes','q-name','q-phone','q-email','q-kt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('price-preview').style.display='none';
   document.getElementById('total-box').style.display='none';
   document.getElementById('sqm-custom-wrap').style.display='none';
