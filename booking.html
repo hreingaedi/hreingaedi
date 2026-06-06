@@ -887,11 +887,27 @@ function validateField(fieldId, errorId, validator){
 }
 
 function validateAllFields(){
-  const r1 = validateField('f-name',    'err-name',    validators.name);
-  const r2 = validateField('f-phone',   'err-phone',   validators.phone);
-  const r3 = validateField('f-email',   'err-email',   validators.email);
-  const r4 = validateField('f-address', 'err-address', validators.address);
-  return r1 && r2 && r3 && r4;
+  let allValid = true;
+  ['name','email','phone','address'].forEach(f => {
+    const el = document.getElementById('f-'+f);
+    const errorEl = document.getElementById('err-'+f);
+    if(!el||!errorEl) return;
+    const value = el.value.trim();
+    const isValid = value && validators[f](value);
+    if(isValid){
+      el.classList.remove('invalid');
+      errorEl.classList.remove('visible');
+    } else {
+      el.classList.add('invalid');
+      errorEl.classList.add('visible');
+      allValid = false;
+    }
+  });
+  if(!allValid){
+    const first = document.querySelector('.form-input.invalid');
+    if(first) first.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  return allValid;
 }
 
 ['name','phone','email','address'].forEach(f => {
