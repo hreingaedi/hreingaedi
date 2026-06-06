@@ -103,6 +103,9 @@ header.scrolled .hamburger span{background:var(--navy);}
 .hero-tag{position:absolute;z-index:2;font-family:'Outfit',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.75);background:rgba(17,24,39,0.35);backdrop-filter:blur(8px);padding:6px 14px;border-radius:50px;border:1px solid rgba(255,255,255,0.15);}
 .hero-tag-top{top:calc(var(--header-h) + 24px);left:2rem;}
 .hero-tag-bottom{bottom:24px;left:2rem;}
+a.hero-half{display:block;text-decoration:none;color:inherit;cursor:pointer;}
+a.hero-half:hover .hero-tag{transform:scale(1.05);transition:transform 0.2s ease;}
+a.hero-half:hover .hero-overlay-top,a.hero-half:hover .hero-overlay-bottom{opacity:0.9;}
 .hero-content-centered{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
 .hero-content-centered .hero-label{justify-content:center;}
 .hero-content-centered .hero-label::before{display:none;}
@@ -311,16 +314,16 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
 <!-- HERO -->
 <section id="hero">
   <div class="hero-bg hero-bg-split">
-    <div class="hero-half hero-half-top">
+    <a href="services.html#heimili" class="hero-half hero-half-top" aria-label="Heimilisþrif">
       <img class="hero-bg-img" src="img-heimili.jpg" alt="Hrein Gæði – heimilisþrif" onload="this.classList.add('loaded')"/>
       <div class="hero-overlay hero-overlay-top"></div>
       <span class="hero-tag hero-tag-top"><span class="is">Heimili</span><span class="en">Home</span></span>
-    </div>
-    <div class="hero-half hero-half-bottom">
+    </a>
+    <a href="services.html#fyrirtaeki" class="hero-half hero-half-bottom" aria-label="Fyrirtækjaþrif">
       <img class="hero-bg-img" src="img-fyrirtaeki.jpg" alt="Hrein Gæði – fyrirtækjaþrif" onload="this.classList.add('loaded')"/>
       <div class="hero-overlay hero-overlay-bottom"></div>
       <span class="hero-tag hero-tag-bottom"><span class="is">Fyrirtæki</span><span class="en">Business</span></span>
-    </div>
+    </a>
   </div>
   <div class="hero-content hero-content-centered">
     <p class="hero-label">
