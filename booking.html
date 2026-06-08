@@ -11,7 +11,7 @@
 <link rel="manifest" href="/site.webmanifest" />
 <meta name="theme-color" content="#1a56db" />
 <title>Bóka þrif — Hrein Gæði | Einfalt og gagnsætt</title>
-<meta name="description" content="Bókaðu þrif á netinu hjá Hrein Gæði. Heimilisþrif frá 240 kr/m², fyrirtækjaþrif, AirBnB og húsfélög. Einfalt bókunarferli á höfuðborgarsvæðinu."/>
+<meta name="description" content="Bókaðu þrif á netinu hjá Hrein Gæði. Heimilisþrif frá 18.900 kr, fyrirtækjaþrif, AirBnB og húsfélög. Einfalt bókunarferli á höfuðborgarsvæðinu."/>
 <meta name="keywords" content="bóka þrif, þrif á netinu, heimilisþrif verð, fyrirtækjaþrif tilboð, AirBnB þrif Reykjavík, bókun"/>
 <meta name="robots" content="index,follow"/>
 <meta name="author" content="Hrein Gæði"/>
@@ -272,7 +272,7 @@ body.lang-en .is{display:none;}
         <div class="type-card" onclick="selType('home',this)">
           <div class="icon">🏠</div>
           <div class="label is">Heimilisþrif</div><div class="label en">Home cleaning</div>
-          <div class="sub is">Almenn viðhaldsþrif · 240 kr/m²</div><div class="sub en">Standard maintenance · 240 kr/m²</div>
+          <div class="sub is">Almenn viðhaldsþrif</div><div class="sub en">Standard maintenance</div>
         </div>
         <div class="type-card" onclick="selType('airbnb',this)">
           <div class="icon">🛎️</div>
@@ -308,17 +308,16 @@ body.lang-en .is{display:none;}
         <div class="sqm-label is">Stærð húsnæðis (fermetrar)</div>
         <div class="sqm-label en">Property size (square metres)</div>
         <div class="sqm-grid">
-          <div class="sqm-btn" onclick="selSqm(25,this,'0–50 m²')"><div class="sqm-range">0 – 50 m²</div><div class="sqm-price">12.000 kr</div></div>
-          <div class="sqm-btn" onclick="selSqm(63,this,'51–75 m²')"><div class="sqm-range">51 – 75 m²</div><div class="sqm-price">15.600 kr</div></div>
-          <div class="sqm-btn" onclick="selSqm(88,this,'76–100 m²')"><div class="sqm-range">76 – 100 m²</div><div class="sqm-price">21.600 kr</div></div>
-          <div class="sqm-btn" onclick="selSqm(125,this,'101–150 m²')"><div class="sqm-range">101 – 150 m²</div><div class="sqm-price">30.000 kr</div></div>
-          <div class="sqm-btn" onclick="selSqm(175,this,'151–200 m²')"><div class="sqm-range">151 – 200 m²</div><div class="sqm-price">40.800 kr</div></div>
-          <div class="sqm-btn" onclick="selSqm(0,this,'200+ m²')" id="sqm-custom-btn"><div class="sqm-range">200+ m²</div><div class="sqm-price is">Sérsniðið</div><div class="sqm-price en">Custom</div></div>
+          <div class="sqm-btn" onclick="selSqm(18900,this,'0–50 m²')"><div class="sqm-range">0 – 50 m²</div><div class="sqm-price">18.900 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(20900,this,'51–80 m²')"><div class="sqm-range">51 – 80 m²</div><div class="sqm-price">20.900 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(23900,this,'81–110 m²')"><div class="sqm-range">81 – 110 m²</div><div class="sqm-price">23.900 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(27500,this,'111–140 m²')"><div class="sqm-range">111 – 140 m²</div><div class="sqm-price">27.500 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(30900,this,'141–180 m²')"><div class="sqm-range">141 – 180 m²</div><div class="sqm-price">30.900 kr</div></div>
+          <div class="sqm-btn" onclick="selSqm(34500,this,'181–220 m²')"><div class="sqm-range">181 – 220 m²</div><div class="sqm-price">34.500 kr</div></div>
         </div>
         <div class="sqm-custom" id="sqm-custom-wrap" style="display:none;">
-          <div class="sqm-custom-label is">Sláðu inn fermetra:</div>
-          <div class="sqm-custom-label en">Enter square metres:</div>
-          <input class="sqm-input" type="number" id="sqm-custom-input" placeholder="220" oninput="calcCustomSqm(this.value)"/>
+          <p class="sqm-custom-label is">Fyrir rými yfir 220 m² vinsamlegast <a href="contact.html">hafðu samband</a> við okkur til að fá sérsniðið tilboð.</p>
+          <p class="sqm-custom-label en">For spaces over 220 m² please <a href="contact.html">contact us</a> for a custom quote.</p>
         </div>
         <div class="price-preview" id="price-preview" style="display:none;">
           <div><div class="price-preview-label is">Grunnverð þrifa</div><div class="price-preview-label en">Base cleaning price</div></div>
@@ -813,25 +812,10 @@ function selType(type,el){
   setTimeout(continueFromType, 200);
 }
 
-function selSqm(sqm,el,label){
+function selSqm(price,el,label){
   document.querySelectorAll('.sqm-btn').forEach(b=>b.classList.remove('sel'));
   el.classList.add('sel');
-  if(sqm===0){
-    document.getElementById('sqm-custom-wrap').style.display='block';
-    state.sqm=0;state.sqmLabel=label;state.basePrice=0;
-    updatePriceDisplay();
-  } else {
-    document.getElementById('sqm-custom-wrap').style.display='none';
-    state.sqm=sqm;state.sqmLabel=label;
-    state.basePrice=sqm*240;
-    updatePriceDisplay();
-  }
-}
-
-function calcCustomSqm(val){
-  const v=parseInt(val)||0;
-  state.sqm=v;state.sqmLabel=v+' m²';
-  state.basePrice=v*240;
+  state.sqm=price;state.sqmLabel=label;state.basePrice=price;
   updatePriceDisplay();
 }
 
@@ -1000,13 +984,6 @@ if(zipEl) zipEl.addEventListener('input', e => {
 });
 
 function refreshStateBeforeConfirm(){
-  const customWrap=document.getElementById('sqm-custom-wrap');
-  if(customWrap&&customWrap.style.display!=='none'){
-    const v=parseInt(document.getElementById('sqm-custom-input').value,10);
-    if(!isNaN(v)&&v>0){
-      state.sqm=v;state.sqmLabel=v+' m²';state.basePrice=v*240;
-    }
-  }
   const subtotal=state.basePrice+state.extrasTotal;
   state.total=Math.max(0,subtotal-(state.discountAmount||0));
 }
