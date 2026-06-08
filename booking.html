@@ -315,9 +315,9 @@ body.lang-en .is{display:none;}
           <div class="sqm-btn" onclick="selSqm(30900,this,'141–180 m²')"><div class="sqm-range">141 – 180 m²</div><div class="sqm-price">30.900 kr</div></div>
           <div class="sqm-btn" onclick="selSqm(34500,this,'181–220 m²')"><div class="sqm-range">181 – 220 m²</div><div class="sqm-price">34.500 kr</div></div>
         </div>
-        <div class="sqm-custom" id="sqm-custom-wrap" style="display:none;">
-          <p class="sqm-custom-label is">Fyrir rými yfir 220 m² vinsamlegast <a href="contact.html">hafðu samband</a> við okkur til að fá sérsniðið tilboð.</p>
-          <p class="sqm-custom-label en">For spaces over 220 m² please <a href="contact.html">contact us</a> for a custom quote.</p>
+        <div class="sqm-custom">
+          <p class="sqm-custom-label is">Stærri en 220 m²? <a href="contact.html">Hafðu samband</a> við okkur og við gerum sérsniðið tilboð.</p>
+          <p class="sqm-custom-label en">Larger than 220 m²? <a href="contact.html">Contact us</a> and we'll put together a custom quote.</p>
         </div>
         <div class="price-preview" id="price-preview" style="display:none;">
           <div><div class="price-preview-label is">Grunnverð þrifa</div><div class="price-preview-label en">Base cleaning price</div></div>
@@ -1170,7 +1170,6 @@ function restart(){
   const sg=document.getElementById('supplies-group');if(sg)sg.style.display='none';;
   document.getElementById('price-preview').style.display='none';
   document.getElementById('total-box').style.display='none';
-  document.getElementById('sqm-custom-wrap').style.display='none';
   const discInput=document.getElementById('discount-code-input');
   const discBtn=document.getElementById('apply-discount-btn');
   const discFb=document.getElementById('discount-feedback');
