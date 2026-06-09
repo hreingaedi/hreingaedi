@@ -79,10 +79,11 @@ section{padding:5rem 2rem;}
 .section-eyebrow{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;font-weight:500;}
 .about-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3.5vw,42px);font-weight:300;color:var(--navy);line-height:1.25;margin-bottom:1.5rem;}
 .about-body{font-size:15px;color:var(--slate);line-height:1.9;font-weight:300;margin-bottom:1.25rem;}
-.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem;}
+.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;}
 .stat{background:var(--off-white);border-radius:var(--radius);padding:1.25rem;border:1px solid var(--mist);}
-.stat-num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--navy);line-height:1;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,2.8vw,38px);font-weight:300;color:var(--navy);line-height:1.1;}
 .stat-label{font-size:12px;color:var(--steel);margin-top:4px;letter-spacing:0.03em;}
+.stat-caption{font-size:11px;color:var(--steel);opacity:0.7;margin-top:3px;}
 
 /* VALUES */
 .values-section{background:var(--off-white);padding:5rem 2rem;}
@@ -167,10 +168,9 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
         <p class="about-body en">At Hrein Gæði we put the emphasis on good work and trust. We know it matters that you can trust the people who come into your home or workplace — that's why we show up on time, do the job well, and leave everything clean and tidy.</p>
         <p class="about-body en">We're not complicating things — just doing this well.</p>
         <div class="about-stats">
-          <div class="stat"><div class="stat-num">100+</div><div class="stat-label is">Ánægðir viðskiptavinir</div><div class="stat-label en">Happy clients</div></div>
-          <div class="stat"><div class="stat-num">24h</div><div class="stat-label is">Svartími</div><div class="stat-label en">Response time</div></div>
-          <div class="stat"><div class="stat-num">5★</div><div class="stat-label is">Meðaleinkunn</div><div class="stat-label en">Average rating</div></div>
-          <div class="stat"><div class="stat-num">100%</div><div class="stat-label is">Ánægjutrygging</div><div class="stat-label en">Satisfaction guarantee</div></div>
+          <div class="stat"><div class="stat-num">60 sek.</div><div class="stat-label is">Bókun á netinu</div><div class="stat-label en">Online booking</div><div class="stat-caption is">Pöntun á einni mínútu</div><div class="stat-caption en">Order in one minute</div></div>
+          <div class="stat"><div class="stat-num">24 klst.</div><div class="stat-label is">Svartími</div><div class="stat-label en">Response time</div><div class="stat-caption is">Svar innan sólarhrings</div><div class="stat-caption en">Reply within 24 hours</div></div>
+          <div class="stat"><div class="stat-num">Allt að 20%</div><div class="stat-label is">Endurtekinn afsláttur</div><div class="stat-label en">Recurring discount</div><div class="stat-caption is">Fyrir vikuleg þrif</div><div class="stat-caption en">For weekly cleaning</div></div>
         </div>
       </div>
     </div>
