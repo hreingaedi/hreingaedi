@@ -897,7 +897,7 @@ function renderPending() {
 }
 
 function renderAllBookings() {
-  const filtered = [...(currentFilter === 'all' ? bookings.filter(b => b.status !== 'Cancelled') : bookings.filter(b => b.status === currentFilter))]
+  const filtered = [...(currentFilter === 'all' ? bookings.filter(b => b.status !== 'Cancelled' && b.status !== 'Done') : bookings.filter(b => b.status === currentFilter))]
     .sort((a,b) => b.date.localeCompare(a.date));
   document.getElementById('bookings-count').textContent = filtered.length + ' bókanir';
   const tbody = document.getElementById('all-bookings-tbody');
