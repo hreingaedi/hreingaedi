@@ -418,6 +418,7 @@ body.lang-en span.en{display:inline;}
         <button class="tab" onclick="filterBookings('Pending',this)">Í bið</button>
         <button class="tab" onclick="filterBookings('Confirmed',this)">Staðfestar</button>
         <button class="tab" onclick="filterBookings('Done',this)">Loknar</button>
+        <button class="tab" onclick="filterBookings('Cancelled',this)">Aflýstar</button>
       </div>
       <div class="card">
         <div class="card-header">
@@ -896,7 +897,7 @@ function renderPending() {
 }
 
 function renderAllBookings() {
-  const filtered = [...(currentFilter === 'all' ? bookings : bookings.filter(b => b.status === currentFilter))]
+  const filtered = [...(currentFilter === 'all' ? bookings.filter(b => b.status !== 'Cancelled') : bookings.filter(b => b.status === currentFilter))]
     .sort((a,b) => b.date.localeCompare(a.date));
   document.getElementById('bookings-count').textContent = filtered.length + ' bókanir';
   const tbody = document.getElementById('all-bookings-tbody');
