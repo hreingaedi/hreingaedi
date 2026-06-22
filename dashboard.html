@@ -1196,6 +1196,14 @@ function updateBulkBar() {
   document.getElementById('bulk-cancel-btn').disabled = (selectedBookings.size === 0);
 }
 
+function clearAllCheckboxes() {
+  document.querySelectorAll('.row-check').forEach(cb => { cb.checked = false; });
+  const selAllPending = document.getElementById('select-all-pending');
+  const selAllBookings = document.getElementById('select-all-bookings');
+  if (selAllPending) selAllPending.checked = false;
+  if (selAllBookings) selAllBookings.checked = false;
+}
+
 document.getElementById('bulk-assign-btn').addEventListener('click', async () => {
   const select = document.getElementById('bulk-worker-select');
   const workerId = select.value;
@@ -1240,12 +1248,14 @@ document.getElementById('bulk-assign-btn').addEventListener('click', async () =>
   }
 
   selectedBookings.clear();
+  clearAllCheckboxes();
   renderAll();
   updateBulkBar();
 });
 
 document.getElementById('bulk-clear-btn').addEventListener('click', () => {
   selectedBookings.clear();
+  clearAllCheckboxes();
   renderAll();
   updateBulkBar();
 });
@@ -1331,6 +1341,7 @@ document.getElementById('bulk-cancel-btn').addEventListener('click', async () =>
   }
 
   selectedBookings.clear();
+  clearAllCheckboxes();
   renderAll();
   updateBulkBar();
 });
