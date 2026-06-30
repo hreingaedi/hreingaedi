@@ -115,6 +115,11 @@ body.auth-loading{visibility:hidden;}
   <div class="section-title">Næstu verkefni</div>
   <div id="upcoming-jobs"></div>
 
+  <div id="completed-section" style="display:none;">
+    <div class="section-title">Lokið</div>
+    <div id="completed-jobs"></div>
+  </div>
+
 </div>
 
 <!-- JOB DETAIL SHEET -->
@@ -197,17 +202,24 @@ async function loadJobs() {
   weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay() || 7));
   const weekEndStr = weekEnd.toISOString().split('T')[0];
 
-  const { data, error } = await sb
-    .from('bookings')
-    .select('*')
-    .eq('worker_id', window.currentUser.id)
-    .gte('date', todayStr)
-    .order('date')
-    .order('time');
+  const uid = window.currentUser.id;
+  const [activeRes, completedRes] = await Promise.all([
+    sb.from('bookings').select('*').eq('worker_id', uid).gte('date', todayStr).order('date').order('time'),
+    sb.from('bookings').select('*').eq('worker_id', uid).eq('status', 'Done').order('date', { ascending: false }),
+  ]);
 
+  const error = activeRes.error || completedRes.error;
   if (error) { console.error('Error loading jobs:', error); return; }
 
-  window.myJobs = (data || []).map(b => ({
+  // Merge and deduplicate (a Done job dated today appears in both result sets)
+  const seen = new Set();
+  const merged = [...(activeRes.data || []), ...(completedRes.data || [])].filter(b => {
+    if (seen.has(b.ref)) return false;
+    seen.add(b.ref);
+    return true;
+  });
+
+  window.myJobs = merged.map(b => ({
     ref: b.ref,
     name: b.name,
     service: b.service || (b.type === 'home' ? 'Heimilisþrif' : b.type === 'airbnb' ? 'AirBnB þrif' : 'Fyrirtækjaþrif'),
@@ -220,15 +232,19 @@ async function loadJobs() {
     notes: b.notes || '',
   }));
 
-  const todayJobs = window.myJobs.filter(j => j.date === todayStr);
-  const upcomingJobs = window.myJobs.filter(j => j.date > todayStr).slice(0, 3);
+  const completedJobs = window.myJobs
+    .filter(j => j.status === 'Done')
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const todayJobs = window.myJobs.filter(j => j.date === todayStr && j.status !== 'Done' && j.status !== 'Cancelled');
+  const upcomingJobs = window.myJobs.filter(j => j.date > todayStr && j.status !== 'Done' && j.status !== 'Cancelled');
 
   document.getElementById('ws-today').textContent = todayJobs.length;
-  document.getElementById('ws-week').textContent = window.myJobs.filter(j => j.date >= todayStr && j.date <= weekEndStr).length;
-  document.getElementById('ws-month').textContent = window.myJobs.length;
+  document.getElementById('ws-week').textContent = window.myJobs.filter(j => j.date >= todayStr && j.date <= weekEndStr && j.status !== 'Done' && j.status !== 'Cancelled').length;
+  document.getElementById('ws-month').textContent = window.myJobs.filter(j => j.status !== 'Cancelled').length;
 
   renderTodayJobs(todayJobs);
   renderUpcomingJobs(upcomingJobs);
+  renderCompletedJobs(completedJobs);
 }
 
 const checklistItems = [
@@ -274,7 +290,27 @@ function renderUpcomingJobs(upcomingJobs) {
       </div>
       <div class="job-svc">${j.service} · ${j.sqm}</div>
       <div class="job-addr"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${j.address}</div>
-      <div class="job-time"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${j.time}</div>
+      <div class="job-time"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${formatDate(j.date)} · ${j.time}</div>
+    </div>
+  `).join('');
+}
+
+function renderCompletedJobs(completedJobs) {
+  const section = document.getElementById('completed-section');
+  const container = document.getElementById('completed-jobs');
+  if (!completedJobs || completedJobs.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+  container.innerHTML = completedJobs.map(j => `
+    <div class="job-item" onclick="openJob('${j.ref}')" style="opacity:0.75;">
+      <div class="job-top">
+        <div><div class="job-name">${j.name}</div><div class="job-ref">${j.ref} · ${formatDate(j.date)}</div></div>
+        <span class="badge badge-done">Lokið</span>
+      </div>
+      <div class="job-svc">${j.service} · ${j.sqm}</div>
+      <div class="job-addr"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${j.address}</div>
     </div>
   `).join('');
 }
@@ -292,8 +328,13 @@ function openJob(ref) {
     <div class="detail-row"><span class="detail-label">Heimilisfang</span><span class="detail-val">${j.address}</span></div>
     ${j.notes ? `<div class="detail-row"><span class="detail-label">Athugasemdir</span><span class="detail-val" style="color:var(--amber);">${j.notes}</span></div>` : ''}
   `;
-  if (!checkState[ref]) checkState[ref] = Array(checklistItems.length).fill(false);
-  renderChecklist(ref);
+  const isDone = j.status === 'Done';
+  document.getElementById('complete-btn').style.display = isDone ? 'none' : '';
+  document.querySelector('.checklist').style.display = isDone ? 'none' : '';
+  if (!isDone) {
+    if (!checkState[ref]) checkState[ref] = Array(checklistItems.length).fill(false);
+    renderChecklist(ref);
+  }
   document.getElementById('job-sheet').classList.add('open');
 }
 
@@ -326,17 +367,12 @@ function toggleCheck(ref, i) {
   renderChecklist(ref);
 }
 
-function markDone() {
-  const j = (window.myJobs || []).find(j => j.ref === currentJobRef);
-  if (j) { j.status = 'Done'; }
-  sb.from('bookings').update({ status: 'Done' }).eq('ref', currentJobRef).then(({ error }) => {
-    if (error) console.error('Error marking done:', error);
-  });
+async function markDone() {
+  const ref = currentJobRef;
+  const { error } = await sb.from('bookings').update({ status: 'Done' }).eq('ref', ref);
+  if (error) { alert('Villa við að merkja lokið: ' + error.message); return; }
   document.getElementById('job-sheet').classList.remove('open');
-  const ts = window.todayStr;
-  renderTodayJobs((window.myJobs || []).filter(j => j.date === ts));
-  renderUpcomingJobs((window.myJobs || []).filter(j => j.date > ts).slice(0, 3));
-  alert('Verkið ' + currentJobRef + ' hefur verið merkt sem lokið!');
+  await loadJobs();
 }
 
 function openMaps() {
