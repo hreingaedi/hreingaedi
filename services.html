@@ -187,10 +187,16 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
   .footer-inner{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:768px){
-  nav{display:none;}.hamburger{display:flex;}
+  nav{display:none;}.hamburger{display:flex;padding:15px 12px;margin:-11px -8px;}
+  :root{--header-h:72px;}
+  .logo-img{height:56px;}
+  .lang-btn{padding:8px 14px;}
+  .mobile-menu{gap:0.5rem;}
+  .mobile-menu a{padding:0.75rem 0;}
   .btn-book-nav{display:none;}
   section{padding:4rem 1.25rem;}
   .form-row{grid-template-columns:1fr;}
+  .form-input,.form-textarea{font-size:16px;}
   .extras-grid{grid-template-columns:1fr 1fr;}
   .footer-inner{grid-template-columns:1fr;}
 }

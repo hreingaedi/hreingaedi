@@ -197,7 +197,10 @@ body.lang-en .is{display:none;}
   .time-slots{grid-template-columns:1fr 1fr;}
   .form-row{grid-template-columns:1fr;}
   .progress-wrap{padding:1rem;}
-  .prog-label{display:none;}
+  .prog-step:not(.active) .prog-label{display:none;}
+  .form-input,.form-textarea,.sqm-input,.discount-input{font-size:16px;}
+  .sqm-btn{min-height:48px;}
+  .time-slot{min-height:44px;padding:12px 6px;}
 }
 /* DISCOUNT */
 .discount-section{margin:16px 0;padding:16px;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;}
