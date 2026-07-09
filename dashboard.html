@@ -12,10 +12,11 @@
 <meta name="theme-color" content="#1a56db" />
 <title>Dashboard – Hrein Gæði</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-:root{--white:#fff;--off:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--green:#057a55;--green-light:#ecfdf5;--amber:#d97706;--amber-light:#fffbeb;--red:#dc2626;--red-light:#fef2f2;--purple:#7c3aed;--purple-light:#f5f3ff;--radius:10px;--radius-lg:16px;--shadow:0 2px 16px rgba(17,24,39,0.07);--transition:0.25s ease;}
+:root{--purple:#7c3aed;--purple-light:#f5f3ff;}  /* dashboard-local: revenue stat icon. DESIGN.md wants purple dropped — pending decision */
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;font-feature-settings:'cv02','cv03','cv04','cv11';}
+body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;font-feature-settings:'cv02','cv03','cv04','cv11';}
 
 /* SIDEBAR */
 .sidebar{width:240px;min-height:100vh;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:100;}
@@ -48,7 +49,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-
 .topbar-right{display:flex;align-items:center;gap:1rem;}
 .topbar-date{font-size:12px;color:var(--steel);}
 .btn-sm{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:50px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
-.btn-sm:hover{background:#1e429f;}
+.btn-sm:hover{background:var(--accent-hover);}
 .btn-sm-outline{background:none;border:1px solid var(--mist);color:var(--slate);padding:8px 16px;border-radius:50px;font-size:12px;cursor:pointer;transition:var(--transition);}
 .btn-sm-outline:hover{border-color:var(--navy);color:var(--navy);}
 .content{flex:1;padding:2rem;}
@@ -86,7 +87,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-
 .bookings-table td{padding:12px 12px 12px 0;font-size:13px;border-bottom:1px solid var(--light);vertical-align:middle;}
 .bookings-table tr:last-child td{border-bottom:none;}
 .bookings-table tr{cursor:pointer;transition:background var(--transition);}
-.bookings-table tr:hover td{background:var(--off);}
+.bookings-table tr:hover td{background:var(--off-white);}
 .booking-name{font-weight:500;color:var(--navy);}
 .booking-ref{font-size:11px;color:var(--steel);margin-top:1px;}
 .booking-svc{font-size:12px;color:var(--slate);}
@@ -162,7 +163,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off);min-
 .detail-label{color:var(--steel);}
 .detail-val{font-weight:500;color:var(--navy);text-align:right;max-width:60%;}
 .modal-actions{display:flex;gap:8px;margin-top:1.5rem;flex-wrap:wrap;}
-.btn-action{flex:1;padding:10px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--mist);background:var(--off);color:var(--navy);transition:var(--transition);}
+.btn-action{flex:1;padding:10px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--mist);background:var(--off-white);color:var(--navy);transition:var(--transition);}
 .btn-action:hover{border-color:var(--navy);}
 .btn-action.confirm{background:var(--green);color:#fff;border-color:var(--green);}
 .btn-action.done{background:var(--accent);color:#fff;border-color:var(--accent);}
@@ -222,8 +223,8 @@ body.lang-en span.en{display:inline;}
 .bulk-select{padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;}
 .bulk-select option{background:#111827;color:white;}
 .bulk-btn{padding:8px 14px;border-radius:6px;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;}
-.bulk-btn-primary{background:#1a56db;color:white;}
-.bulk-btn-primary:hover{background:#1e40af;}
+.bulk-btn-primary{background:var(--accent);color:white;}
+.bulk-btn-primary:hover{background:var(--accent-hover);}
 .bulk-btn-primary:disabled{background:#475569;cursor:not-allowed;}
 .bulk-btn-danger{background:rgba(239,68,68,0.9);color:white;}
 .bulk-btn-danger:hover{background:rgb(220,38,38);}

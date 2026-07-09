@@ -35,8 +35,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-:root{--white:#fff;--off-white:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--accent-hover:#1e429f;--green:#057a55;--green-light:#ecfdf5;--radius:12px;--radius-lg:20px;--shadow:0 4px 32px rgba(17,24,39,0.08);--shadow-lg:0 16px 64px rgba(17,24,39,0.14);--transition:0.35s cubic-bezier(0.4,0,0.2,1);--header-h:110px;}
+:root{--header-h:110px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
@@ -268,9 +269,9 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
 .newsletter-popup-subtitle{font-size:15px;color:#4b5563;margin:0 0 20px;line-height:1.5;}
 .newsletter-popup-form{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
 .newsletter-popup-input{padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;font-family:inherit;}
-.newsletter-popup-input:focus{outline:none;border-color:#1a56db;box-shadow:0 0 0 3px rgba(26,86,219,0.15);}
-.newsletter-popup-button{padding:12px 20px;background:#1a56db;color:white;border:none;border-radius:8px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;transition:background 0.15s;}
-.newsletter-popup-button:hover{background:#1e40af;}
+.newsletter-popup-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.15);}
+.newsletter-popup-button{padding:12px 20px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;transition:background 0.15s;}
+.newsletter-popup-button:hover{background:var(--accent-hover);}
 .newsletter-popup-button:disabled{background:#9ca3af;cursor:not-allowed;}
 .newsletter-popup-fineprint{font-size:12px;color:#9ca3af;margin:0;text-align:center;}
 .newsletter-popup-success{text-align:center;padding:16px 0;}

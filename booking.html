@@ -34,10 +34,10 @@
 <meta name="twitter:image" content="https://hreingaedi.is/img-heimili.jpg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-:root{--white:#fff;--off:#f7f8fa;--light:#eef0f5;--mist:#dde1ea;--steel:#8a95a8;--slate:#4a5568;--navy:#111827;--accent:#1a56db;--accent-light:#eff6ff;--green:#057a55;--green-light:#ecfdf5;--radius:12px;--radius-lg:20px;--shadow:0 4px 32px rgba(17,24,39,0.08);--transition:0.3s cubic-bezier(0.4,0,0.2,1);}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off);min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off-white);min-height:100vh;-webkit-font-smoothing:antialiased;}
 body.lang-is .en{display:none;}
 body.lang-en .is{display:none;}
 
@@ -146,7 +146,7 @@ body.lang-en .is{display:none;}
 .form-label{font-size:12px;color:var(--slate);margin-bottom:5px;display:block;letter-spacing:0.02em;}
 .form-input{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);background:var(--white);transition:var(--transition);}
 .form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
-.form-input[readonly]{background:var(--off);color:var(--slate);cursor:default;}
+.form-input[readonly]{background:var(--off-white);color:var(--slate);cursor:default;}
 .form-input.invalid{border-color:#dc2626;background:#fef2f2;}
 .form-input.invalid:focus{box-shadow:0 0 0 3px rgba(220,38,38,0.1);}
 .field-error{color:#dc2626;font-size:12px;margin-top:4px;display:none;}
@@ -155,7 +155,7 @@ body.lang-en .is{display:none;}
 .form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;color:var(--navy);resize:none;height:80px;transition:var(--transition);}
 .form-textarea:focus{outline:none;border-color:var(--accent);}
 
-.confirm-card{background:var(--off);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border:1px solid var(--mist);}
+.confirm-card{background:var(--off-white);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border:1px solid var(--mist);}
 .confirm-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--light);font-size:13px;}
 .confirm-row:last-child{border-bottom:none;}
 .confirm-label{color:var(--steel);}
@@ -165,7 +165,7 @@ body.lang-en .is{display:none;}
 .teya-box{border:1px solid var(--mist);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem;}
 .teya-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
 .teya-badge{font-size:10px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:50px;}
-.teya-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--off);border-radius:8px;border:1px solid var(--mist);}
+.teya-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--off-white);border-radius:8px;border:1px solid var(--mist);}
 .teya-logo-box{width:52px;height:30px;background:var(--navy);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;letter-spacing:0.05em;flex-shrink:0;}
 .teya-info-name{font-size:13px;font-weight:500;color:var(--navy);}
 .teya-info-sub{font-size:11px;color:var(--steel);}
@@ -176,7 +176,7 @@ body.lang-en .is{display:none;}
 .btn-back{background:none;border:1.5px solid var(--mist);color:var(--slate);padding:12px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;transition:var(--transition);}
 .btn-back:hover{border-color:var(--navy);color:var(--navy);}
 .btn-next{flex:1;background:var(--accent);color:#fff;border:none;padding:13px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition);}
-.btn-next:hover{background:#1e429f;}
+.btn-next:hover{background:var(--accent-hover);}
 
 .success-wrap{text-align:center;padding:3rem 2rem;}
 .success-icon{width:64px;height:64px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
@@ -204,10 +204,10 @@ body.lang-en .is{display:none;}
 .discount-label{display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:8px;}
 .discount-input-row{display:flex;gap:8px;}
 .discount-input{flex:1;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;font-family:inherit;text-transform:uppercase;}
-.discount-input:focus{outline:none;border-color:#1a56db;box-shadow:0 0 0 3px rgba(26,86,219,0.15);}
+.discount-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.15);}
 .discount-input:disabled{background:#f3f4f6;color:#6b7280;}
-.discount-apply-btn{padding:10px 16px;background:#1a56db;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
-.discount-apply-btn:hover{background:#1e40af;}
+.discount-apply-btn{padding:10px 16px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
+.discount-apply-btn:hover{background:var(--accent-hover);}
 .discount-apply-btn:disabled{background:#9ca3af;cursor:not-allowed;}
 .discount-remove-btn{padding:10px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
 .discount-remove-btn:hover{background:#dc2626;}
