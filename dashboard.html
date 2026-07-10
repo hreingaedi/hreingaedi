@@ -205,6 +205,11 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
   .modal{width:calc(100vw - 2rem);padding:1.5rem;}
   .bookings-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .btn-action{min-height:44px;}
+  html,body{overflow-x:hidden;}
+  .topbar{padding:0 1rem;gap:8px;}
+  .topbar-date,.topbar-user{display:none;}
+  .topbar-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bulk-bar{left:12px;right:12px;transform:none;flex-wrap:wrap;gap:10px;bottom:calc(72px + env(safe-area-inset-bottom));}
 }
 .topbar-user{font-size:12px;color:var(--steel);white-space:nowrap;}
 .topbar-bell{background:none;border:1px solid var(--mist);border-radius:50px;width:34px;height:34px;display:none;align-items:center;justify-content:center;color:var(--steel);cursor:pointer;transition:var(--transition);flex-shrink:0;}
