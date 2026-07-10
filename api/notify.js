@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { pushToRoles, pushToUser } from './_push.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -69,6 +70,12 @@ export default async function handler(req, res) {
         ${row('Athugasemdir', data.notes)}
         ${row('Verð áætlað', data.estimated_price ? Number(data.estimated_price).toLocaleString('is-IS') + ' kr' : null)}
       `);
+      await pushToRoles(['admin', 'manager'], {
+        title: 'Ný bókun',
+        body: [data.name, data.service, formatDate(data.date) + (data.time ? ' kl. ' + data.time : '')].filter(Boolean).join(' — '),
+        url: '/dashboard.html?view=bookings',
+        tag: data.ref ? 'booking-' + data.ref : undefined
+      });
     } else if (type === 'company_quote') {
       subject = `💼 Ný fyrirspurn — ${data.company_name || data.name || 'Fyrirtæki'}`;
       html = wrapper('Ný fyrirspurn frá fyrirtæki', `
@@ -80,6 +87,11 @@ export default async function handler(req, res) {
         ${row('Heimilisfang', data.address)}
         ${row('Skilaboð', data.message)}
       `);
+      await pushToRoles(['admin', 'manager'], {
+        title: 'Ný fyrirspurn',
+        body: [data.company_name || data.name, data.service].filter(Boolean).join(' — '),
+        url: '/dashboard.html?view=quotes'
+      });
     } else if (type === 'contact') {
       subject = `✉️ Ný skilaboð — ${data.name || 'Nafn ekki gefið'}`;
       html = wrapper('Ný skilaboð úr vefformi', `
@@ -127,6 +139,12 @@ export default async function handler(req, res) {
         ${row('', 'Hafðu samband ef þú vilt bóka aftur á öðrum tíma: hreingaedi@hreingaedi.is')}
         ${row('', 'Með kveðju, Hrein Gæði')}
       `);
+      await pushToUser(data.worker_id, {
+        title: 'Verkefni afbókað',
+        body: [data.service, formatDate(data.date) + (data.time ? ' kl. ' + data.time : '')].filter(Boolean).join(' — ') + ' var afbókað.',
+        url: '/worker.html',
+        tag: data.ref ? 'job-' + data.ref : undefined
+      });
       const { data: sentCanc, error: errCanc } = await resend.emails.send({
         from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
         to: [toEmail],
@@ -175,6 +193,12 @@ export default async function handler(req, res) {
         ${row('', '')}
         ${row('', 'Hafðu samband við stjórnanda ef einhverjar spurningar koma upp: <a href="mailto:hreingaedi@hreingaedi.is" style="color:#1a56db;">hreingaedi@hreingaedi.is</a>')}
       `);
+      await pushToUser(data.worker_id, {
+        title: 'Nýtt verkefni',
+        body: [data.service, formatDate(data.date) + (data.time ? ' kl. ' + data.time : ''), data.address].filter(Boolean).join(' — '),
+        url: '/worker.html',
+        tag: data.ref ? 'job-' + data.ref : undefined
+      });
       const { data: sentAssign, error: errAssign } = await resend.emails.send({
         from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
         to: [toEmail],
@@ -198,6 +222,12 @@ export default async function handler(req, res) {
         ${row('', '')}
         ${row('', 'Hafðu samband við stjórnanda ef einhverjar spurningar koma upp: <a href="mailto:hreingaedi@hreingaedi.is" style="color:#1a56db;">hreingaedi@hreingaedi.is</a>')}
       `);
+      await pushToUser(data.worker_id, {
+        title: 'Breyting á verkefni',
+        body: 'Þú varst tekin/n af verkefni' + (data.ref ? ' ' + data.ref : '') + '.',
+        url: '/worker.html',
+        tag: data.ref ? 'job-' + data.ref : undefined
+      });
       const { data: sentUnassign, error: errUnassign } = await resend.emails.send({
         from: 'Hrein Gæði Bókanir <hreingaedi@hreingaedi.is>',
         to: [toEmail],

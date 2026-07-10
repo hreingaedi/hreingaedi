@@ -25,7 +25,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
 .logout-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
 .worker-greeting{font-family:'Inter',sans-serif;font-size:22px;font-weight:600;color:#fff;margin-bottom:4px;letter-spacing:-0.02em;}
 .worker-sub{font-size:13px;color:rgba(255,255,255,0.5);}
-.content{max-width:480px;margin:-2.5rem auto 0;padding:0 1.25rem 3rem;position:relative;z-index:10;}
+.content{max-width:480px;margin:-2.5rem auto 0;padding:0 1.25rem calc(3rem + env(safe-area-inset-bottom));position:relative;z-index:10;}
 .today-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--mist);padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--shadow);}
 .today-label{font-size:11px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;}
 .job-item{border:1px solid var(--mist);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:10px;cursor:pointer;transition:var(--transition);}
@@ -55,7 +55,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
 /* JOB DETAIL SHEET */
 .sheet-overlay{display:none;position:fixed;inset:0;background:rgba(17,24,39,0.5);z-index:100;align-items:flex-end;justify-content:center;}
 .sheet-overlay.open{display:flex;}
-.sheet{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:1.5rem;max-height:85vh;overflow-y:auto;}
+.sheet{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;}
 .sheet-handle{width:36px;height:4px;background:var(--mist);border-radius:2px;margin:0 auto 1.5rem;}
 .sheet-title{font-size:16px;font-weight:500;color:var(--navy);margin-bottom:1.25rem;}
 .detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--light);font-size:13px;}
