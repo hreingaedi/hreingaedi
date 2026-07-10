@@ -210,6 +210,11 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
   .topbar-date,.topbar-user{display:none;}
   .topbar-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .bulk-bar{left:12px;right:12px;transform:none;flex-wrap:wrap;gap:10px;bottom:calc(72px + env(safe-area-inset-bottom));}
+  .topbar-right{gap:8px;flex-shrink:0;}
+  .topbar-title{min-width:0;flex:1;}
+  .btn-sm{padding:8px 12px;white-space:nowrap;}
+  .btn-sm .btn-sm-label{display:none;}
+  .dash-lang-btn{padding:5px 9px;}
 }
 .topbar-user{font-size:12px;color:var(--steel);white-space:nowrap;}
 .topbar-bell{background:none;border:1px solid var(--mist);border-radius:50px;width:34px;height:34px;display:none;align-items:center;justify-content:center;color:var(--steel);cursor:pointer;transition:var(--transition);flex-shrink:0;}
@@ -364,7 +369,7 @@ body.lang-en span.en{display:inline;}
       </div>
       <a href="booking.html" class="btn-sm" target="_blank">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ný bókun
+        <span class="btn-sm-label">Ný bókun</span>
       </a>
     </div>
   </div>
