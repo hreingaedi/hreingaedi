@@ -35,3 +35,17 @@
   --shadow-lg:0 16px 64px rgba(17,24,39,0.14);
   --transition:0.25s cubic-bezier(0.4,0,0.2,1);
 }
+
+/* ============================================================
+   Buttons — canonical system per DESIGN.md.
+   Use these for all NEW buttons; legacy per-page classes are
+   being conformed to these rules and retired over time.
+   ============================================================ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:50px;font-weight:500;font-size:14px;padding:13px 28px;border:none;cursor:pointer;text-decoration:none;transition:var(--transition);font-family:inherit;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-hover);}
+.btn-secondary{background:transparent;color:var(--navy);border:1.5px solid var(--mist);}
+.btn-secondary:hover{background:var(--off-white);border-color:var(--navy);}
+.btn-lg{font-size:15px;padding:16px 36px;}
+.btn-sm-size{font-size:13px;padding:10px 22px;}
+.btn-block{width:100%;}
