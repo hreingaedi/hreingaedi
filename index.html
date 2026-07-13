@@ -36,6 +36,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="750f1e74-8e60-4757-b0a0-84e3a7322636" data-domains="hreingaedi.is,www.hreingaedi.is"></script>
 <style>
 :root{--header-h:110px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -319,7 +320,7 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
   <a href="contact.html" onclick="toggleMenu()"><span class="is">Samband</span><span class="en">Contact</span></a>
   <a href="booking.html" style="background:var(--accent);color:#fff;padding:12px 20px;border-radius:50px;text-align:center;font-weight:500;"><span class="is">Bóka þrif</span><span class="en">Book now</span></a>
   <div class="mobile-menu-divider"></div>
-  <a href="login.html" class="mobile-menu-login"><span class="is">Innskráning</span><span class="en">Log in</span></a>
+  <a href="login.html" class="mobile-menu-login" data-umami-event="login-click" data-umami-event-source="mobile-menu"><span class="is">Innskráning</span><span class="en">Log in</span></a>
 </div>
 
 <!-- HERO -->
@@ -576,7 +577,7 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
   <div class="footer-bottom">
     <span>© 2026 Hrein Gæði ehf. <span class="is">Öll réttindi áskilin.</span><span class="en">All rights reserved.</span></span>
     <div class="footer-right">
-      <a href="login.html" class="footer-login">Innskráning</a>
+      <a href="login.html" class="footer-login" data-umami-event="login-click" data-umami-event-source="footer">Innskráning</a>
       <div class="footer-social">
         <a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
         <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
@@ -607,7 +608,8 @@ footer{background:var(--navy);color:rgba(255,255,255,0.5);padding:3.5rem 2rem;}
 
 <script>
 let lang='is';
-function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
+function hgTrack(e,d){if(window.umami&&umami.track){try{umami.track(e,d||{});}catch(_){}}}
+function setLang(l){hgTrack('language_switch',{lang:l});lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
 const savedLang=localStorage.getItem('hg-lang');if(savedLang)setLang(savedLang);
 window.addEventListener('scroll',()=>{document.getElementById('header').classList.toggle('scrolled',window.scrollY>40);});
 function toggleMenu(){document.getElementById('mobile-menu').classList.toggle('open');}

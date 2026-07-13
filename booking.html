@@ -35,6 +35,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="750f1e74-8e60-4757-b0a0-84e3a7322636" data-domains="hreingaedi.is,www.hreingaedi.is"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Outfit',sans-serif;color:var(--navy);background:var(--off-white);min-height:100vh;-webkit-font-smoothing:antialiased;}
@@ -617,7 +618,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let lang = localStorage.getItem('hg-lang') || 'is';
-function setLang(l){lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
+function hgTrack(e,d){if(window.umami&&umami.track){try{umami.track(e,d||{});}catch(_){}}}
+function setLang(l){hgTrack('language_switch',{lang:l});lang=l;document.body.className='lang-'+l;document.documentElement.lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');localStorage.setItem('hg-lang',l);}
 setLang(lang);
 
 const POSTAL_CODES = {
@@ -664,7 +666,7 @@ function handleStepClick(n){
 }
 
 function goStep(n){
-  if(typeof n==='number'){currentStep=n;visitedSteps.add(n);}
+  if(typeof n==='number'){if(!visitedSteps.has(n))hgTrack('booking_step',{step:n});currentStep=n;visitedSteps.add(n);}
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const target=document.getElementById('step'+n);
   if(target)target.classList.add('active');
@@ -769,6 +771,7 @@ async function submitQuote(){
       notes: 'Tegund: ' + (state.type === 'company' ? 'Fyrirtækjaþrif' : 'Húsfélög') + '\n\n' + document.getElementById('q-notes').value,
       status: 'new'
     }]);
+    if (!error) hgTrack('quote_submitted',{type:state.type});
     if (error) {
       console.error('Supabase error:', error);
       alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
@@ -1054,6 +1057,7 @@ async function submitBooking(){
       notes: document.getElementById('f-notes').value,
       status: 'Pending'
     }]);
+    if (!error) hgTrack('booking_completed',{service:state.type,tier:state.sqmLabel,total:state.total});
     if (error) {
       console.error('Supabase error:', error);
       alert(lang === 'is' ? 'Villa kom upp við að senda bókunina. Vinsamlegast reyndu aftur eða hafðu samband við okkur.' : 'An error occurred. Please try again or contact us.');
