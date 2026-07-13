@@ -204,6 +204,23 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
   .modal-input{font-size:16px;}
   .modal{width:calc(100vw - 2rem);padding:1.5rem;}
   .bookings-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .table-cards{overflow:visible;}
+  .table-cards thead{display:none;}
+  .table-cards tbody{display:flex;flex-direction:column;gap:10px;}
+  .table-cards tr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;border:1px solid var(--mist);border-radius:var(--radius);padding:12px;background:var(--white);}
+  .table-cards tr:hover td{background:none;}
+  .table-cards td{display:block;border-bottom:none;padding:0;font-size:12.5px;order:3;}
+  .table-cards td:first-child{order:0;}
+  .table-cards td:nth-child(2){order:1;flex:1 1 auto;min-width:50%;}
+  .table-cards td:last-child{order:2;margin-left:auto;}
+  .table-cards td[colspan]{width:100%;text-align:center;order:1;margin-left:0;}
+  .table-cards .assign-select{max-width:140px;}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tab{flex:0 0 auto;padding:7px 14px;white-space:nowrap;}
+  .stat-card{padding:1rem 1.1rem;}
+  .stat-value{font-size:19px;white-space:nowrap;}
+  .stat-top{margin-bottom:0.5rem;}
+  .card-header{flex-wrap:wrap;gap:4px 8px;padding:1rem 1.1rem;}
   .btn-action{min-height:44px;}
   html,body{overflow-x:hidden;}
   .topbar{padding:0 1rem;gap:8px;}
@@ -437,7 +454,7 @@ body.lang-en span.en{display:inline;}
             <span class="badge badge-pending" id="pending-count-label">0</span>
           </div>
           <div class="card-body" style="padding:0 1.5rem;">
-            <table class="bookings-table" id="pending-table">
+            <table class="bookings-table table-cards" id="pending-table">
               <thead><tr><th><input type="checkbox" id="select-all-pending"></th><th>Viðskiptavinur</th><th>Þjónusta</th><th>Dagsetning</th><th>Starfsm.</th></tr></thead>
               <tbody id="pending-tbody"></tbody>
             </table>
@@ -479,7 +496,7 @@ body.lang-en span.en{display:inline;}
           <span class="card-action" id="bookings-count">0 bókanir</span>
         </div>
         <div class="card-body" style="padding:0 1.5rem;">
-          <table class="bookings-table" id="all-bookings-table">
+          <table class="bookings-table table-cards" id="all-bookings-table">
             <thead><tr><th><input type="checkbox" id="select-all-bookings"></th><th>Viðskiptavinur</th><th>Þjónusta</th><th>Stærð</th><th>Verð</th><th>Dagsetning</th><th>Starfsm.</th><th>Staða</th></tr></thead>
             <tbody id="all-bookings-tbody"></tbody>
           </table>
@@ -1683,7 +1700,7 @@ function renderCodes() {
     container.innerHTML = '<div class="codes-empty">Engir afsláttarkóðar enn. Smelltu á "+ Nýr kóði" til að búa til þinn fyrsta kóða.</div>';
     return;
   }
-  let html = `<table class="bookings-table"><thead><tr>
+  let html = `<table class="bookings-table table-cards"><thead><tr>
     <th>Kóði</th><th>Tegund</th><th>Verðgildi</th><th>Notkun</th><th>Gildir til</th><th>Staða</th><th>Búið til af</th><th>Aðgerðir</th>
   </tr></thead><tbody>`;
   for (const c of discountCodes) {
