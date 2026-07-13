@@ -226,13 +226,7 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
   .topbar{padding:0 1rem;gap:8px;}
   .topbar-date,.topbar-user{display:none;}
   .topbar-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .bulk-bar{left:10px;right:10px;transform:none;flex-direction:column;align-items:stretch;gap:10px;bottom:calc(70px + env(safe-area-inset-bottom));padding:14px;border-radius:16px;}
-  .bulk-bar-info{display:flex;align-items:center;justify-content:space-between;font-size:13px;}
-  .bulk-bar-actions{flex-direction:column;align-items:stretch;gap:8px;width:100%;}
-  .bulk-select{width:100%;min-height:44px;font-size:16px;}
-  .bulk-btn{min-height:44px;font-size:14px;}
-  .bulk-bar .bulk-btn-ghost{position:absolute;top:10px;right:10px;min-height:0;padding:6px 10px;font-size:12px;}
-  .topbar-right{gap:8px;flex-shrink:0;}
+    .topbar-right{gap:8px;flex-shrink:0;}
   .topbar-title{min-width:0;flex:1;}
   .btn-sm{padding:8px 12px;white-space:nowrap;}
   .btn-sm .btn-sm-label{display:none;}
@@ -294,6 +288,15 @@ body.lang-en span.en{display:inline;}
 .bulk-btn-danger:disabled{background:#475569;cursor:not-allowed;}
 .bulk-btn-ghost{background:transparent;color:rgba(255,255,255,0.7);}
 .bulk-btn-ghost:hover{color:white;}
+@media(max-width:768px){
+  .bulk-bar{left:10px;right:10px;width:auto;transform:none;flex-direction:column;align-items:stretch;gap:12px;bottom:calc(72px + env(safe-area-inset-bottom));padding:16px;border-radius:16px;}
+  .bulk-bar-info{display:flex;align-items:center;justify-content:space-between;font-size:14px;padding-right:0;}
+  .bulk-bar-info::after{content:none;}
+  .bulk-bar-actions{flex-direction:column;align-items:stretch;gap:10px;width:100%;}
+  .bulk-select{width:100%;min-height:46px;font-size:16px;padding:10px 14px;border-radius:10px;}
+  .bulk-btn{min-height:46px;font-size:15px;border-radius:10px;}
+  .bulk-bar .bulk-btn-ghost{align-self:center;min-height:0;padding:8px 12px;font-size:13px;order:9;}
+}
 /* DISCOUNT CODES */
 .modal.modal-wide{max-width:640px;}
 .modal-form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
