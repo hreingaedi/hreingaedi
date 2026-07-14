@@ -288,6 +288,19 @@ body.lang-en span.en{display:inline;}
 .bulk-btn-danger:disabled{background:#475569;cursor:not-allowed;}
 .bulk-btn-ghost{background:transparent;color:rgba(255,255,255,0.7);}
 .bulk-btn-ghost:hover{color:white;}
+/* PULL TO REFRESH (touch devices) */
+#ptr{position:fixed;top:0;left:0;right:0;height:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;z-index:400;transition:height 0.18s ease;pointer-events:none;}
+.ptr-spinner{width:22px;height:22px;border:2.5px solid var(--mist);border-top-color:var(--accent);border-radius:50%;margin-bottom:9px;transition:transform 0.18s;}
+#ptr.armed .ptr-spinner{transform:rotate(180deg);}
+#ptr.loading .ptr-spinner{animation:ptr-spin 0.7s linear infinite;}
+@keyframes ptr-spin{to{transform:rotate(360deg)}}
+
+/* PRESS FEEDBACK (touch) */
+.tab-item{transition:transform 0.12s ease,color var(--transition);}
+.tab-item:active{transform:scale(0.88);}
+.table-cards tr{transition:transform 0.12s ease,background var(--transition);}
+.table-cards tr:active{transform:scale(0.985);background:var(--off-white);}
+.btn-sm:active,.bulk-btn:active,.btn-action:active,.topbar-bell:active{transform:scale(0.94);}
 @media(max-width:768px){
   .bulk-bar{left:10px;right:10px;width:auto;transform:none;flex-direction:column;align-items:stretch;gap:12px;bottom:calc(72px + env(safe-area-inset-bottom));padding:16px;border-radius:16px;}
   .bulk-bar-info{display:flex;align-items:center;justify-content:space-between;font-size:14px;padding-right:0;}
@@ -1971,5 +1984,35 @@ initAuth();
   <a class="tab-sheet-item danger" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Útskrá</a>
 </div>
 
+<script>
+/* Pull-to-refresh: the installed app has no reload control */
+(function(){
+  if(!('ontouchstart' in window)) return;
+  const bar=document.createElement('div');bar.id='ptr';bar.innerHTML='<div class="ptr-spinner"></div>';document.body.appendChild(bar);
+  let startY=0,pulling=false,armed=false,busy=false;
+  document.addEventListener('touchstart',function(e){
+    if(busy||window.scrollY>2||e.touches.length!==1){pulling=false;return;}
+    if(e.target.closest('.tab-sheet,.modal-overlay,.modal,.bulk-bar')){pulling=false;return;}
+    startY=e.touches[0].clientY;pulling=true;armed=false;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(!pulling)return;
+    const dy=e.touches[0].clientY-startY;
+    if(window.scrollY>2||dy<=6){bar.style.height='0px';armed=false;bar.classList.remove('armed');return;}
+    const h=Math.min(dy*0.42,68);
+    bar.style.height=h+'px';
+    armed=h>=52;
+    bar.classList.toggle('armed',armed);
+  },{passive:true});
+  document.addEventListener('touchend',async function(){
+    if(!pulling)return;
+    pulling=false;
+    if(!armed){bar.style.height='0px';bar.classList.remove('armed');return;}
+    busy=true;bar.classList.add('loading');bar.style.height='44px';
+    try{await Promise.all([loadBookings(),loadQuotes()]);}catch(_){}
+    bar.style.height='0px';bar.classList.remove('armed','loading');busy=false;
+  });
+})();
+</script>
 </body>
 </html>
