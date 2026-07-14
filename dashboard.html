@@ -215,6 +215,11 @@ body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--off-white
   .table-cards td:last-child{order:2;margin-left:auto;}
   .table-cards td[colspan]{width:100%;text-align:center;order:1;margin-left:0;}
   .table-cards .assign-select{max-width:140px;}
+  #quotes-table td:first-child{order:3;}
+  #quotes-table td:nth-child(2){order:1;flex:1 1 auto;min-width:50%;font-weight:500;}
+  #quotes-table td:nth-child(6){order:2;margin-left:auto;}
+  #quotes-table td:last-child{order:4;width:100%;margin-left:0;}
+  #quotes-table td:last-child .btn-sm{width:100%;justify-content:center;min-height:42px;margin-top:2px;}
   .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .tab{flex:0 0 auto;padding:7px 14px;white-space:nowrap;}
   .stat-card{padding:1rem 1.1rem;}
@@ -615,7 +620,7 @@ body.lang-en span.en{display:inline;}
           <span id="quotes-count" class="muted" style="font-size:12px;color:var(--steel);"></span>
         </div>
         <div class="card-body" style="padding:0 1.5rem;">
-          <table class="bookings-table">
+          <table class="bookings-table table-cards" id="quotes-table">
             <thead>
               <tr>
                 <th>Tegund</th>
