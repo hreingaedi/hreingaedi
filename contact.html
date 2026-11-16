@@ -257,6 +257,8 @@ async function submitContact(){
   const email=document.getElementById('c-email').value;
   const msg=document.getElementById('c-message').value;
   if(!name||!email||!msg){alert(lang==='is'?'Vinsamlegast fylltu út nafn, email og skilaboð.':'Please fill in name, email and message.');return;}
+  // Varaleið: emailið er sent þótt vistun mistakist, svo fyrirspurnin tapist ekki.
+  let dbOk = false;
   try {
     const { error } = await sb.from('contact_messages').insert([{
       name: name,
@@ -266,20 +268,15 @@ async function submitContact(){
       message: msg,
       status: 'new'
     }]);
-    if (error) {
-      console.error('Supabase error:', error);
-      alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
-      return;
-    }
+    if (error) console.error('Supabase error:', error);
+    else dbOk = true;
   } catch (err) {
     console.error('Error:', err);
-    alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
-    return;
   }
 
-  hgTrack('contact_submitted');
+  let mailOk = false;
   try {
-    await fetch('/api/notify', {
+    const notifyRes = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -288,13 +285,21 @@ async function submitContact(){
           name: name,
           phone: document.getElementById('c-phone').value,
           email: email,
-          message: msg
+          message: msg,
+          db_failed: !dbOk
         }
       })
     });
+    mailOk = notifyRes.ok;
   } catch (e) {
     console.error('Notification failed:', e);
   }
+
+  if (!dbOk && !mailOk) {
+    alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
+    return;
+  }
+  hgTrack('contact_submitted',{degraded:!dbOk});
 
   document.getElementById('contact-form').style.display='none';
   document.getElementById('contact-success').style.display='block';

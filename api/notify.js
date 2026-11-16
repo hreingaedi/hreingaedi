@@ -34,12 +34,23 @@ export default async function handler(req, res) {
     let subject = '';
     let html = '';
 
-    const wrapper = (title, rows) => `
+    /* Rautt viðvörunarborð. Birtist aðeins þegar færslan komst EKKI í Supabase
+       (t.d. gagnagrunnur í pásu eða niðri). Þá er þessi póstur eina eintakið
+       af fyrirspurninni og hana þarf að skrá handvirkt. */
+    const dbWarning = `
+      <div style="background:#fef2f2;border:1.5px solid #dc2626;border-radius:8px;padding:14px 16px;margin-bottom:24px;">
+        <p style="margin:0;font-size:14px;font-weight:600;color:#dc2626;">&#9888;&#65039; EKKI VISTAÐ Í GAGNAGRUNN</p>
+        <p style="margin:6px 0 0;font-size:13px;color:#991b1b;line-height:1.5;">Þessi færsla birtist EKKI á stjórnborðinu. Þessi póstur er eina eintakið — skráðu hana handvirkt.</p>
+      </div>
+    `;
+
+    const wrapper = (title, rows, warn) => `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;color:#111827;">
         <div style="background-color:#ffffff;text-align:center;padding:24px 16px;border-bottom:1px solid #e5e7eb;">
           <img src="https://hreingaedi.is/logo.png" alt="Hrein Gæði" style="max-width:200px;height:auto;display:inline-block;" width="200" />
         </div>
         <div style="padding:24px;">
+          ${warn ? dbWarning : ''}
           <div style="border-bottom:2px solid #1a56db;padding-bottom:12px;margin-bottom:24px;">
             <h1 style="font-size:20px;font-weight:600;margin:0;color:#111827;">Hrein Gæði</h1>
             <p style="font-size:13px;color:#6b7280;margin:4px 0 0;">${title}</p>
@@ -69,7 +80,7 @@ export default async function handler(req, res) {
         ${row('Hreinsiefni', data.supplies ? ({company_all:'Hrein Gæði leggur til allt',customer_vacuum:'Hrein Gæði leggur til hreinsiefni, viðskiptavinur ryksugu',customer_all:'Viðskiptavinur leggur til hreinsiefni og ryksugu'}[data.supplies]||data.supplies) : null)}
         ${row('Athugasemdir', data.notes)}
         ${row('Verð áætlað', data.estimated_price ? Number(data.estimated_price).toLocaleString('is-IS') + ' kr' : null)}
-      `);
+      `, data.db_failed);
       await pushToRoles(['admin', 'manager'], {
         title: 'Ný bókun',
         body: [data.name, data.service, formatDate(data.date) + (data.time ? ' kl. ' + data.time : '')].filter(Boolean).join(' — '),
@@ -85,8 +96,10 @@ export default async function handler(req, res) {
         ${row('Sími', data.phone)}
         ${row('Email', data.email)}
         ${row('Heimilisfang', data.address)}
+        ${row('Stærð', data.size ? data.size + ' m²' : null)}
+        ${row('Tíðni', data.frequency)}
         ${row('Skilaboð', data.message)}
-      `);
+      `, data.db_failed);
       await pushToRoles(['admin', 'manager'], {
         title: 'Ný fyrirspurn',
         body: [data.company_name || data.name, data.service].filter(Boolean).join(' — '),
@@ -99,7 +112,7 @@ export default async function handler(req, res) {
         ${row('Sími', data.phone)}
         ${row('Email', data.email)}
         ${row('Skilaboð', data.message)}
-      `);
+      `, data.db_failed);
     } else if (type === 'customer_confirmation') {
       const toEmail = data.email;
       if (!toEmail) return res.status(400).json({ error: 'Missing customer email' });
@@ -239,6 +252,9 @@ export default async function handler(req, res) {
     } else {
       return res.status(400).json({ error: 'Unknown notification type' });
     }
+
+    // Merkja efnislínuna líka — það er það sem sést á símanum.
+    if (data && data.db_failed) subject = '\u26A0\uFE0F ' + subject;
 
     const { data: sent, error } = await resend.emails.send({
       from: 'Hrein Gæði <hreingaedi@hreingaedi.is>',

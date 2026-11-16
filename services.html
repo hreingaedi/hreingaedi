@@ -523,6 +523,9 @@ async function submitCompanyForm(){
   const name=document.getElementById('cf-name').value;
   const email=document.getElementById('cf-email').value;
   if(!company||!name||!email){alert(lang==='is'?'Vantar upplýsingar — fylltu inn það sem merkt er með stjörnu.':'Some fields are missing — anything with a star is needed.');return;}
+  // Varaleið + tilkynning. Þetta form sendi ENGAN póst áður — fyrirspurnir
+  // lágu óséðar í company_quotes þar til einhver opnaði Fyrirspurnir.
+  let dbOk = false;
   try {
     const { error } = await sb.from('company_quotes').insert([{
       company: company,
@@ -535,16 +538,42 @@ async function submitCompanyForm(){
       notes: document.getElementById('cf-notes').value,
       status: 'new'
     }]);
-    if (error) {
-      console.error('Supabase error:', error);
-      alert(lang==='is'?'Eitthvað fór úrskeiðis. Prófaðu aftur.':'Something went wrong. Please try again.');
-      return;
-    }
+    if (error) console.error('Supabase error:', error);
+    else dbOk = true;
   } catch (err) {
     console.error('Error:', err);
+  }
+
+  let mailOk = false;
+  try {
+    const notifyRes = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'company_quote',
+        data: {
+          service: 'Fyrirtækjaþrif',
+          company_name: company,
+          name: name,
+          phone: document.getElementById('cf-phone').value,
+          email: email,
+          size: parseInt(document.getElementById('cf-size').value) || null,
+          frequency: document.getElementById('cf-freq').value,
+          message: document.getElementById('cf-notes').value,
+          db_failed: !dbOk
+        }
+      })
+    });
+    mailOk = notifyRes.ok;
+  } catch (e) {
+    console.error('Notification failed:', e);
+  }
+
+  if (!dbOk && !mailOk) {
     alert(lang==='is'?'Eitthvað fór úrskeiðis. Prófaðu aftur.':'Something went wrong. Please try again.');
     return;
   }
+  hgTrack('quote_submitted',{type:'company',source:'services',degraded:!dbOk});
   document.getElementById('company-form').style.display='none';
   document.getElementById('company-success').style.display='block';
 }

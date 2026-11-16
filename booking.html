@@ -763,6 +763,8 @@ async function submitQuote(){
   const ref = 'HG-'+Math.floor(1000+Math.random()*9000);
   document.getElementById('ref-num').textContent = ref;
 
+  // Sama varaleið og í submitBooking — emailið er sent þótt vistun mistakist.
+  let dbOk = false;
   try {
     const { error } = await sb.from('company_quotes').insert([{
       company: document.getElementById('q-company').value,
@@ -776,20 +778,15 @@ async function submitQuote(){
       notes: 'Tegund: ' + (state.type === 'company' ? 'Fyrirtækjaþrif' : 'Húsfélög') + '\n\n' + document.getElementById('q-notes').value,
       status: 'new'
     }]);
-    if (!error) hgTrack('quote_submitted',{type:state.type});
-    if (error) {
-      console.error('Supabase error:', error);
-      alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
-      return;
-    }
+    if (error) console.error('Supabase error:', error);
+    else dbOk = true;
   } catch (err) {
     console.error('Error:', err);
-    alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
-    return;
   }
 
+  let mailOk = false;
   try {
-    await fetch('/api/notify', {
+    const notifyRes = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -801,13 +798,24 @@ async function submitQuote(){
           phone: phone,
           email: email,
           address: document.getElementById('q-address').value,
-          message: document.getElementById('q-notes').value
+          size: parseInt(document.getElementById('q-size').value) || null,
+          frequency: document.getElementById('q-freq').value,
+          message: document.getElementById('q-notes').value,
+          ref: ref,
+          db_failed: !dbOk
         }
       })
     });
+    mailOk = notifyRes.ok;
   } catch (e) {
     console.error('Notification failed:', e);
   }
+
+  if (!dbOk && !mailOk) {
+    alert(lang==='is'?'Villa kom upp. Vinsamlegast reyndu aftur.':'An error occurred. Please try again.');
+    return;
+  }
+  hgTrack('quote_submitted',{type:state.type,degraded:!dbOk});
 
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.prog-step').forEach(p=>p.className='prog-step done');
@@ -1037,6 +1045,10 @@ async function submitBooking(){
   document.getElementById('ref-num').textContent=ref;
 
   // SAVE BOOKING TO SUPABASE
+  // Mistakist þetta er bókunin EKKI töpuð: emailið hér að neðan er sent hvort sem
+  // er og verður þá eina eintakið. Aðeins ef hvort tveggja klikkar fær
+  // viðskiptavinurinn villu. Ekki breyta í early return.
+  let dbOk = false;
   try {
     const { error } = await sb.from('bookings').insert([{
       ref: ref,
@@ -1062,20 +1074,15 @@ async function submitBooking(){
       notes: document.getElementById('f-notes').value,
       status: 'Pending'
     }]);
-    if (!error) hgTrack('booking_completed',{service:state.type,tier:state.sqmLabel,total:state.total});
-    if (error) {
-      console.error('Supabase error:', error);
-      alert(lang === 'is' ? 'Villa kom upp við að senda bókunina. Vinsamlegast reyndu aftur eða hafðu samband við okkur.' : 'An error occurred. Please try again or contact us.');
-      return;
-    }
+    if (error) console.error('Supabase error:', error);
+    else dbOk = true;
   } catch (err) {
     console.error('Error saving booking:', err);
-    alert(lang === 'is' ? 'Villa kom upp. Vinsamlegast reyndu aftur.' : 'An error occurred. Please try again.');
-    return;
   }
 
-  // Increment discount code use count (best effort)
-  if (state.discountCode) {
+  // Increment discount code use count (best effort). Aðeins ef bókunin vistaðist
+  // — annars myndum við brenna notkun á kóða sem engin bókun liggur að baki.
+  if (dbOk && state.discountCode) {
     try {
       await sb.rpc('increment_discount_use', { code_param: state.discountCode });
     } catch (e) {
@@ -1083,8 +1090,10 @@ async function submitBooking(){
     }
   }
 
+  // Tilkynning til Hrein Gæði — ALLTAF send, líka þótt gagnagrunnurinn sé niðri.
+  let mailOk = false;
   try {
-    await fetch('/api/notify', {
+    const notifyRes = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1101,13 +1110,23 @@ async function submitBooking(){
           time: state.time,
           supplies: state.supplies || null,
           notes: [document.getElementById('f-access').value, document.getElementById('f-notes').value].filter(Boolean).join('\n\n'),
-          estimated_price: state.total
+          estimated_price: state.total,
+          ref: ref,
+          db_failed: !dbOk
         }
       })
     });
+    mailOk = notifyRes.ok;
   } catch (e) {
     console.error('Notification failed:', e);
   }
+
+  // Bæði gagnagrunnur OG email klikkuðu — bókunin er raunverulega töpuð.
+  if (!dbOk && !mailOk) {
+    alert(lang === 'is' ? 'Villa kom upp við að senda bókunina. Vinsamlegast reyndu aftur eða hafðu samband við okkur.' : 'An error occurred. Please try again or contact us.');
+    return;
+  }
+  hgTrack('booking_completed',{service:state.type,tier:state.sqmLabel,total:state.total,degraded:!dbOk});
 
   // Customer auto-receipt (best-effort, don't fail booking on error)
   try {
