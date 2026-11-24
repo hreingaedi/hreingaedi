@@ -228,20 +228,18 @@ async function init() {
     return;
   }
 
-  const { data, error } = await sb
-    .from('invites')
-    .select('*')
-    .eq('token', token)
-    .is('used_at', null)
-    .gt('expires_at', new Date().toISOString())
-    .single();
+  // Invites are no longer readable directly. RLS cannot scope a SELECT to the
+  // caller's token, so the lookup lives in a SECURITY DEFINER function that
+  // returns only the row matching this exact token, unused and unexpired.
+  const { data, error } = await sb.rpc('get_invite_by_token', { p_token: token });
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
     showState('state-error');
     return;
   }
 
-  invite = data;
+  invite = data[0];
+  invite.token = token;  // the RPC does not hand the token back; step 3 needs it
   document.getElementById('signup-email').value = invite.email;
   showState('state-form');
 }
@@ -320,8 +318,9 @@ async function doSignup() {
 
   // Step 3: Mark invite as used
   try {
-    const { error: inviteError } = await sb.from('invites').update({ used_at: new Date().toISOString() }).eq('token', invite.token);
-    if (inviteError) console.error('[signup] step 3 invites update error:', inviteError);
+    const { data: marked, error: inviteError } = await sb.rpc('mark_invite_used', { p_token: invite.token });
+    if (inviteError) console.error('[signup] step 3 mark_invite_used error:', inviteError);
+    else if (marked === false) console.warn('[signup] step 3 — invite already used or expired');
     else console.log('[signup] step 3 ok — invite marked used');
   } catch (err) {
     console.error('[signup] step 3 threw:', err);

@@ -51,6 +51,27 @@ The Supabase anon key is public and embedded directly in every HTML file (intent
 
 RLS policies: workers can SELECT and UPDATE only their own rows in `bookings` (matched by `worker_id = auth.uid()::text`). Admins/managers have broader access via role-checked policies.
 
+**`invites` and `discount_codes` are not readable by `anon` — do not "fix" this.**
+RLS cannot scope a SELECT to the caller's token, so a `USING (true)` policy on
+`invites` published every pending invite's email, role and signup token to the
+internet. Access now goes through two `SECURITY DEFINER` functions:
+
+| Function | Caller | Returns |
+|---|---|---|
+| `get_invite_by_token(p_token)` | `signup.html`, anonymous | the one unused, unexpired invite matching that exact token |
+| `mark_invite_used(p_token)` | `signup.html`, anonymous | `true` if it consumed the invite, `false` if already used/expired |
+
+`signup.html` must keep using these RPCs. Reverting it to `sb.from('invites')`
+will break signup, because anon has no SELECT or UPDATE policy on the table.
+
+`discount_codes` needs no anon access at all: `/api/validate-discount` uses the
+service role key and `increment_discount_use` is `SECURITY DEFINER`, so both
+bypass RLS. `dashboard.html` CRUD is covered by the admin/manager policy.
+
+Supabase grants `EXECUTE` to `PUBLIC` by default, and `anon` inherits `PUBLIC` —
+so revoking from `anon` alone does nothing. Revoke from `PUBLIC`, then grant to
+the roles that genuinely need it. Migrations live in `supabase/migrations/`.
+
 ### Serverless API (`/api/`)
 
 All functions are ESM, deployed as Vercel serverless functions:
